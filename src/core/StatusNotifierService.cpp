@@ -5,11 +5,17 @@
 
 #include "SystemService.h"
 
+#include <QColor>
 #include <QCoreApplication>
 #include <QDBusConnection>
 #include <QDBusInterface>
 #include <QDBusMetaType>
 #include <QDBusServiceWatcher>
+#include <QDir>
+#include <QFile>
+#include <QIcon>
+#include <QImage>
+#include <QPainter>
 
 using namespace Qt::StringLiterals;
 
@@ -113,15 +119,20 @@ QString StatusNotifierItemAdaptor::title() {
     return u"Tattle"_s;
 }
 
-QString StatusNotifierItemAdaptor::status() {
-    return u"Active"_s;
+QString StatusNotifierItemAdaptor::status() const {
+    const bool rec = m_service && m_service->controller() && m_service->controller()->recording();
+    return rec ? u"NeedsAttention"_s : u"Active"_s;
 }
 
 int StatusNotifierItemAdaptor::windowId() {
     return 0;
 }
 
-QString StatusNotifierItemAdaptor::iconThemePath() {
+QString StatusNotifierItemAdaptor::iconThemePath() const {
+    const QString localShare = QDir::homePath() + u"/.local/share/icons"_s;
+    if (QFile::exists(localShare + u"/hicolor/32x32/apps/io.github.tattle.png"_s)) {
+        return localShare;
+    }
     return {};
 }
 
@@ -133,12 +144,23 @@ bool StatusNotifierItemAdaptor::itemIsMenu() {
     return false;
 }
 
-QString StatusNotifierItemAdaptor::iconName() {
+QString StatusNotifierItemAdaptor::iconName() const {
+    const bool rec = m_service && m_service->controller() && m_service->controller()->recording();
+    if (rec) {
+        return u"media-record"_s;
+    }
     return u"io.github.tattle"_s;
 }
 
-KDbusImageVector StatusNotifierItemAdaptor::iconPixmap() {
-    return {};
+KDbusImageVector StatusNotifierItemAdaptor::iconPixmap() const {
+    if (!m_service) {
+        return {};
+    }
+    const bool rec = m_service->controller() && m_service->controller()->recording();
+    if (rec && !m_service->recordingIconPixmap().isEmpty()) {
+        return m_service->recordingIconPixmap();
+    }
+    return m_service->iconPixmap();
 }
 
 QString StatusNotifierItemAdaptor::overlayIconName() {
@@ -149,12 +171,12 @@ KDbusImageVector StatusNotifierItemAdaptor::overlayIconPixmap() {
     return {};
 }
 
-QString StatusNotifierItemAdaptor::attentionIconName() {
-    return {};
+QString StatusNotifierItemAdaptor::attentionIconName() const {
+    return u"media-record"_s;
 }
 
-KDbusImageVector StatusNotifierItemAdaptor::attentionIconPixmap() {
-    return {};
+KDbusImageVector StatusNotifierItemAdaptor::attentionIconPixmap() const {
+    return m_service ? m_service->recordingIconPixmap() : KDbusImageVector {};
 }
 
 QString StatusNotifierItemAdaptor::attentionMovieName() {
@@ -163,10 +185,11 @@ QString StatusNotifierItemAdaptor::attentionMovieName() {
 
 KDbusToolTipStruct StatusNotifierItemAdaptor::toolTip() const {
     KDbusToolTipStruct tip;
-    const bool rec = m_service->controller() && m_service->controller()->recording();
-    tip.icon = u"io.github.tattle"_s;
+    const bool rec = m_service && m_service->controller() && m_service->controller()->recording();
+    tip.icon = rec ? u"media-record"_s : u"audio-input-microphone"_s;
+    tip.image = m_service ? m_service->iconPixmap() : KDbusImageVector {};
     tip.title = u"Tattle"_s;
-    tip.subTitle = rec ? u"Recording..."_s : u"Ready"_s;
+    tip.subTitle = rec ? u"Recording speech..."_s : u"Ready"_s;
     return tip;
 }
 
@@ -347,9 +370,57 @@ void StatusNotifierService::registerMetaTypes() {
     qDBusRegisterMetaType<DBusMenuItemKeysList>();
 }
 
+static KDbusImageStruct imageToDbusPixmap(const QImage& img) {
+    KDbusImageStruct item;
+    if (img.isNull()) {
+        return item;
+    }
+    const QImage argb = img.convertToFormat(QImage::Format_ARGB32);
+    item.width = argb.width();
+    item.height = argb.height();
+    item.data.resize(item.width * item.height * 4);
+    auto* dest = reinterpret_cast<uchar*>(item.data.data());
+    for (int y = 0; y < item.height; ++y) {
+        const auto* src = reinterpret_cast<const QRgb*>(argb.constScanLine(y));
+        for (int x = 0; x < item.width; ++x) {
+            *dest++ = static_cast<uchar>(qAlpha(src[x]));
+            *dest++ = static_cast<uchar>(qRed(src[x]));
+            *dest++ = static_cast<uchar>(qGreen(src[x]));
+            *dest++ = static_cast<uchar>(qBlue(src[x]));
+        }
+    }
+    return item;
+}
+
+void StatusNotifierService::loadIcons() {
+    m_iconPixmap.clear();
+    m_recordingIconPixmap.clear();
+
+    const QList<int> sizes = {16, 24, 32, 64};
+    for (const int sz : sizes) {
+        const QString path = QString(u":/qt/qml/Tattle/assets/speech-to-text-%1.png"_s).arg(sz);
+        const QImage img(path);
+        if (!img.isNull()) {
+            m_iconPixmap.append(imageToDbusPixmap(img));
+
+            QImage recImg = img.copy();
+            QPainter p(&recImg);
+            p.setRenderHint(QPainter::Antialiasing);
+            const int dotSize = qMax(5, sz / 3);
+            const QRect dotRect(sz - dotSize - 1, sz - dotSize - 1, dotSize, dotSize);
+            p.setBrush(QColor(0xf4, 0x3f, 0x5e));
+            p.setPen(QPen(QColor(0xff, 0xff, 0xff), 1));
+            p.drawEllipse(dotRect);
+            p.end();
+            m_recordingIconPixmap.append(imageToDbusPixmap(recImg));
+        }
+    }
+}
+
 StatusNotifierService::StatusNotifierService(QObject* parent)
     : QObject(parent) {
     registerMetaTypes();
+    loadIcons();
     m_sniAdaptor = new StatusNotifierItemAdaptor(this);
     m_menuAdaptor = new DBusMenuAdaptor(this);
 }
@@ -425,7 +496,9 @@ void StatusNotifierService::registerWithWatcher() {
 void StatusNotifierService::onRecordingChanged() {
     m_revision++;
     if (m_sniAdaptor) {
+        emit m_sniAdaptor->NewStatus(m_sniAdaptor->status());
         emit m_sniAdaptor->NewIcon();
+        emit m_sniAdaptor->NewAttentionIcon();
         emit m_sniAdaptor->NewToolTip();
     }
     if (m_menuAdaptor) {

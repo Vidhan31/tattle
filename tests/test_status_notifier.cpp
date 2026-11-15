@@ -89,6 +89,8 @@ void TestStatusNotifier::testRegistrationAndProperties() {
     QCOMPARE(sniInterface.property("Title").toString(), u"Tattle"_s);
     QCOMPARE(sniInterface.property("Status").toString(), u"Active"_s);
     QCOMPARE(sniInterface.property("IconName").toString(), u"io.github.tattle"_s);
+    QVERIFY(!m_service->iconPixmap().isEmpty());
+    QCOMPARE(m_service->iconPixmap().size(), 4);
     QCOMPARE(sniInterface.property("Menu").value<QDBusObjectPath>().path(), u"/MenuBar"_s);
 }
 
@@ -130,10 +132,12 @@ void TestStatusNotifier::testRecordingStateUpdates() {
 
     const uint revInitial = m_service->revision();
     QCOMPARE(m_coordinator->recording(), false);
+    QCOMPARE(m_service->iconPixmap().size(), 4);
 
     m_coordinator->startRecording();
     QCOMPARE(m_coordinator->recording(), true);
     QVERIFY(m_service->revision() > revInitial);
+    QCOMPARE(m_service->recordingIconPixmap().size(), 4);
 
     const uint revRecording = m_service->revision();
     m_coordinator->stopRecording();

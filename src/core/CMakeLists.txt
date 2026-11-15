@@ -102,6 +102,7 @@ target_link_libraries(tattle_core
         transcribe
         miniaudio
         Qt6::Core
+        Qt6::Gui
         Qt6::Network
         Qt6::Multimedia
         Qt6::DBus
@@ -119,10 +120,14 @@ target_compile_definitions(tattle_core
         TATTLE_VERSION="${PROJECT_VERSION}"
 )
 
-qt_add_resources(tattle_core "tattle_core_audio_assets"
+qt_add_resources(tattle_core "tattle_core_assets"
     PREFIX "/qt/qml/Tattle/assets"
     BASE "${CMAKE_SOURCE_DIR}/assets"
     FILES
         ${CMAKE_SOURCE_DIR}/assets/chime_start.wav
         ${CMAKE_SOURCE_DIR}/assets/chime_stop.wav
+        ${CMAKE_SOURCE_DIR}/assets/speech-to-text-16.png
+        ${CMAKE_SOURCE_DIR}/assets/speech-to-text-24.png
+        ${CMAKE_SOURCE_DIR}/assets/speech-to-text-32.png
+        ${CMAKE_SOURCE_DIR}/assets/speech-to-text-64.png
 )
