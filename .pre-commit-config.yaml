@@ -18,6 +18,14 @@ repos:
         stages: [commit-msg]
         args: [build, chore, ci, docs, feat, fix, perf, refactor, revert, style, test, release]
 
+  - repo: https://github.com/Mateusz-Grzelinski/actionlint-py
+    rev: v1.7.12.25
+    hooks:
+      - id: actionlint
+        additional_dependencies:
+          - pyflakes>=3.4.0
+          - shellcheck-py>=0.11.0.1
+
   - repo: local
     hooks:
       - id: clang-format

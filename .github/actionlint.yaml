@@ -1,0 +1,11 @@
+# actionlint configuration file
+# See: https://github.com/rhysd/actionlint/blob/main/docs/config.md
+
+# Self-hosted runner labels (if any are introduced in future)
+self-hosted-runner:
+  labels: []
+
+# Paths-based configuration overrides
+paths:
+  .github/workflows/**/*.yml:
+    ignore: []
