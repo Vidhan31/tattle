@@ -2,11 +2,7 @@
 
 Voice typing for Wayland. Press a shortcut, speak, and your words appear directly in the active input field.
 
-Offline transcription runs locally on your device, keeping your audio private. You can also connect cloud providers like Groq or Google Gemini for fast online transcription.
-
-> Free API keys:
-> - Groq: [console.groq.com/keys](https://console.groq.com/keys)
-> - Google Gemini: [aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey)
+Offline transcription runs locally on your device. Audio stays private. You can also connect cloud providers like Groq or Google Gemini for online transcription.
 
 <p align="center">
   <img src="assets/screenshots/Tattle-Screenshots-1.png" alt="Tattle main window" width="800" />
@@ -22,7 +18,7 @@ Offline transcription runs locally on your device, keeping your audio private. Y
 </p>
 <p align="center">
   <img src="assets/screenshots/Tattle-Screenshots-5.png" alt="Cloud provider configuration" width="400" />
-  <img src="assets/screenshots/Tattle-Screenshots-6.png" alt="Language and custom vocabulary" width="400" />
+  <img src="assets/screenshots/Tattle-Screenshots-6.png" alt="Language settings" width="400" />
 </p>
 <p align="center">
   <img src="assets/screenshots/Tattle-Screenshots-8.png" alt="Audio device settings" width="400" />
@@ -33,18 +29,17 @@ Offline transcription runs locally on your device, keeping your audio private. Y
 
 ## Features
 
-- **Text injection.** Injects transcribed text into the focused input field of any application using a background helper daemon, automatically restoring your clipboard.
+- **Text injection.** Injects transcribed text into the focused input field of any application using a background helper daemon, and restores your clipboard.
 - **Push-to-talk and toggle.** Hold a key to record and release to transcribe, or use toggle shortcuts.
 - **Private and offline.** Runs speech models directly on your device. Audio never leaves your computer.
+- **Local model architectures.** Runs Whisper (Tiny to Large v3 Turbo), Moonshine, and Parakeet TDT models locally in quantized GGUF format.
 - **Hardware acceleration.** Runs local models on Vulkan-capable GPUs with automatic CPU fallback.
-- **Cloud providers.** Connects to Groq or Google Gemini when you want cloud transcription.
-- **Auto offline fallback.** Switches to your local model when the internet goes down, then back to cloud when the connection returns. No manual intervention needed.
-- **System notifications.** Alerts you when recording limits are hit, the microphone disconnects, a model fails to load, or transcription errors occur.
-- **Custom vocabulary.** Add specialized terminology, acronyms, and names to improve accuracy.
-- **Language detection.** Detects spoken languages automatically or lets you pick a specific language.
+- **Cloud providers.** Connects to Groq or Google Gemini for cloud transcription.
+- **Automatic offline fallback.** Switches to your local model when the internet disconnects, then returns to cloud when the connection restores.
+- **System notifications.** Alerts you when recording limits are reached, the microphone disconnects, a model fails to load, or transcription errors occur.
 - **Desktop shortcuts and tray.** Control recording with global shortcuts, system tray controls, or CLI commands.
 - **Audio feedback.** Plays a chime when recording starts and finishes.
-- **Secure credentials.** Stores API keys inside your system keyring (GNOME Keyring, KWallet, or Secret Service).
+- **Secure credentials.** Stores API keys in your system keyring (GNOME Keyring, KWallet, or Secret Service), with fallback to a local configuration file if the keyring service is unavailable.
 
 ---
 
@@ -76,7 +71,7 @@ To uninstall:
 sudo dnf remove tattle
 ```
 
-### Arch Linux (.pkg.tar.zst / AUR)
+### Arch Linux (.pkg.tar.zst and AUR)
 
 ```bash
 # Pre-built package
@@ -95,15 +90,15 @@ sudo pacman -R tattle
 
 ## Desktop environment support and Wayland notes
 
-For the best experience, use GNOME 48 or above, or KDE Plasma 6 and above. These environments support the global shortcuts portal natively, enabling push-to-talk dictation without manual shortcut configuration.
+KDE Plasma 6 and GNOME 48+ support the global shortcuts portal natively, allowing push-to-talk dictation without manual shortcut configuration.
 
 ### Input injection and security
 
-Tattle cannot read, intercept, or log keystrokes. It only has write access to inject transcribed text through a helper daemon writing to `/dev/uinput`.
+Tattle cannot read, intercept, or log keystrokes. It only writes transcribed text through a helper daemon writing to `/dev/uinput`.
 
 ### Push-to-talk portal support
 
-Push-to-talk mode requires the desktop compositor to implement the `org.freedesktop.portal.GlobalShortcuts` portal interface. The portal delivers press and release events, allowing the app to detect when a key is held down and released. On environments without this portal, dictation works via toggle mode using a custom shortcut mapped to `tattle --toggle`.
+Push-to-talk mode requires the compositor to implement `org.freedesktop.portal.GlobalShortcuts`. The portal delivers press and release events so the app detects when a key is held down and released. Compositors without this portal use toggle mode mapped to `tattle --toggle`.
 
 | Desktop environment | Status | Push-to-talk | Notes |
 | :--- | :---: | :---: | :--- |
@@ -137,15 +132,15 @@ The `tattle` binary supports command-line actions for scripting and window manag
 ### 1. Configure speech engine
 Open **Settings** in Tattle:
 - **Offline (default):** Download a speech model under **Offline Dictation**.
-- **Cloud:** Select your provider (Groq or Google Gemini) under **Cloud Settings**, add your API key, and choose a model. Keys are saved securely in your system keyring.
+- **Cloud:** Select Groq or Google Gemini under **Cloud Settings**, enter your API key, and choose a model. Keys are stored in the system keyring with local file fallback.
 
 ### 2. Set shortcut
-- **Plasma 6, GNOME 48+:** Approve the portal shortcut prompt on first start. Supports both toggle and push-to-talk.
-- **COSMIC, GNOME 46, Hyprland, Sway:** Bind a custom keyboard shortcut to `tattle --toggle` in your desktop or compositor settings.
+- **Plasma 6, GNOME 48+:** Approve the portal shortcut prompt on first start. Supports toggle and push-to-talk.
+- **COSMIC, GNOME 46, Hyprland, Sway:** Bind a custom keyboard shortcut to `tattle --toggle` in desktop or compositor settings.
 
 ### 3. Dictate
-- **Push-to-talk (Portal DEs):** Focus any input field, hold your shortcut, speak, and release.
-- **Toggle mode:** Focus any input field, hit your shortcut, speak, and press it again to finish.
+- **Push-to-talk (portal environments):** Focus any input field, hold your shortcut, speak, and release.
+- **Toggle mode:** Focus any input field, press your shortcut, speak, and press it again when finished.
 
 ---
 
@@ -172,29 +167,23 @@ Open **Settings** in Tattle:
 - **Cloud API errors:**
   - Check your API key and network connection. Free tier keys are subject to provider rate limits.
 - **Prompted for password on startup:**
-  - This is expected. Your system asks for your password to unlock the keyring (GNOME Keyring or KWallet) so Tattle can read stored API keys.
+  - Your system prompts for your password to unlock the keyring (GNOME Keyring or KWallet) so Tattle can read stored API keys.
 - **Keyring unlocked warning or errors:**
   - Ensure `gnome-keyring-daemon` or `kwalletd` is running and unlocked for your user session.
 - **Clipboard contents overwritten:**
-  - If `keyinjectord` cannot access `/dev/uinput`, Tattle falls back to clipboard paste. Non-text data (such as image clips) cannot be restored after pasting. Ensure `keyinjectord` has proper capabilities set.
+  - If `keyinjectord` cannot access `/dev/uinput`, Tattle falls back to clipboard paste. Non-text data, such as images, cannot be restored after pasting. Ensure `keyinjectord` has proper capabilities set.
 
 ---
 
 ## Building from source
 
-Qt 6.11.2 is required. Ubuntu 24.04 ships an older system Qt, so install Qt 6.11.2 from the Qt Online installer or with aqtinstall. CMake picks up `~/Qt/6.11.2/gcc_64` on its own. For a custom path, export `QT_DIR` or pass `-DCMAKE_PREFIX_PATH` when you configure.
-
-Pinned third party versions are transcribe.cpp v0.4.2 at commit `275cd50` and QtKeychain 0.18.0 at commit `e86bc3c`. CMake fetches transcribe.cpp for you. Packaging builds QtKeychain from source. Local builds can use the distro package instead.
-
 ### Prerequisites
 
-Core tools are CMake 3.28 to 4.4, Ninja, a C++20 compiler (GCC 13 or newer, or Clang 17 or newer), and pkg-config.
+- Qt 6.11.2 (official installer or `aqtinstall`)
+- CMake 3.28+, Ninja, C++20 compiler (GCC 13+ or Clang 17+), pkg-config
 
-Qt modules used are Gui, Qml, Quick, QuickControls2, Network, Multimedia, DBus, WaylandClient, and QuickEffects. The base Qt 6.11.2 install already contains them. You only need to add the Multimedia module when you install Qt with aqt.
-
-System libraries cover Wayland protocols, secrets, input, audio, and clipboard fallback. Audio dev packages matter because QtMultimedia needs ALSA and Pulse headers at build time. `wl-clipboard` is a runtime dependency for clipboard fallback typing.
-
-Ubuntu 24.04:
+<details>
+<summary>Ubuntu 24.04 dependencies</summary>
 
 ```bash
 sudo apt-get install -y --no-install-recommends \
@@ -204,8 +193,10 @@ sudo apt-get install -y --no-install-recommends \
   libasound2-dev libpulse-dev wl-clipboard \
   libvulkan-dev glslc spirv-headers
 ```
+</details>
 
-Fedora 44:
+<details>
+<summary>Fedora 44 dependencies</summary>
 
 ```bash
 sudo dnf install -y \
@@ -215,8 +206,10 @@ sudo dnf install -y \
   libevdev-devel libcap-devel wl-clipboard \
   vulkan-loader-devel vulkan-headers glslc spirv-headers-devel
 ```
+</details>
 
-Arch:
+<details>
+<summary>Arch Linux dependencies</summary>
 
 ```bash
 sudo pacman -S --needed \
@@ -225,125 +218,37 @@ sudo pacman -S --needed \
   qtkeychain-qt6 libevdev libcap wayland wl-clipboard \
   vulkan-headers vulkan-icd-loader shaderc spirv-headers
 ```
+</details>
 
-Optional lint tools are clang-format 22, `qmllint` and `qmlformat` from Qt 6, and pre-commit.
-
-### 1. Configure
-
-Configure once. Reconfigure when CMake files change.
+### Build and test
 
 ```bash
+# 1. Configure
 cmake --preset linux-qt6-debug
-```
 
-Other presets exist for other output folders. Debug builds into `build/`. Release builds into `build-release/`. RelWithDebInfo builds into `build-relwithdebinfo/`. Sanitizer builds use `ci-sanitizer` for ASan and UBSan and `ci-sanitizer-tsan` for TSan.
-
-```bash
-cmake --preset linux-qt6-release
-cmake --preset linux-qt6-relwithdebinfo
-```
-
-If Qt lives outside the default path, point CMake at it:
-
-```bash
-cmake --preset linux-qt6-debug -DCMAKE_PREFIX_PATH="$QT_DIR;/usr/lib/x86_64-linux-gnu"
-```
-
-#### Vulkan GPU acceleration
-
-Vulkan GPU acceleration is disabled by default (`ENABLE_VULKAN=OFF`) to eliminate shader regeneration overhead during development. Official release packages (Debian, Arch, RPM) build with Vulkan acceleration enabled.
-
-To enable Vulkan GPU acceleration in a local build:
-
-```bash
-cmake --preset linux-qt6-debug -DENABLE_VULKAN=ON
-```
-
-#### Offline or air-gapped builds
-
-CMake downloads transcribe.cpp and miniaudio during configure. For a machine without network access, clone the pinned commits first and pass their paths to CMake:
-
-```bash
-git clone https://github.com/handy-computer/transcribe.cpp.git /opt/transcribe-src
-git -C /opt/transcribe-src checkout 275cd50d2c4104c204009a197ac091b9687668e5
-
-git clone https://github.com/mackron/miniaudio.git /opt/miniaudio-src
-git -C /opt/miniaudio-src checkout 877ea4a7c2601c7b0f2a44e83dfac42e6470fea6
-
-cmake --preset linux-qt6-release \
-  -DFETCHCONTENT_SOURCE_DIR_TRANSCRIBE=/opt/transcribe-src \
-  -DFETCHCONTENT_SOURCE_DIR_MINIAUDIO=/opt/miniaudio-src \
-  -DFETCHCONTENT_FULLY_DISCONNECTED=ON
-```
-
-### 2. Build
-
-Build the full project:
-
-```bash
+# 2. Build
 cmake --build --preset build-debug
-```
 
-Build only the GUI when you work on QML or views:
-
-```bash
-cmake --build --preset build-debug --target tattle
-```
-
-Build only the helper daemon when you work on `src/keyinjectord/`:
-
-```bash
-cmake --build --preset build-debug --target keyinjectord
-```
-
-Release and RelWithDebInfo follow the same pattern with `build-release` and `build-relwithdebinfo`. Sanitizer builds use `ci-sanitizer` and `ci-sanitizer-tsan`.
-
-Rebuild from scratch when build files look corrupt:
-
-```bash
-cmake --build --preset build-debug --clean-first
-```
-
-There is also a `ci-release` workflow preset that runs configure, build, test, and Debian packaging in one step.
-
-### 3. Grant helper daemon capability
-
-The daemon needs `cap_dac_override` to write to `/dev/uinput`. Grant it after each fresh build:
-
-```bash
+# 3. Grant key injection capability to helper daemon
 sudo setcap cap_dac_override+ep build/keyinjectord
-```
 
-Use `build-release/keyinjectord` or `build-relwithdebinfo/keyinjectord` when you build those presets.
-
-### 4. Run tests and linting
-
-Run the unit suite. The test preset sets `QT_QPA_PLATFORM=offscreen`, and CTest also sets `QT_MEDIA_BACKEND=null`, so tests run headless:
-
-```bash
+# 4. Run tests
 ctest --preset test-debug
 ```
 
-Use `test-release`, `test-relwithdebinfo`, `ci-sanitizer`, or `ci-sanitizer-tsan` to match the build preset.
-
-Check QML lint and AOT stats the same way CI does:
-
-```bash
-ninja -C build all_qmllint
-cmake --build build --target all_aotstats
-```
-
-Run formatting and repo checks on all files:
-
-```bash
-pre-commit run --all-files
-```
+Build notes:
+- If Qt is outside default paths, pass `-DCMAKE_PREFIX_PATH="$QT_DIR"` to cmake.
+- Target flags: append `--target tattle` or `--target keyinjectord` to build a single module.
+- GPU acceleration: pass `-DENABLE_VULKAN=ON` during configure.
+- Other presets: `linux-qt6-release` / `build-release`, `linux-qt6-relwithdebinfo` / `build-relwithdebinfo`.
+- Offline or air-gapped builds: clone transcribe.cpp (commit `275cd50`) and miniaudio (commit `877ea4a`) and pass `-DFETCHCONTENT_SOURCE_DIR_TRANSCRIBE=/path/to/transcribe -DFETCHCONTENT_SOURCE_DIR_MINIAUDIO=/path/to/miniaudio -DFETCHCONTENT_FULLY_DISCONNECTED=ON`.
+- Format and lint check: `pre-commit run --all-files`.
 
 ---
 
 ## Packaging
 
-Packaging scripts live in [`packaging/`](packaging/) and need Docker Buildx. They read the version from `VERSION` when you skip the version args, and they write finished packages to `dist/`.
+Packaging scripts live in [`packaging/`](packaging/) and use Docker Buildx. They read the version from `VERSION` when version arguments are omitted, and write output packages to `dist/`.
 
 <details>
 <summary><strong>Debian and Ubuntu (.deb)</strong></summary>
@@ -353,7 +258,7 @@ Packaging scripts live in [`packaging/`](packaging/) and need Docker Buildx. The
 sudo apt install ./dist/deb/tattle_1.0.0_amd64.deb
 ```
 
-Omit the args to build with defaults from `VERSION`:
+Omit arguments to build with defaults from `VERSION`:
 
 ```bash
 ./packaging/deb/build-deb.sh
@@ -368,7 +273,7 @@ Omit the args to build with defaults from `VERSION`:
 sudo dnf install ./dist/rpm/tattle-1.0.0-1.fc44.x86_64.rpm
 ```
 
-Omit the args to build with defaults from `VERSION`:
+Omit arguments to build with defaults from `VERSION`:
 
 ```bash
 ./packaging/rpm/build-rpm.sh
@@ -383,7 +288,7 @@ Omit the args to build with defaults from `VERSION`:
 sudo pacman -U ./dist/arch/tattle-1.0.0-1-x86_64.pkg.tar.zst
 ```
 
-Omit the args to build with defaults from `VERSION`:
+Omit arguments to build with defaults from `VERSION`:
 
 ```bash
 ./packaging/arch/build-arch.sh
