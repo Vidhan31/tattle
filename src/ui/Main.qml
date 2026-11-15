@@ -16,6 +16,10 @@ T.ApplicationWindow {
     title: qsTr("Tattle")
     color: Theme.windowBg
 
+    T.Overlay.modal: Rectangle {
+        color: Theme.isDark ? "#8c000000" : "#59000000"
+    }
+
     property string currentSectionId: "dictate"
 
     function sectionToViewIndex(section: string): int {

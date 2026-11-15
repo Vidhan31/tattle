@@ -10,10 +10,18 @@ T.Dialog {
 
     title: qsTr("Setup Custom Desktop Shortcut")
     modal: true
-    width: 480
-    x: Math.round(((Overlay.overlay ? Overlay.overlay.width : 960) - width) / 2)
-    y: Math.round(((Overlay.overlay ? Overlay.overlay.height : 660) - height) / 2)
+    dim: true
+    parent: T.Overlay.overlay
+    width: Math.min(500, (T.Overlay.overlay ? T.Overlay.overlay.width - 32 : 500))
+    height: Math.min(440, (T.Overlay.overlay ? T.Overlay.overlay.height - 40 : 440))
+    x: Math.round(((T.Overlay.overlay ? T.Overlay.overlay.width : 960) - width) / 2)
+    y: Math.round(((T.Overlay.overlay ? T.Overlay.overlay.height : 660) - height) / 2)
     closePolicy: T.Popup.CloseOnEscape | T.Popup.CloseOnPressOutside
+    padding: 0
+    topPadding: 0
+    bottomPadding: 0
+    leftPadding: 0
+    rightPadding: 0
 
     background: Rectangle {
         color: Theme.cardBgElevated
@@ -22,94 +30,118 @@ T.Dialog {
         radius: Theme.radiusMd
     }
 
-    header: Rectangle {
-        implicitHeight: 44
-        color: "transparent"
-
-        StyledText {
-            anchors.left: parent.left
-            anchors.leftMargin: Theme.spacingMd
-            anchors.verticalCenter: parent.verticalCenter
-            text: root.title
-            variant: "subheading"
-            customWeight: Font.Bold
-        }
-    }
-
-    ColumnLayout {
-        width: parent.width
-        spacing: Theme.spacingMd
-
-        StyledText {
-            text: qsTr(
-                      "Your desktop environment does not support the XDG Global Shortcuts portal directly, but you can easily set up a system-wide hotkey using the Tattle CLI command:")
-            variant: "body"
-            wrapMode: Text.WordWrap
-            Layout.fillWidth: true
-        }
+    contentItem: ColumnLayout {
+        anchors.fill: parent
+        spacing: 0
 
         Rectangle {
             Layout.fillWidth: true
-            implicitHeight: 38
-            color: Theme.inputBg
-            border.color: Theme.inputBorder
-            border.width: 1
-            radius: Theme.radiusSm
+            Layout.preferredHeight: 52
+            color: "transparent"
 
             RowLayout {
                 anchors.fill: parent
-                anchors.margins: Theme.spacingSm
+                anchors.leftMargin: Theme.spacingLg
+                anchors.rightMargin: Theme.spacingMd
 
                 StyledText {
-                    text: "tattle --toggle"
-                    fontFamily: "mono"
+                    text: root.title
+                    variant: "subheading"
                     customWeight: Font.Bold
-                    colorRole: "accent"
                     Layout.fillWidth: true
                 }
 
                 StyledButton {
-                    id: copyCmdBtn
-                    text: qsTr("Copy Command")
-                    iconSource: "qrc:/qt/qml/Tattle/assets/icons/copy.svg"
-                    variant: "flat"
+                    text: qsTr("✕")
+                    variant: "ghost"
                     size: "small"
-                    onClicked: {
-                        TranscriptionModel.copyToClipboard("tattle --toggle");
-                    }
+                    onClicked: root.reject()
                 }
             }
         }
 
+        StyledDivider {
+            Layout.fillWidth: true
+            dividerColor: Theme.cardBorder
+        }
+
         ColumnLayout {
             Layout.fillWidth: true
-            spacing: 4
+            Layout.fillHeight: true
+            Layout.margins: Theme.spacingLg
+            spacing: Theme.spacingMd
 
             StyledText {
-                text: qsTr("Steps for GNOME:")
-                customWeight: Font.DemiBold
+                text: qsTr(
+                          "Your desktop environment does not support the XDG Global Shortcuts portal directly, but you can easily set up a system-wide hotkey using the Tattle CLI command:")
                 variant: "body"
+                wrapMode: Text.WordWrap
+                Layout.fillWidth: true
+            }
+
+            Rectangle {
+                Layout.fillWidth: true
+                implicitHeight: 42
+                color: Theme.inputBg
+                border.color: Theme.inputBorder
+                border.width: 1
+                radius: Theme.radiusSm
+
+                RowLayout {
+                    anchors.fill: parent
+                    anchors.margins: Theme.spacingSm
+
+                    StyledText {
+                        text: "tattle --toggle"
+                        fontFamily: "mono"
+                        customWeight: Font.Bold
+                        colorRole: "accent"
+                        Layout.fillWidth: true
+                    }
+
+                    StyledButton {
+                        id: copyCmdBtn
+                        text: qsTr("Copy Command")
+                        iconSource: "qrc:/qt/qml/Tattle/assets/icons/copy.svg"
+                        variant: "flat"
+                        size: "small"
+                        onClicked: {
+                            TranscriptionModel.copyToClipboard("tattle --toggle");
+                        }
+                    }
+                }
+            }
+
+            ColumnLayout {
+                Layout.fillWidth: true
+                spacing: 4
+
+                StyledText {
+                    text: qsTr("Steps for GNOME:")
+                    customWeight: Font.DemiBold
+                    variant: "body"
+                }
+
+                StyledText {
+                    text: qsTr(
+                              "1. Open <b>Settings → Keyboard → View and Customize Shortcuts</b>.<br>2. Scroll down to <b>Custom Shortcuts</b> and click <b>+</b>.<br>3. Set Name to <i>Tattle</i>, Command to <code>tattle --toggle</code>, and Shortcut to <b>Ctrl+Shift+Space</b>.")
+                    textFormat: Text.StyledText
+                    variant: "caption"
+                    colorRole: "secondary"
+                    wrapMode: Text.WordWrap
+                    Layout.fillWidth: true
+                }
             }
 
             StyledText {
                 text: qsTr(
-                          "1. Open <b>Settings → Keyboard → View and Customize Shortcuts</b>.<br>2. Scroll down to <b>Custom Shortcuts</b> and click <b>+</b>.<br>3. Set Name to <i>Tattle</i>, Command to <code>tattle --toggle</code>, and Shortcut to <b>Ctrl+Shift+Space</b>.")
+                          "<b>Note:</b> Custom desktop shortcuts operate in <b>Toggle mode</b>. Push-to-Talk requires native support for the <code>org.freedesktop.portal.GlobalShortcuts</code> portal (available on KDE Plasma 6+ and compatible Wayland compositors).")
                 textFormat: Text.StyledText
                 variant: "caption"
                 colorRole: "secondary"
                 wrapMode: Text.WordWrap
                 Layout.fillWidth: true
             }
-        }
-
-        StyledText {
-            text: qsTr(
-                      "<b>Note:</b> Custom desktop shortcuts operate in <b>Toggle mode</b>. Push-to-Talk requires native support for the <code>org.freedesktop.portal.GlobalShortcuts</code> portal (available on KDE Plasma 6+ and compatible Wayland compositors).")
-            textFormat: Text.StyledText
-            variant: "caption"
-            colorRole: "secondary"
-            wrapMode: Text.WordWrap
-            Layout.fillWidth: true
         }
     }
 }
