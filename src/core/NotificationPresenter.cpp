@@ -203,7 +203,7 @@ void NotificationPresenter::onAudioDeviceAvailabilityChanged() {
 
 void NotificationPresenter::onFailoverTriggered() {
     sendNotification(tr("QtScribe: Switched to Offline Dictation"),
-                     tr("Internet connection offline. Automatically switched to local whisper.cpp model."),
+                     tr("Internet connection offline. Automatically switched to local transcribe.cpp model."),
                      static_cast<int>(LinuxNotificationService::Urgency::Normal), u"network-offline"_s);
 }
 
@@ -214,7 +214,7 @@ void NotificationPresenter::onOnlineRestored() {
 
 void NotificationPresenter::onOfflineModelRequired() {
     sendNotification(tr("QtScribe: Offline Model Required"),
-                     tr("No internet connection available. Please open QtScribe and download a Whisper model to "
+                     tr("No internet connection available. Please open QtScribe and download a speech model to "
                         "use offline dictation."),
                      static_cast<int>(LinuxNotificationService::Urgency::Critical), u"dialog-warning"_s);
 }

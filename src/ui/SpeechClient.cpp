@@ -20,7 +20,7 @@ SpeechClient::SpeechClient(QObject* parent)
 
     const QSettings settings;
     m_activeBackend =
-        (settings.value(SettingsKeys::kSpeechBackend.toString(), u"Cloud"_s).toString() == u"WhisperCpp"_s) ? 1 : 0;
+        (settings.value(SettingsKeys::kSpeechBackend.toString(), u"Cloud"_s).toString() == u"TranscribeCpp"_s) ? 1 : 0;
     m_recordingMode =
         (settings.value(SettingsKeys::kSpeechRecordingMode.toString(), u"Toggle"_s).toString() == u"PushToTalk"_s) ? 1
                                                                                                                    : 0;

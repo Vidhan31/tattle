@@ -184,7 +184,7 @@ Open **Settings** in QtScribe:
 
 Qt 6.11.1 is required. Ubuntu 24.04 ships an older system Qt, so install Qt 6.11.1 from the Qt Online installer or with aqtinstall. CMake picks up `~/Qt/6.11.1/gcc_64` on its own. For a custom path, export `QT_DIR` or pass `-DCMAKE_PREFIX_PATH` when you configure.
 
-Pinned third party versions are whisper.cpp v1.9.5 at commit `d1be6fd` and QtKeychain 0.17.0 at commit `875f77d`. CMake fetches whisper.cpp for you. Packaging builds QtKeychain from source. Local builds can use the distro package instead.
+Pinned third party versions are transcribe.cpp v0.4.2 at commit `275cd50` and QtKeychain 0.17.0 at commit `875f77d`. CMake fetches transcribe.cpp for you. Packaging builds QtKeychain from source. Local builds can use the distro package instead.
 
 ### Prerequisites
 
@@ -261,14 +261,14 @@ cmake --preset linux-qt6-debug -DENABLE_VULKAN=ON
 
 #### Offline or air-gapped builds
 
-CMake downloads whisper.cpp during configure. For a machine without network access, clone the pinned commit first and pass its path to CMake:
+CMake downloads transcribe.cpp during configure. For a machine without network access, clone the pinned commit first and pass its path to CMake:
 
 ```bash
-git clone https://github.com/ggml-org/whisper.cpp.git /opt/whisper-src
-git -C /opt/whisper-src checkout 371b5a7561823ab2bb32142d2751e35e7534727b
+git clone https://github.com/handy-computer/transcribe.cpp.git /opt/transcribe-src
+git -C /opt/transcribe-src checkout 275cd50d2c4104c204009a197ac091b9687668e5
 
 cmake --preset linux-qt6-release \
-  -DFETCHCONTENT_SOURCE_DIR_WHISPER=/opt/whisper-src \
+  -DFETCHCONTENT_SOURCE_DIR_TRANSCRIBE=/opt/transcribe-src \
   -DFETCHCONTENT_FULLY_DISCONNECTED=ON
 ```
 

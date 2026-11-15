@@ -52,7 +52,7 @@ qt_standard_project_setup(REQUIRES 6.11)
 option(ENABLE_QT_DEPLOYMENT "Enable Qt deployment script generation for standalone bundle packaging" ON)
 option(BUILD_KEYINJECTORD "Build keyinjectord helper daemon" ON)
 option(ENABLE_CPACK_DEB "Configure CPack for Debian (.deb) package generation" OFF)
-option(ENABLE_VULKAN "Enable Vulkan GPU acceleration for whisper.cpp" OFF)
+option(ENABLE_VULKAN "Enable Vulkan GPU acceleration for transcribe.cpp" OFF)
 
 include(cmake/CompilerFlags.cmake)
 include(FetchContent)
@@ -61,43 +61,59 @@ if(ENABLE_VULKAN)
     find_package(Vulkan QUIET COMPONENTS glslc)
     find_package(SPIRV-Headers QUIET CONFIG)
     if(Vulkan_FOUND AND Vulkan_glslc_FOUND AND SPIRV-Headers_FOUND)
-        message(STATUS "Vulkan SDK, glslc, and SPIRV-Headers found (${Vulkan_VERSION}): enabling Vulkan acceleration for whisper.cpp")
-        set(GGML_VULKAN ON CACHE BOOL "whisper: enable Vulkan backend" FORCE)
+        message(STATUS "Vulkan SDK, glslc, and SPIRV-Headers found (${Vulkan_VERSION}): enabling Vulkan acceleration for transcribe.cpp")
+        set(TRANSCRIBE_VULKAN ON CACHE BOOL "transcribe: enable Vulkan backend" FORCE)
+        set(GGML_VULKAN ON CACHE BOOL "ggml: enable Vulkan backend" FORCE)
         add_compile_definitions(GGML_USE_VULKAN)
     else()
         message(FATAL_ERROR "ENABLE_VULKAN is ON but Vulkan SDK, glslc, or SPIRV-Headers was not found")
     endif()
 else()
-    message(STATUS "Vulkan GPU acceleration is disabled (ENABLE_VULKAN=OFF): building whisper.cpp with CPU inference only")
-    set(GGML_VULKAN OFF CACHE BOOL "whisper: enable Vulkan backend" FORCE)
+    message(STATUS "Vulkan GPU acceleration is disabled (ENABLE_VULKAN=OFF): building transcribe.cpp with CPU inference only")
+    set(TRANSCRIBE_VULKAN OFF CACHE BOOL "transcribe: enable Vulkan backend" FORCE)
+    set(GGML_VULKAN OFF CACHE BOOL "ggml: enable Vulkan backend" FORCE)
 endif()
 
-set(WHISPER_BUILD_EXAMPLES OFF CACHE BOOL "whisper: disable examples" FORCE)
-set(WHISPER_BUILD_TESTS OFF CACHE BOOL "whisper: disable tests" FORCE)
-set(WHISPER_BUILD_SERVER OFF CACHE BOOL "whisper: disable server" FORCE)
-# Scope note: BUILD_SHARED_LIBS is forced to OFF for third-party FetchContent targets
-# (whisper.cpp, ggml) to ensure they link statically. All first-party QtScribe libraries
-# are explicitly declared STATIC in their respective CMakeLists.txt files.
-set(BUILD_SHARED_LIBS OFF CACHE BOOL "whisper: build static libraries" FORCE)
+set(TRANSCRIBE_BUILD_TESTS OFF CACHE BOOL "transcribe: disable tests" FORCE)
+set(TRANSCRIBE_BUILD_EXAMPLES OFF CACHE BOOL "transcribe: disable examples" FORCE)
+set(TRANSCRIBE_BUILD_TOOLS OFF CACHE BOOL "transcribe: disable tools" FORCE)
+set(TRANSCRIBE_INSTALL OFF CACHE BOOL "transcribe: disable install" FORCE)
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "transcribe: build static libraries" FORCE)
 set(GGML_CCACHE ON CACHE BOOL "ggml: use ccache" FORCE)
 
-# Fetch whisper.cpp for embedded local speech-to-text inference.
-# For offline or air-gapped CI environments, pre-clone the repository and configure with:
-#   -DFETCHCONTENT_SOURCE_DIR_WHISPER=/opt/whisper-src
-#   -DFETCHCONTENT_FULLY_DISCONNECTED=ON
 FetchContent_Declare(
-    whisper
-    GIT_REPOSITORY https://github.com/ggml-org/whisper.cpp.git
-    GIT_TAG        d1be6fde11ac6e0407606b4e42fe72d34add8037 # v1.9.5
+    transcribe
+    GIT_REPOSITORY https://github.com/handy-computer/transcribe.cpp.git
+    GIT_TAG        275cd50d2c4104c204009a197ac091b9687668e5 # v0.4.2
     GIT_SHALLOW    TRUE
     EXCLUDE_FROM_ALL
     SYSTEM
-    FIND_PACKAGE_ARGS NAMES whisper whisper.cpp
 )
-FetchContent_MakeAvailable(whisper)
+FetchContent_MakeAvailable(transcribe)
 
-# Keep third-party whisper and ggml targets free of warnings-as-errors and clang-tidy
-foreach(tgt whisper ggml ggml-base ggml-cpu ggml-vulkan)
+# transcribe.cpp uses ${CMAKE_SOURCE_DIR}/include in src/CMakeLists.txt; when included as a subproject
+# ${CMAKE_SOURCE_DIR} points to parent root. Provide its actual include directory to target transcribe.
+if(TARGET transcribe)
+    target_include_directories(transcribe PUBLIC "${transcribe_SOURCE_DIR}/include")
+endif()
+
+set(MINIAUDIO_BUILD_EXAMPLES OFF CACHE BOOL "miniaudio: disable examples" FORCE)
+set(MINIAUDIO_BUILD_TESTS OFF CACHE BOOL "miniaudio: disable tests" FORCE)
+set(MINIAUDIO_BUILD_TOOLS OFF CACHE BOOL "miniaudio: disable tools" FORCE)
+set(MINIAUDIO_INSTALL OFF CACHE BOOL "miniaudio: disable install" FORCE)
+
+FetchContent_Declare(
+    miniaudio
+    GIT_REPOSITORY https://github.com/mackron/miniaudio.git
+    GIT_TAG        877ea4a7c2601c7b0f2a44e83dfac42e6470fea6 # v0.11.26
+    GIT_SHALLOW    TRUE
+    EXCLUDE_FROM_ALL
+    SYSTEM
+)
+FetchContent_MakeAvailable(miniaudio)
+
+# Keep third-party transcribe, ggml, and miniaudio targets free of warnings-as-errors and clang-tidy
+foreach(tgt transcribe ggml ggml-base ggml-cpu ggml-vulkan miniaudio)
     if(TARGET ${tgt})
         set_target_properties(${tgt} PROPERTIES
             COMPILE_WARNING_AS_ERROR OFF

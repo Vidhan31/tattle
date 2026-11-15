@@ -116,7 +116,7 @@ private slots:
         QSignalSpy spyInjector(&manager, &SettingsManager::textInjectorConfigChanged);
         QSignalSpy spySetting(&manager, &SettingsManager::settingChanged);
 
-        manager.setBackend(SettingsManager::TranscriptionBackend::WhisperCpp);
+        manager.setBackend(SettingsManager::TranscriptionBackend::TranscribeCpp);
         QCOMPARE(spySpeech.count(), 1);
         QCOMPARE(spySetting.count(), 1);
 
@@ -132,14 +132,14 @@ private slots:
     void testGenericSetSettingAndPersistence() {
         SettingsManager manager;
 
-        manager.setSetting(SettingsKeys::kSpeechBackend.toString(), u"WhisperCpp"_s);
+        manager.setSetting(SettingsKeys::kSpeechBackend.toString(), u"TranscribeCpp"_s);
         manager.setSetting(SettingsKeys::kSpeechRecordingMode.toString(), u"PushToTalk"_s);
         manager.setSetting(SettingsKeys::kSpeechAutoSwitchOffline.toString(), false);
         manager.setSetting(SettingsKeys::kCloudActiveProvider.toString(), u"gemini"_s);
         manager.setSetting(SettingsKeys::kAudioSoundEnabled.toString(), false);
         manager.setSetting(SettingsKeys::kNotificationsEnabled.toString(), false);
 
-        QCOMPARE(manager.speechConfig().backend, SettingsManager::TranscriptionBackend::WhisperCpp);
+        QCOMPARE(manager.speechConfig().backend, SettingsManager::TranscriptionBackend::TranscribeCpp);
         QCOMPARE(manager.speechConfig().recordingMode, SettingsManager::RecordingMode::PushToTalk);
         QCOMPARE(manager.speechConfig().autoSwitchOffline, false);
         QCOMPARE(manager.cloudRouterConfig().activeProvider, u"gemini"_s);
@@ -148,7 +148,7 @@ private slots:
 
         // Verify stored in QSettings
         QSettings settings;
-        QCOMPARE(settings.value(SettingsKeys::kSpeechBackend.toString()).toString(), u"WhisperCpp"_s);
+        QCOMPARE(settings.value(SettingsKeys::kSpeechBackend.toString()).toString(), u"TranscribeCpp"_s);
         QCOMPARE(settings.value(SettingsKeys::kSpeechRecordingMode.toString()).toString(), u"PushToTalk"_s);
         QCOMPARE(settings.value(SettingsKeys::kSpeechAutoSwitchOffline.toString()).toBool(), false);
         QCOMPARE(settings.value(SettingsKeys::kCloudActiveProvider.toString()).toString(), u"gemini"_s);
@@ -157,7 +157,7 @@ private slots:
 
         // Create a new manager instance and verify load() restores the settings
         SettingsManager secondManager;
-        QCOMPARE(secondManager.speechConfig().backend, SettingsManager::TranscriptionBackend::WhisperCpp);
+        QCOMPARE(secondManager.speechConfig().backend, SettingsManager::TranscriptionBackend::TranscribeCpp);
         QCOMPARE(secondManager.speechConfig().recordingMode, SettingsManager::RecordingMode::PushToTalk);
         QCOMPARE(secondManager.speechConfig().autoSwitchOffline, false);
         QCOMPARE(secondManager.cloudRouterConfig().activeProvider, u"gemini"_s);

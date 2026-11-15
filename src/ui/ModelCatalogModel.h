@@ -8,7 +8,7 @@
 class QQmlEngine;
 class QJSEngine;
 
-// Read-only view of the daemon-owned Whisper model catalog.
+// Read-only view of the daemon-owned transcribe.cpp model catalog.
 //
 // The daemon discovers installed files, performs downloads, and deletes models.
 // The GUI only mirrors the catalog it publishes over D-Bus.
@@ -85,6 +85,7 @@ public:
     Q_INVOKABLE static void deleteModel(const QString& modelId);
     Q_INVOKABLE static void refreshModelList();
     Q_INVOKABLE static void checkDiskSpace();
+    Q_INVOKABLE static void clearLastError();
 
 signals:
     void modelsDirectoryChanged();

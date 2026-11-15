@@ -87,13 +87,13 @@ function(add_qtscribe_test name)
     )
 endfunction()
 
-add_qtscribe_test(whisper_pipeline
-    TEST_NAME WhisperPipelineTest
+add_qtscribe_test(transcribe_pipeline
+    TEST_NAME TranscribePipelineTest
     LIBRARIES Qt6::Gui Qt6::Multimedia Qt6::Network
 )
 
-add_qtscribe_test(whisper_model_manager
-    TEST_NAME WhisperModelManagerTest
+add_qtscribe_test(transcribe_model_manager
+    TEST_NAME TranscribeModelManagerTest
     LIBRARIES Qt6::Network
 )
 

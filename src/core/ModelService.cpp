@@ -3,8 +3,8 @@
 #include "DictationCoordinator.h"
 #include "LoggingCategories.h"
 
-#include "WhisperModelManager.h"
-#include "WhisperSttClient.h"
+#include "TranscribeModelManager.h"
+#include "TranscribeSttClient.h"
 
 #include <QJsonArray>
 #include <QJsonDocument>
@@ -15,7 +15,7 @@ using namespace Qt::StringLiterals;
 ModelService::ModelService(QObject* parent)
     : QObject(parent) { }
 
-void ModelService::setModelManager(WhisperModelManager* manager) {
+void ModelService::setModelManager(TranscribeModelManager* manager) {
     if (m_modelManager == manager) {
         return;
     }
@@ -29,47 +29,49 @@ void ModelService::setModelManager(WhisperModelManager* manager) {
     if (m_modelManager) {
         connect(m_modelManager, &QAbstractItemModel::dataChanged, this, &ModelService::modelCatalogChanged);
         connect(m_modelManager, &QAbstractItemModel::modelReset, this, &ModelService::modelCatalogChanged);
-        connect(m_modelManager, &WhisperModelManager::modelsChanged, this, &ModelService::modelCatalogChanged);
-        connect(m_modelManager, &WhisperModelManager::selectedModelChanged, this, &ModelService::modelCatalogChanged);
-        connect(m_modelManager, &WhisperModelManager::modelStatusChanged, this, &ModelService::modelCatalogChanged);
-        connect(m_modelManager, &WhisperModelManager::isDownloadingAnyChanged, this,
+        connect(m_modelManager, &TranscribeModelManager::modelsChanged, this, &ModelService::modelCatalogChanged);
+        connect(m_modelManager, &TranscribeModelManager::selectedModelChanged, this,
                 &ModelService::modelCatalogChanged);
-        connect(m_modelManager, &WhisperModelManager::downloadProgressChanged, this,
+        connect(m_modelManager, &TranscribeModelManager::modelStatusChanged, this, &ModelService::modelCatalogChanged);
+        connect(m_modelManager, &TranscribeModelManager::isDownloadingAnyChanged, this,
                 &ModelService::modelCatalogChanged);
-        connect(m_modelManager, &WhisperModelManager::lastErrorChanged, this, &ModelService::modelCatalogChanged);
-        connect(m_modelManager, &WhisperModelManager::diskSpaceChanged, this, &ModelService::modelCatalogChanged);
+        connect(m_modelManager, &TranscribeModelManager::downloadProgressChanged, this,
+                &ModelService::modelCatalogChanged);
+        connect(m_modelManager, &TranscribeModelManager::lastErrorChanged, this, &ModelService::modelCatalogChanged);
+        connect(m_modelManager, &TranscribeModelManager::diskSpaceChanged, this, &ModelService::modelCatalogChanged);
     }
 
     emit modelCatalogChanged();
 }
 
-WhisperModelManager* ModelService::modelManager() const noexcept {
+TranscribeModelManager* ModelService::modelManager() const noexcept {
     return m_modelManager;
 }
 
-void ModelService::setWhisperClient(WhisperSttClient* client) {
-    if (m_whisperClient == client) {
+void ModelService::setTranscribeClient(TranscribeSttClient* client) {
+    if (m_transcribeClient == client) {
         return;
     }
 
-    if (m_whisperClient) {
-        disconnect(m_whisperClient, nullptr, this, nullptr);
+    if (m_transcribeClient) {
+        disconnect(m_transcribeClient, nullptr, this, nullptr);
     }
 
-    m_whisperClient = client;
+    m_transcribeClient = client;
 
-    if (m_whisperClient) {
-        connect(m_whisperClient, &WhisperSttClient::modelStatusChanged, this, &ModelService::modelStatusChanged);
-        connect(m_whisperClient, &AbstractSttClient::busyChanged, this, &ModelService::modelStatusChanged);
-        connect(m_whisperClient, &WhisperSttClient::computeDeviceChanged, this, &ModelService::computeDeviceChanged);
+    if (m_transcribeClient) {
+        connect(m_transcribeClient, &TranscribeSttClient::modelStatusChanged, this, &ModelService::modelStatusChanged);
+        connect(m_transcribeClient, &AbstractSttClient::busyChanged, this, &ModelService::modelStatusChanged);
+        connect(m_transcribeClient, &TranscribeSttClient::computeDeviceChanged, this,
+                &ModelService::computeDeviceChanged);
     }
 
     emit modelStatusChanged();
     emit computeDeviceChanged();
 }
 
-WhisperSttClient* ModelService::whisperClient() const noexcept {
-    return m_whisperClient;
+TranscribeSttClient* ModelService::transcribeClient() const noexcept {
+    return m_transcribeClient;
 }
 
 void ModelService::setDictationCoordinator(DictationCoordinator* coordinator) {
@@ -96,37 +98,37 @@ DictationCoordinator* ModelService::dictationCoordinator() const noexcept {
 }
 
 bool ModelService::isModelLoaded() const {
-    return m_whisperClient ? m_whisperClient->isModelLoaded() : false;
+    return m_transcribeClient ? m_transcribeClient->isModelLoaded() : false;
 }
 
 bool ModelService::isModelBusy() const {
     const bool coordinatorBusy = m_coordinator ? m_coordinator->isBusy() : false;
-    const bool whisperBusy = m_whisperClient ? m_whisperClient->isBusy() : false;
-    return coordinatorBusy || whisperBusy;
+    const bool transcribeBusy = m_transcribeClient ? m_transcribeClient->isBusy() : false;
+    return coordinatorBusy || transcribeBusy;
 }
 
 QString ModelService::loadedModelPath() const {
-    return m_whisperClient ? m_whisperClient->loadedModelPath() : QString();
+    return m_transcribeClient ? m_transcribeClient->loadedModelPath() : QString();
 }
 
 QString ModelService::modelPath() const {
-    return m_whisperClient ? m_whisperClient->modelPath() : QString();
+    return m_transcribeClient ? m_transcribeClient->modelPath() : QString();
 }
 
 QString ModelService::modelFileName() const {
-    return m_whisperClient ? m_whisperClient->modelFileName() : QString();
+    return m_transcribeClient ? m_transcribeClient->modelFileName() : QString();
 }
 
 QString ModelService::computeDevice() const {
-    return m_whisperClient ? m_whisperClient->computeDevice() : QString();
+    return m_transcribeClient ? m_transcribeClient->computeDevice() : QString();
 }
 
 bool ModelService::isVulkanSupported() {
-    return WhisperSttClient::isVulkanSupported();
+    return TranscribeSttClient::isVulkanSupported();
 }
 
 bool ModelService::isModelInstalled() const {
-    return m_whisperClient ? m_whisperClient->isModelInstalled() : false;
+    return m_transcribeClient ? m_transcribeClient->isModelInstalled() : false;
 }
 
 QString ModelService::modelsDirectory() const {
@@ -189,8 +191,8 @@ void ModelService::loadModel(const QString& customPath) {
         qCWarning(lcSpeech) << "ModelService: Rejecting loadModel while dictation is active or model is busy";
         return;
     }
-    if (m_whisperClient) {
-        m_whisperClient->loadModel(customPath);
+    if (m_transcribeClient) {
+        m_transcribeClient->loadModel(customPath);
     }
 }
 
@@ -199,14 +201,14 @@ void ModelService::unloadModel() {
         qCWarning(lcSpeech) << "ModelService: Rejecting unloadModel while dictation is active or model is busy";
         return;
     }
-    if (m_whisperClient) {
-        m_whisperClient->unloadModel();
+    if (m_transcribeClient) {
+        m_transcribeClient->unloadModel();
     }
 }
 
 void ModelService::checkModelStatus() {
-    if (m_whisperClient) {
-        m_whisperClient->checkModelStatus();
+    if (m_transcribeClient) {
+        m_transcribeClient->checkModelStatus();
     }
 }
 
@@ -247,5 +249,11 @@ void ModelService::refreshModelCatalog() {
 void ModelService::checkModelDiskSpace() {
     if (m_modelManager) {
         m_modelManager->checkDiskSpace();
+    }
+}
+
+void ModelService::clearModelCatalogLastError() {
+    if (m_modelManager) {
+        m_modelManager->clearLastError();
     }
 }

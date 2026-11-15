@@ -31,7 +31,7 @@ Item {
             }
 
             StyledText {
-                text: qsTr("Configure on-device whisper.cpp speech recognition models and hardware acceleration")
+                text: qsTr("Configure on-device transcribe.cpp speech recognition models and hardware acceleration")
                 variant: "caption"
                 colorRole: "secondary"
             }
@@ -42,7 +42,7 @@ Item {
         }
 
         StyledCard {
-            title: qsTr("Active Whisper Model")
+            title: qsTr("Active Speech Model")
             description: qsTr("Current model selected for offline transcription inference")
 
             RowLayout {
@@ -157,8 +157,8 @@ Item {
         }
 
         StyledCard {
-            title: qsTr("Whisper Model Library")
-            description: qsTr("Download and manage speech recognition models from HuggingFace (ggerganov/whisper.cpp)")
+            title: qsTr("Speech Model Library")
+            description: qsTr("Download and manage GGUF speech recognition models from HuggingFace (handy-computer)")
 
             Rectangle {
                 Layout.fillWidth: true
@@ -261,7 +261,7 @@ Item {
                         size: "small"
                         variant: "flat"
                         onClicked: {
-                            ModelCatalog.checkDiskSpace();
+                            ModelCatalog.clearLastError();
                         }
                     }
                 }
@@ -310,11 +310,9 @@ Item {
                             anchors.margins: Theme.spacingSm
                             spacing: Theme.spacingXs
 
-                            GridLayout {
+                            RowLayout {
                                 Layout.fillWidth: true
-                                columns: root.width >= 540 ? 3 : 1
-                                columnSpacing: Theme.spacingSm
-                                rowSpacing: Theme.spacingXs
+                                spacing: Theme.spacingMd
 
                                 ColumnLayout {
                                     Layout.fillWidth: true
@@ -360,7 +358,7 @@ Item {
                                             variant: "caption"
                                             colorRole: "secondary"
                                             elide: Text.ElideRight
-                                            Layout.maximumWidth: 150
+                                            Layout.maximumWidth: 260
                                             visible: root.width >= 480
                                         }
 
@@ -381,31 +379,20 @@ Item {
                                 }
 
                                 StateBadge {
-                                    text: qsTr("Active")
-                                    statusType: "accent"
-                                    visible: modelRow.isSelected
-                                    Layout.alignment: root.width >= 540 ? Qt.AlignVCenter : Qt.AlignLeft
-                                }
-
-                                StateBadge {
-                                    text: qsTr("Installed")
-                                    statusType: "neutral"
-                                    visible: modelRow.isInstalled && !modelRow.isSelected && !modelRow.isDownloading
-                                    Layout.alignment: root.width >= 540 ? Qt.AlignVCenter : Qt.AlignLeft
-                                }
-
-                                StateBadge {
-                                    text: qsTr("Downloading")
-                                    statusType: "accent"
-                                    visible: modelRow.isDownloading
-                                    showDot: true
-                                    pulsing: true
-                                    Layout.alignment: root.width >= 540 ? Qt.AlignVCenter : Qt.AlignLeft
+                                    text: modelRow.isSelected ? qsTr("Active") : (modelRow.isDownloading ? qsTr(
+                                                                                                               "Downloading") :
+                                                                                                           qsTr("Installed"))
+                                    statusType: modelRow.isSelected || modelRow.isDownloading ? "accent" : "neutral"
+                                    visible: modelRow.isSelected || (modelRow.isInstalled && !modelRow.isDownloading)
+                                             || modelRow.isDownloading
+                                    showDot: modelRow.isDownloading
+                                    pulsing: modelRow.isDownloading
+                                    Layout.alignment: Qt.AlignVCenter
                                 }
 
                                 RowLayout {
                                     spacing: Theme.spacingXs
-                                    Layout.alignment: root.width >= 540 ? Qt.AlignVCenter : Qt.AlignLeft
+                                    Layout.alignment: Qt.AlignVCenter
 
                                     StyledButton {
                                         text: qsTr("Cancel")
@@ -472,9 +459,20 @@ Item {
                                     }
 
                                     StyledText {
-                                        text: ModelCatalog.downloadBytesFormatted + (modelRow.speedFormatted.length > 0
-                                                                                     ? " (" + modelRow.speedFormatted
-                                                                                       + ")" : "")
+                                        text: {
+                                            const bytes = ModelCatalog.downloadBytesFormatted;
+                                            const speed = modelRow.speedFormatted;
+                                            if (bytes.length > 0 && speed.length > 0) {
+                                                return bytes + " (" + speed + ")";
+                                            }
+                                            if (bytes.length > 0) {
+                                                return bytes;
+                                            }
+                                            if (speed.length > 0) {
+                                                return speed;
+                                            }
+                                            return "";
+                                        }
                                         variant: "caption"
                                         colorRole: "secondary"
                                     }

@@ -123,3 +123,9 @@ void ModelAdaptor::checkModelDiskSpace() {
         m_service->checkModelDiskSpace();
     }
 }
+
+void ModelAdaptor::clearModelCatalogLastError() {
+    if (m_service) {
+        m_service->clearModelCatalogLastError();
+    }
+}

@@ -26,8 +26,8 @@
 #include "StatusNotifierService.h"
 #include "SystemHealthMonitor.h"
 #include "SystemService.h"
-#include "WhisperModelManager.h"
-#include "WhisperSttClient.h"
+#include "TranscribeModelManager.h"
+#include "TranscribeSttClient.h"
 
 #include <QDBusConnection>
 #include <QDBusServiceWatcher>
@@ -49,8 +49,8 @@ void ApplicationContext::initializeHeadless(bool startServices) {
     m_geminiSttClient = new GeminiSttClient(this);
     m_metaMusaSttClient = new MetaMusaSttClient(this);
     m_cloudSttRouter = new CloudSttRouter(this);
-    m_whisperModelManager = new WhisperModelManager(this);
-    m_whisperSttClient = new WhisperSttClient(this);
+    m_transcribeModelManager = new TranscribeModelManager(this);
+    m_transcribeSttClient = new TranscribeSttClient(this);
     m_compositeSttEngine = new CompositeSttEngine(this);
     m_notificationPresenter = new NotificationPresenter(this);
     m_groqLlmClient = new GroqLlmClient(this);
@@ -126,11 +126,11 @@ void ApplicationContext::reloadSettings() {
     if (m_compositeSttEngine) {
         m_compositeSttEngine->loadSettings();
     }
-    if (m_whisperModelManager) {
-        m_whisperModelManager->loadSettings();
+    if (m_transcribeModelManager) {
+        m_transcribeModelManager->loadSettings();
     }
-    if (m_whisperSttClient) {
-        m_whisperSttClient->loadSettings();
+    if (m_transcribeSttClient) {
+        m_transcribeSttClient->loadSettings();
     }
     if (m_feedbackPlayer) {
         m_feedbackPlayer->loadSettings();
@@ -173,8 +173,8 @@ void ApplicationContext::wireSubsystems() {
         if (m_groqLlmClient) {
             m_groqLlmClient->setSettingsManager(m_settingsManager);
         }
-        if (m_whisperModelManager) {
-            m_whisperModelManager->setSettingsManager(m_settingsManager);
+        if (m_transcribeModelManager) {
+            m_transcribeModelManager->setSettingsManager(m_settingsManager);
         }
         if (m_feedbackPlayer) {
             m_feedbackPlayer->setSettingsManager(m_settingsManager);
@@ -190,8 +190,8 @@ void ApplicationContext::wireSubsystems() {
         }
     }
 
-    if (m_whisperSttClient && m_whisperModelManager) {
-        m_whisperSttClient->setModelManager(m_whisperModelManager);
+    if (m_transcribeSttClient && m_transcribeModelManager) {
+        m_transcribeSttClient->setModelManager(m_transcribeModelManager);
     }
     if (m_groqLlmClient && m_groqSttClient) {
         m_groqLlmClient->setKeyStore(m_groqSttClient->keyStore());
@@ -207,8 +207,8 @@ void ApplicationContext::wireSubsystems() {
         AbstractCloudSttClient* cloudClient = m_cloudSttRouter ? static_cast<AbstractCloudSttClient*>(m_cloudSttRouter)
                                                                : static_cast<AbstractCloudSttClient*>(m_groqSttClient);
         m_compositeSttEngine->setCloudClient(cloudClient);
-        m_compositeSttEngine->setWhisperClient(m_whisperSttClient);
-        m_compositeSttEngine->setModelManager(m_whisperModelManager);
+        m_compositeSttEngine->setOfflineClient(m_transcribeSttClient);
+        m_compositeSttEngine->setModelManager(m_transcribeModelManager);
         m_compositeSttEngine->setHealthMonitor(m_healthMonitor);
         m_compositeSttEngine->setAudioRecorder(m_audioRecorder);
     }
@@ -221,8 +221,8 @@ void ApplicationContext::wireSubsystems() {
     }
 
     if (m_modelService) {
-        m_modelService->setModelManager(m_whisperModelManager);
-        m_modelService->setWhisperClient(m_whisperSttClient);
+        m_modelService->setModelManager(m_transcribeModelManager);
+        m_modelService->setTranscribeClient(m_transcribeSttClient);
         m_modelService->setDictationCoordinator(m_dictationCoordinator);
     }
 
@@ -286,13 +286,13 @@ void ApplicationContext::wireSubsystems() {
                 &ApplicationContext::reloadSettings);
     }
 
-    if (m_whisperModelManager && m_notificationService) {
-        connect(m_whisperModelManager, &WhisperModelManager::modelDownloadFinished, this,
+    if (m_transcribeModelManager && m_notificationService) {
+        connect(m_transcribeModelManager, &TranscribeModelManager::modelDownloadFinished, this,
                 [this](const QString& modelId, bool success, const QString& error) {
                     if (success) {
                         m_notificationService->showCategoryNotification(
                             u"model_download"_s, tr("Offline Model Ready"),
-                            tr("Whisper model '%1' downloaded and ready for dictation.").arg(modelId),
+                            tr("Speech model '%1' downloaded and ready for dictation.").arg(modelId),
                             LinuxNotificationService::Urgency::Normal, u"software-update-available"_s, 5000,
                             {u"offline"_s, tr("Offline Settings")});
                     } else if (!error.isEmpty() && !error.contains(u"cancelled"_s, Qt::CaseInsensitive)) {
@@ -352,12 +352,12 @@ ApiKeyStore* ApplicationContext::apiKeyStore() const noexcept {
     return m_groqSttClient ? m_groqSttClient->keyStore() : nullptr;
 }
 
-WhisperSttClient* ApplicationContext::whisperSttClient() const noexcept {
-    return m_whisperSttClient;
+TranscribeSttClient* ApplicationContext::transcribeSttClient() const noexcept {
+    return m_transcribeSttClient;
 }
 
-WhisperModelManager* ApplicationContext::whisperModelManager() const noexcept {
-    return m_whisperModelManager;
+TranscribeModelManager* ApplicationContext::transcribeModelManager() const noexcept {
+    return m_transcribeModelManager;
 }
 
 AbstractLlmClient* ApplicationContext::llmClient() const noexcept {

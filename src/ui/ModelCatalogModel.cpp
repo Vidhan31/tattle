@@ -225,6 +225,12 @@ void ModelCatalogModel::checkDiskSpace() {
     }
 }
 
+void ModelCatalogModel::clearLastError() {
+    if (auto* client = DaemonClient::instance()) {
+        client->clearModelCatalogLastError();
+    }
+}
+
 // TODO: Stream active download progress via a dedicated D-Bus signal/property
 // instead of re-serializing and re-parsing the full model catalog JSON on every tick.
 void ModelCatalogModel::reloadFromDaemon() {

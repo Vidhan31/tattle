@@ -50,7 +50,7 @@ build() {
     -D ENABLE_QT_DEPLOYMENT=OFF
     -D BUILD_KEYINJECTORD=ON
     -D ENABLE_VULKAN=ON
-    -D FETCHCONTENT_SOURCE_DIR_WHISPER=/opt/whisper-src
+    -D FETCHCONTENT_SOURCE_DIR_TRANSCRIBE=/opt/transcribe-src
   )
   cmake "${cmake_options[@]}"
   cmake --build build

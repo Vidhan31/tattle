@@ -50,7 +50,7 @@ and seamless desktop integration on Wayland environments (Plasma 6+, GNOME 49+).
 %cmake -G Ninja \
     -DENABLE_QT_DEPLOYMENT=OFF \
     -DENABLE_VULKAN=ON \
-    -DFETCHCONTENT_SOURCE_DIR_WHISPER=/opt/whisper-src \
+    -DFETCHCONTENT_SOURCE_DIR_TRANSCRIBE=/opt/transcribe-src \
     -DCMAKE_BUILD_TYPE=Release
 %cmake_build
 

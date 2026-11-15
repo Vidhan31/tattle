@@ -12,7 +12,7 @@
 
 class SettingsManager;
 
-struct WhisperModelItem {
+struct TranscribeModelItem {
     QString id;
     QString name;
     QString fileName;
@@ -32,10 +32,10 @@ struct WhisperModelItem {
     QString speedFormatted;
 };
 
-class WhisperModelManager : public QAbstractListModel {
+class TranscribeModelManager : public QAbstractListModel {
     Q_OBJECT
 
-    Q_PROPERTY(QString modelsDirectory READ modelsDirectory CONSTANT FINAL)
+    Q_PROPERTY(QString modelsDirectory READ modelsDirectory NOTIFY modelsDirectoryChanged FINAL)
     Q_PROPERTY(QString selectedModelId READ selectedModelId WRITE setSelectedModelId NOTIFY selectedModelChanged FINAL)
     Q_PROPERTY(QString selectedModelPath READ selectedModelPath NOTIFY selectedModelChanged FINAL)
     Q_PROPERTY(QString selectedModelName READ selectedModelName NOTIFY selectedModelChanged FINAL)
@@ -49,7 +49,6 @@ class WhisperModelManager : public QAbstractListModel {
     Q_PROPERTY(QString availableDiskSpaceFormatted READ availableDiskSpaceFormatted NOTIFY diskSpaceChanged FINAL)
 
 public:
-    // NOLINTNEXTLINE(performance-enum-size) QML-registered enums need int backing for qmlcachegen AOT
     enum Roles {
         IdRole = Qt::UserRole + 1,
         NameRole,
@@ -71,11 +70,11 @@ public:
     };
     Q_ENUM(Roles)
 
-    explicit WhisperModelManager(QObject* parent = nullptr);
-    explicit WhisperModelManager(std::unique_ptr<ModelDownloader> downloader, QObject* parent = nullptr);
-    ~WhisperModelManager() override;
+    explicit TranscribeModelManager(QObject* parent = nullptr);
+    explicit TranscribeModelManager(std::unique_ptr<ModelDownloader> downloader, QObject* parent = nullptr);
+    ~TranscribeModelManager() override;
 
-    static WhisperModelManager* instance();
+    static TranscribeModelManager* instance();
 
     int rowCount(const QModelIndex& parent = QModelIndex()) const override;
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
@@ -87,8 +86,8 @@ public:
     void setSettingsManager(SettingsManager* settings);
     [[nodiscard]] SettingsManager* settingsManager() const noexcept;
 
-    const QList<WhisperModelItem>& models() const;
-    std::optional<WhisperModelItem> model(const QString& modelId) const;
+    const QList<TranscribeModelItem>& models() const;
+    std::optional<TranscribeModelItem> model(const QString& modelId) const;
     int modelCount() const;
     int findModelIndex(const QString& modelId) const;
 
@@ -119,11 +118,13 @@ public:
     Q_INVOKABLE bool deleteModel(const QString& modelId);
     Q_INVOKABLE void refreshModelList();
     Q_INVOKABLE void checkDiskSpace();
+    Q_INVOKABLE void clearLastError();
     void loadSettings();
     void scanInstalledModels();
     void cleanupOrphanedPartFiles() const;
 
 signals:
+    void modelsDirectoryChanged();
     void modelsChanged();
     void selectedModelChanged();
     void modelStatusChanged();
@@ -139,7 +140,7 @@ private:
     void setLastError(const QString& error);
 
     std::unique_ptr<ModelDownloader> m_downloader;
-    QList<WhisperModelItem> m_models;
+    QList<TranscribeModelItem> m_models;
     QString m_customModelsDirectory;
     QString m_selectedModelId;
     SettingsManager* m_settingsManager = nullptr;

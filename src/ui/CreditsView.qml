@@ -172,12 +172,12 @@ Item {
                 }
 
                 ComponentItem {
-                    title: qsTr("whisper.cpp")
+                    title: qsTr("transcribe.cpp")
                     badgeText: qsTr("MIT")
-                    url: "https://github.com/ggerganov/whisper.cpp"
-                    urlLabel: "ggerganov/whisper.cpp"
+                    url: "https://github.com/handy-computer/transcribe.cpp"
+                    urlLabel: "handy-computer/transcribe.cpp"
                     description: qsTr(
-                                     "High-performance C/C++ inference engine for OpenAI's Whisper model, providing private offline transcription with optional Vulkan GPU acceleration.")
+                                     "High-performance C/C++ offline speech recognition engine for Whisper, Parakeet, Moonshine and Granite GGUF models with GPU acceleration.")
                 }
 
                 StyledDivider {}
@@ -229,7 +229,7 @@ Item {
                     url: "https://github.com/KhronosGroup/Vulkan-Headers"
                     urlLabel: "KhronosGroup/Vulkan-Headers"
                     description: qsTr(
-                                     "Khronos cross-platform low-overhead GPU compute and graphics headers enabling Vulkan tensor acceleration for whisper.cpp.")
+                                     "Khronos cross-platform low-overhead GPU compute and graphics headers enabling Vulkan tensor acceleration for transcribe.cpp.")
                 }
             }
 
