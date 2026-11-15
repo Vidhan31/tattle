@@ -11,7 +11,7 @@ class QJSEngine;
 //
 // The GUI never executes speech, audio, or download work. It only edits the
 // shared configuration (QSettings plus the system keychain) and asks the daemon
-// to reload. This keeps every hardware and service resource owned by qtscribed.
+// to reload. This keeps every hardware and service resource owned by tattled.
 class AppSettings : public QObject {
     Q_OBJECT
     QML_ELEMENT

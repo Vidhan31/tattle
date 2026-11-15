@@ -10,11 +10,11 @@
 
 using namespace Qt::StringLiterals;
 
-#ifndef QTSCRIBE_IS_DEV_BUILD
+#ifndef TATTLE_IS_DEV_BUILD
 #if defined(DEBUG) || !defined(NDEBUG)
-#define QTSCRIBE_IS_DEV_BUILD true
+#define TATTLE_IS_DEV_BUILD true
 #else
-#define QTSCRIBE_IS_DEV_BUILD false
+#define TATTLE_IS_DEV_BUILD false
 #endif
 #endif
 
@@ -119,7 +119,7 @@ bool DaemonDiagnosticModel::isKde() {
 }
 
 bool DaemonDiagnosticModel::isDevBuild() {
-    return QTSCRIBE_IS_DEV_BUILD;
+    return TATTLE_IS_DEV_BUILD;
 }
 
 bool DaemonDiagnosticModel::clipboardWarningAcknowledged() const {

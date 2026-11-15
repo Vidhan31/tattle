@@ -1,13 +1,13 @@
 # cmake/Sanitizers.cmake
 # Configures AddressSanitizer (ASan), UndefinedBehaviorSanitizer (UBSan), and ThreadSanitizer (TSan)
-# for first-party QtScribe targets.
+# for first-party Tattle targets.
 
-if(TARGET qtscribe_sanitizers)
+if(TARGET tattle_sanitizers)
     return()
 endif()
 
-add_library(qtscribe_sanitizers INTERFACE)
-add_library(qtscribe::sanitizers ALIAS qtscribe_sanitizers)
+add_library(tattle_sanitizers INTERFACE)
+add_library(tattle::sanitizers ALIAS tattle_sanitizers)
 
 option(ENABLE_ASAN_UBSAN "Enable Address and Undefined Behavior Sanitizers (ASan + UBSan)" OFF)
 option(ENABLE_TSAN "Enable Thread Sanitizer (TSan)" OFF)
@@ -24,26 +24,26 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     if(ENABLE_ASAN_UBSAN)
         message(STATUS "Enabling AddressSanitizer (ASan) and UndefinedBehaviorSanitizer (UBSan)")
 
-        target_compile_options(qtscribe_sanitizers INTERFACE
+        target_compile_options(tattle_sanitizers INTERFACE
             -fsanitize=address,undefined
             -fno-omit-frame-pointer
             -fno-sanitize-recover=all
             -g
         )
 
-        target_link_options(qtscribe_sanitizers INTERFACE
+        target_link_options(tattle_sanitizers INTERFACE
             -fsanitize=address,undefined
         )
     elseif(ENABLE_TSAN)
         message(STATUS "Enabling ThreadSanitizer (TSan)")
 
-        target_compile_options(qtscribe_sanitizers INTERFACE
+        target_compile_options(tattle_sanitizers INTERFACE
             -fsanitize=thread
             -fno-omit-frame-pointer
             -g
         )
 
-        target_link_options(qtscribe_sanitizers INTERFACE
+        target_link_options(tattle_sanitizers INTERFACE
             -fsanitize=thread
         )
     endif()
@@ -51,6 +51,6 @@ else()
     message(WARNING "Sanitizers are not configured for compiler: ${CMAKE_CXX_COMPILER_ID}")
 endif()
 
-if(TARGET qtscribe_compiler_flags)
-    target_link_libraries(qtscribe_compiler_flags INTERFACE qtscribe_sanitizers)
+if(TARGET tattle_compiler_flags)
+    target_link_libraries(tattle_compiler_flags INTERFACE tattle_sanitizers)
 endif()

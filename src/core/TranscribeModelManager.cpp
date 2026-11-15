@@ -344,7 +344,7 @@ QString TranscribeModelManager::modelsDirectory() const {
         return m_customModelsDirectory;
     }
     const QString genericData = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation);
-    return genericData + u"/qtscribe/models"_s;
+    return genericData + u"/tattle/models"_s;
 }
 
 void TranscribeModelManager::setModelsDirectory(const QString& path) {

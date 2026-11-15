@@ -17,8 +17,8 @@ class TranscribeModelManagerTest : public QObject {
 private slots:
     void initTestCase() {
         QStandardPaths::setTestModeEnabled(true);
-        QCoreApplication::setOrganizationName(u"QtScribeTest"_s);
-        QCoreApplication::setApplicationName(u"QtScribeTest_ModelManager"_s);
+        QCoreApplication::setOrganizationName(u"TattleTest"_s);
+        QCoreApplication::setApplicationName(u"TattleTest_ModelManager"_s);
         if (auto* inst = SettingsManager::instance()) {
             inst->setTranscribeSelectedModel(QString());
         }

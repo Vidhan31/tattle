@@ -97,14 +97,14 @@ bool validateExecutableTopology(const std::filesystem::path& parentExePath, cons
 
     const std::string parentExeName = parentExePath.filename().string();
     if (allowDevMode) {
-        if (parentExeName != "qtscribed" && parentExeName != "test_ipc_server" &&
+        if (parentExeName != "tattled" && parentExeName != "test_ipc_server" &&
             parentExeName != "test_transcription_pipeline") {
             KEYINJECTORD_LOG_ERROR("Launcher authorization failed: unauthorized parent executable name '%s' at '%s'",
                                    parentExeName.c_str(), parentExePath.c_str());
             return setResult(outResult, AuthResult::UnauthorizedExecutable);
         }
     } else {
-        if (parentExeName != "qtscribed") {
+        if (parentExeName != "tattled") {
             KEYINJECTORD_LOG_ERROR("Launcher authorization failed: unauthorized parent executable name '%s' at '%s'",
                                    parentExeName.c_str(), parentExePath.c_str());
             return setResult(outResult, AuthResult::UnauthorizedExecutable);

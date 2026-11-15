@@ -113,9 +113,9 @@ uint LinuxNotificationService::showNotification(const QString& title, const QStr
 
     QVariantMap hints;
     hints.insert(u"urgency"_s, QVariant::fromValue(static_cast<uchar>(urgency)));
-    hints.insert(u"desktop-entry"_s, QStringLiteral("io.github.qtscribe"));
+    hints.insert(u"desktop-entry"_s, QStringLiteral("io.github.tattle"));
 
-    const QDBusReply<uint> reply = notifyIface.call(u"Notify"_s, QStringLiteral("QtScribe"), replacesId, icon, title,
+    const QDBusReply<uint> reply = notifyIface.call(u"Notify"_s, QStringLiteral("Tattle"), replacesId, icon, title,
                                                     body, actions, hints, timeoutMs);
 
     if (!reply.isValid()) {

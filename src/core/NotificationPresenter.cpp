@@ -148,7 +148,7 @@ void NotificationPresenter::onNotificationActionInvoked(uint id, const QString& 
 void NotificationPresenter::onCoordinatorErrorOccurred(const QString& error) {
     sendCategoryNotification(u"transcription"_s, tr("Transcription Failed"), error,
                              static_cast<int>(LinuxNotificationService::Urgency::Critical), u"dialog-error"_s,
-                             {u"default"_s, tr("Open QtScribe")});
+                             {u"default"_s, tr("Open Tattle")});
 }
 
 void NotificationPresenter::onCoordinatorTranscriptionFinished(const QString& text) {
@@ -163,14 +163,14 @@ void NotificationPresenter::onCoordinatorMaxDurationWarning() {
         u"recording_limit"_s, tr("Recording Limit Reached"),
         tr("Maximum recording duration (5m) reached. Dictation stopped and audio sent for transcription."),
         static_cast<int>(LinuxNotificationService::Urgency::Normal), u"dialog-information"_s,
-        {u"default"_s, tr("Open QtScribe")});
+        {u"default"_s, tr("Open Tattle")});
 }
 
 void NotificationPresenter::onCoordinatorLlmFallbackWarning(const QString& warning) {
     sendCategoryNotification(u"llm_fallback"_s, tr("AI Formatting Unavailable"),
                              tr("Enhancement failed (%1). Injected raw speech transcript instead.").arg(warning),
                              static_cast<int>(LinuxNotificationService::Urgency::Low), u"dialog-warning"_s,
-                             {u"default"_s, tr("Open QtScribe")});
+                             {u"default"_s, tr("Open Tattle")});
 }
 
 void NotificationPresenter::onAudioDeviceDisconnected(const QString& deviceName, const QString& fallbackDeviceName) {
@@ -202,25 +202,25 @@ void NotificationPresenter::onAudioDeviceAvailabilityChanged() {
 }
 
 void NotificationPresenter::onFailoverTriggered() {
-    sendNotification(tr("QtScribe: Switched to Offline Dictation"),
+    sendNotification(tr("Tattle: Switched to Offline Dictation"),
                      tr("Internet connection offline. Automatically switched to local transcribe.cpp model."),
                      static_cast<int>(LinuxNotificationService::Urgency::Normal), u"network-offline"_s);
 }
 
 void NotificationPresenter::onOnlineRestored() {
-    sendNotification(tr("QtScribe: Internet Connection Restored"), tr("Switched back to Cloud transcription engine."),
+    sendNotification(tr("Tattle: Internet Connection Restored"), tr("Switched back to Cloud transcription engine."),
                      static_cast<int>(LinuxNotificationService::Urgency::Normal), u"network-wireless"_s);
 }
 
 void NotificationPresenter::onOfflineModelRequired() {
-    sendNotification(tr("QtScribe: Offline Model Required"),
-                     tr("No internet connection available. Please open QtScribe and download a speech model to "
+    sendNotification(tr("Tattle: Offline Model Required"),
+                     tr("No internet connection available. Please open Tattle and download a speech model to "
                         "use offline dictation."),
                      static_cast<int>(LinuxNotificationService::Urgency::Critical), u"dialog-warning"_s);
 }
 
 void NotificationPresenter::onNetworkDisconnectedDuringSession() {
-    sendNotification(tr("QtScribe: Network Disconnected"),
+    sendNotification(tr("Tattle: Network Disconnected"),
                      tr("Internet connection lost while recording. Model will not be changed during active session."),
                      static_cast<int>(LinuxNotificationService::Urgency::Normal), u"network-offline"_s);
 }
@@ -228,7 +228,7 @@ void NotificationPresenter::onNetworkDisconnectedDuringSession() {
 void NotificationPresenter::onModelLoadFailed(const QString& modelPath, const QString& error) {
     Q_UNUSED(error);
     sendNotification(
-        tr("QtScribe: Model Load Failed"),
+        tr("Tattle: Model Load Failed"),
         tr("Could not load offline speech model (%1). Please verify model integrity in Settings.").arg(modelPath),
         static_cast<int>(LinuxNotificationService::Urgency::Normal), u"dialog-error"_s);
 }

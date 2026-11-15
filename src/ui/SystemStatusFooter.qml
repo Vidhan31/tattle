@@ -1,7 +1,7 @@
 pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Layouts
-import QtScribe
+import Tattle
 import "controls"
 
 Item {
@@ -34,7 +34,7 @@ Item {
                 spacing: 6
 
                 StyledIcon {
-                    source: "qrc:/qt/qml/QtScribe/assets/icons/keyboard.svg"
+                    source: "qrc:/qt/qml/Tattle/assets/icons/keyboard.svg"
                     size: 14
                     color: Theme.textSecondary
                     Layout.alignment: Qt.AlignVCenter
@@ -81,7 +81,7 @@ Item {
                 spacing: 6
 
                 StyledIcon {
-                    source: "qrc:/qt/qml/QtScribe/assets/icons/bolt.svg"
+                    source: "qrc:/qt/qml/Tattle/assets/icons/bolt.svg"
                     size: 13
                     color: Theme.textSecondary
                     Layout.alignment: Qt.AlignVCenter

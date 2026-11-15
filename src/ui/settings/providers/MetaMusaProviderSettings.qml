@@ -1,7 +1,7 @@
 pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Layouts
-import QtScribe
+import Tattle
 import "../../controls"
 import ".."
 
@@ -38,7 +38,7 @@ Item {
             description: qsTr("Guide recognition on domain terms, acronyms, and product names")
             fieldLabel: qsTr("Keywords")
             placeholderText: qsTr(
-                                 "Comma-separated or newline-separated keywords, e.g. QtScribe, Wayland, Qt6, CMake, PyTorch...")
+                                 "Comma-separated or newline-separated keywords, e.g. Tattle, Wayland, Qt6, CMake, PyTorch...")
             vocabulary: AppSettings.metaMusaKeywords
             maxCharacters: 0
             onVocabularySaved: text => {

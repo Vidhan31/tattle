@@ -24,12 +24,12 @@ public:
     static bool sendRemoteCommand(const QString& method);
     static bool isRemoteRunning();
 
-    static constexpr QStringView kDbusServiceName = u"io.github.qtscribe.SpeechService";
-    static constexpr QStringView kDbusObjectPath = u"/io/github/qtscribe/SpeechService";
-    static constexpr QStringView kDbusInterfaceName = u"io.github.qtscribe.SpeechService";
-    static constexpr QStringView kDbusModelInterfaceName = u"io.github.qtscribe.ModelService";
-    static constexpr QStringView kDbusSystemInterfaceName = u"io.github.qtscribe.SystemService";
-    static constexpr QStringView kDbusSettingsInterfaceName = u"io.github.qtscribe.SettingsService";
+    static constexpr QStringView kDbusServiceName = u"io.github.tattle.SpeechService";
+    static constexpr QStringView kDbusObjectPath = u"/io/github/tattle/SpeechService";
+    static constexpr QStringView kDbusInterfaceName = u"io.github.tattle.SpeechService";
+    static constexpr QStringView kDbusModelInterfaceName = u"io.github.tattle.ModelService";
+    static constexpr QStringView kDbusSystemInterfaceName = u"io.github.tattle.SystemService";
+    static constexpr QStringView kDbusSettingsInterfaceName = u"io.github.tattle.SettingsService";
 
 private:
     bool m_registered = false;

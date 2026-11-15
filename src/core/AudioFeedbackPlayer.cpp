@@ -14,10 +14,10 @@ AudioFeedbackPlayer::AudioFeedbackPlayer(QObject* parent)
     : QObject(parent)
     , m_startChime(new QSoundEffect(this))
     , m_stopChime(new QSoundEffect(this)) {
-    m_startChime->setSource(QUrl(u"qrc:/qt/qml/QtScribe/assets/chime_start.wav"_s));
+    m_startChime->setSource(QUrl(u"qrc:/qt/qml/Tattle/assets/chime_start.wav"_s));
     m_startChime->setVolume(0.8F);
 
-    m_stopChime->setSource(QUrl(u"qrc:/qt/qml/QtScribe/assets/chime_stop.wav"_s));
+    m_stopChime->setSource(QUrl(u"qrc:/qt/qml/Tattle/assets/chime_stop.wav"_s));
     m_stopChime->setVolume(0.8F);
 
     if (auto* inst = SettingsManager::instance()) {

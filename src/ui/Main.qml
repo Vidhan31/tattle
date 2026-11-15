@@ -2,7 +2,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Templates as T
 import QtQuick.Layouts
-import QtScribe
+import Tattle
 import "controls"
 import "settings"
 
@@ -13,7 +13,7 @@ T.ApplicationWindow {
     minimumWidth: 760
     minimumHeight: 520
     visible: true
-    title: qsTr("QtScribe")
+    title: qsTr("Tattle")
     color: Theme.windowBg
 
     property string currentSectionId: "dictate"

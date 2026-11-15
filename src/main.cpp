@@ -15,17 +15,17 @@
 
 #include <array>
 
-Q_IMPORT_QML_PLUGIN(QtScribePlugin)
+Q_IMPORT_QML_PLUGIN(TattlePlugin)
 
 using namespace Qt::StringLiterals;
 
-#ifndef QTSCRIBE_VERSION
-#define QTSCRIBE_VERSION "0.0.0-dev"
+#ifndef TATTLE_VERSION
+#define TATTLE_VERSION "0.0.0-dev"
 #endif
 
 class SettingsGuiService : public QObject {
     Q_OBJECT
-    Q_CLASSINFO("D-Bus Interface", "io.github.qtscribe.SettingsGui")
+    Q_CLASSINFO("D-Bus Interface", "io.github.tattle.SettingsGui")
 
 public:
     explicit SettingsGuiService(QObject* parent = nullptr)
@@ -46,13 +46,13 @@ public:
 };
 
 /**
- * @brief Application entry point for the QtScribe GUI client.
+ * @brief Application entry point for the Tattle GUI client.
  *
  * Configures the Wayland platform environment, single-instance D-Bus registration,
  * registers QML types, initializes the daemon client façade, and launches the main
  * QML application engine.
  *
- * All speech, audio, model download, and notification work runs in qtscribed; the
+ * All speech, audio, model download, and notification work runs in tattled; the
  * GUI is a pure D-Bus presentation layer.
  */
 int main(int argc, char* argv[]) {
@@ -65,19 +65,19 @@ int main(int argc, char* argv[]) {
         QQuickStyle::setStyle(u"Fusion"_s);
         QQuickStyle::setFallbackStyle(u"Fusion"_s);
     }
-    QGuiApplication::setApplicationName(u"QtScribe"_s);
-    QGuiApplication::setApplicationVersion(u"" QTSCRIBE_VERSION ""_s);
-    QGuiApplication::setOrganizationName(u"QtScribe"_s);
-    QGuiApplication::setOrganizationDomain(u"io.github.qtscribe"_s);
-    QGuiApplication::setDesktopFileName(u"io.github.qtscribe"_s);
+    QGuiApplication::setApplicationName(u"Tattle"_s);
+    QGuiApplication::setApplicationVersion(u"" TATTLE_VERSION ""_s);
+    QGuiApplication::setOrganizationName(u"Tattle"_s);
+    QGuiApplication::setOrganizationDomain(u"io.github.tattle"_s);
+    QGuiApplication::setDesktopFileName(u"io.github.tattle"_s);
     QGuiApplication::setQuitOnLastWindowClosed(true);
 
     QCommandLineParser parser;
-    parser.setApplicationDescription(u"QtScribe — Wayland native Speech-to-Text application"_s);
+    parser.setApplicationDescription(u"Tattle — Wayland native Speech-to-Text application"_s);
     parser.addHelpOption();
     parser.addVersionOption();
 
-    const QCommandLineOption daemonOption(u"daemon"_s, u"Launch the headless daemon (qtscribed)"_s);
+    const QCommandLineOption daemonOption(u"daemon"_s, u"Launch the headless daemon (tattled)"_s);
     const QCommandLineOption toggleOption({u"t"_s, u"toggle"_s}, u"Toggle speech-to-text recording"_s);
     const QCommandLineOption startOption(u"start"_s, u"Start speech-to-text recording"_s);
     const QCommandLineOption stopOption(u"stop"_s, u"Stop speech-to-text recording"_s);
@@ -97,9 +97,9 @@ int main(int argc, char* argv[]) {
 
     const auto launchDaemon = [](const QStringList& args = {}) -> bool {
         const QString appDir = QCoreApplication::applicationDirPath();
-        const QString daemonInAppDir = appDir + u"/qtscribed"_s;
-        const QString daemonExec = QFile::exists(daemonInAppDir) ? daemonInAppDir : u"qtscribed"_s;
-        qInfo() << "QtScribe: Starting background daemon:" << daemonExec << args;
+        const QString daemonInAppDir = appDir + u"/tattled"_s;
+        const QString daemonExec = QFile::exists(daemonInAppDir) ? daemonInAppDir : u"tattled"_s;
+        qInfo() << "Tattle: Starting background daemon:" << daemonExec << args;
         return QProcess::startDetached(daemonExec, args);
     };
 
@@ -126,8 +126,8 @@ int main(int argc, char* argv[]) {
         return DaemonClient::sendRemoteCommand(u"quitApp"_s) ? 0 : 1;
     }
 
-    const QString kGuiService = u"io.github.qtscribe.SettingsGui"_s;
-    const QString kGuiPath = u"/io/github/qtscribe/SettingsGui"_s;
+    const QString kGuiService = u"io.github.tattle.SettingsGui"_s;
+    const QString kGuiPath = u"/io/github/tattle/SettingsGui"_s;
 
     if (QDBusConnection::sessionBus().isConnected()) {
         auto* guiService = new SettingsGuiService(&app);
@@ -154,7 +154,7 @@ int main(int argc, char* argv[]) {
     QIcon appIcon;
     constexpr auto kIconSizes = std::to_array({16, 24, 32, 64, 128, 256, 512});
     for (const int sz : kIconSizes) {
-        appIcon.addFile(QString(u":/qt/qml/QtScribe/assets/speech-to-text-%1.png"_s).arg(sz), QSize(sz, sz));
+        appIcon.addFile(QString(u":/qt/qml/Tattle/assets/speech-to-text-%1.png"_s).arg(sz), QSize(sz, sz));
     }
     QGuiApplication::setWindowIcon(appIcon);
 
@@ -174,7 +174,7 @@ int main(int argc, char* argv[]) {
 
     DaemonClient::instance();
 
-    engine.loadFromModule("QtScribe", "Main");
+    engine.loadFromModule("Tattle", "Main");
 
     if (parser.isSet(sectionOption)) {
         const QString section = parser.value(sectionOption);

@@ -25,19 +25,19 @@ if(NOT CMAKE_PREFIX_PATH)
     endif()
 endif()
 
-if(NOT DEFINED QTSCRIBE_VERSION)
+if(NOT DEFINED TATTLE_VERSION)
     if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/VERSION")
-        file(READ "${CMAKE_CURRENT_SOURCE_DIR}/VERSION" QTSCRIBE_VERSION_FILE)
-        string(STRIP "${QTSCRIBE_VERSION_FILE}" QTSCRIBE_VERSION)
+        file(READ "${CMAKE_CURRENT_SOURCE_DIR}/VERSION" TATTLE_VERSION_FILE)
+        string(STRIP "${TATTLE_VERSION_FILE}" TATTLE_VERSION)
     else()
-        set(QTSCRIBE_VERSION "1.0.0")
+        set(TATTLE_VERSION "1.0.0")
     endif()
 endif()
 
-project(QtScribe VERSION ${QTSCRIBE_VERSION} LANGUAGES C CXX)
+project(Tattle VERSION ${TATTLE_VERSION} LANGUAGES C CXX)
 
 option(ENABLE_LTO "Enable Interprocedural / Link-Time Optimization (LTO) for release executables" OFF)
-option(QTSCRIBE_WERROR "Treat compiler warnings as errors for QtScribe targets" OFF)
+option(TATTLE_WERROR "Treat compiler warnings as errors for Tattle targets" OFF)
 
 set_property(GLOBAL PROPERTY JOB_POOLS link_pool=2)
 set(CMAKE_JOB_POOL_LINK link_pool)
@@ -137,8 +137,8 @@ if(ENABLE_CLANG_TIDY)
     endif()
 endif()
 
-# Enforce warnings-as-errors on first-party QtScribe targets when requested
-if(QTSCRIBE_WERROR)
+# Enforce warnings-as-errors on first-party Tattle targets when requested
+if(TATTLE_WERROR)
     set(CMAKE_COMPILE_WARNING_AS_ERROR ON)
 endif()
 
@@ -149,29 +149,29 @@ if(BUILD_KEYINJECTORD)
     add_subdirectory(src/keyinjectord)
 endif()
 
-qt_add_executable(qtscribe
+qt_add_executable(tattle
     src/main.cpp
 )
 
-target_compile_definitions(qtscribe
+target_compile_definitions(tattle
     PRIVATE
-        QTSCRIBE_VERSION="${PROJECT_VERSION}"
+        TATTLE_VERSION="${PROJECT_VERSION}"
 )
 
-target_include_directories(qtscribe
+target_include_directories(tattle
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
-target_link_libraries(qtscribe
+target_link_libraries(tattle
     PRIVATE
-        qtscribe_ui
-        qtscribe_uiplugin
-        qtscribe::compiler_flags
+        tattle_ui
+        tattle_uiplugin
+        tattle::compiler_flags
 )
 
 
-target_precompile_headers(qtscribe
+target_precompile_headers(tattle
     PRIVATE
         <QGuiApplication>
         <QQmlApplicationEngine>
@@ -182,7 +182,7 @@ if(ENABLE_LTO)
     include(CheckIPOSupported)
     check_ipo_supported(RESULT ipo_supported OUTPUT ipo_error)
     if(ipo_supported)
-        set_target_properties(qtscribe PROPERTIES INTERPROCEDURAL_OPTIMIZATION_RELEASE TRUE)
+        set_target_properties(tattle PROPERTIES INTERPROCEDURAL_OPTIMIZATION_RELEASE TRUE)
     endif()
 endif()
 
@@ -242,7 +242,7 @@ add_custom_target(check-aot
 
 include(GNUInstallDirs)
 
-install(TARGETS qtscribe
+install(TARGETS tattle
     DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
@@ -250,11 +250,11 @@ if(TARGET keyinjectord)
     install(TARGETS keyinjectord
         DESTINATION ${CMAKE_INSTALL_BINDIR}
     )
-    add_dependencies(qtscribe keyinjectord)
+    add_dependencies(tattle keyinjectord)
 endif()
 
-if(TARGET qtscribed)
-    add_dependencies(qtscribe qtscribed)
+if(TARGET tattled)
+    add_dependencies(tattle tattled)
 endif()
 
 if(ENABLE_CPACK_DEB)
@@ -266,12 +266,12 @@ else()
 endif()
 
 install(
-    FILES assets/io.github.qtscribe.desktop assets/io.github.qtscribe.daemon.desktop
+    FILES assets/io.github.tattle.desktop assets/io.github.tattle.daemon.desktop
     DESTINATION ${DESKTOP_AND_ICON_PREFIX}/applications
 )
 
 install(
-    FILES assets/io.github.qtscribe.daemon.desktop
+    FILES assets/io.github.tattle.daemon.desktop
     DESTINATION ${XDG_AUTOSTART_PREFIX}
 )
 
@@ -279,17 +279,17 @@ set(APP_ICON_SIZES 16 24 32 64 128 256 512)
 foreach(SIZE ${APP_ICON_SIZES})
     install(FILES "assets/speech-to-text-${SIZE}.png"
         DESTINATION "${DESKTOP_AND_ICON_PREFIX}/icons/hicolor/${SIZE}x${SIZE}/apps"
-        RENAME "io.github.qtscribe.png"
+        RENAME "io.github.tattle.png"
     )
     install(FILES "assets/speech-to-text-${SIZE}.png"
         DESTINATION "${DESKTOP_AND_ICON_PREFIX}/icons/hicolor/${SIZE}x${SIZE}/apps"
-        RENAME "qtscribe.png"
+        RENAME "tattle.png"
     )
 endforeach()
 
 if(ENABLE_QT_DEPLOYMENT)
     qt_generate_deploy_qml_app_script(
-        TARGET qtscribe
+        TARGET tattle
         OUTPUT_SCRIPT deploy_script
         NO_TRANSLATIONS
 

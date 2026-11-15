@@ -10,7 +10,7 @@ APP_RELEASE="${2:-1}"
 OUTPUT_DIR="${REPO_ROOT}/dist/arch"
 
 echo "======================================================================"
-echo " Building QtScribe Arch Linux Package (.pkg.tar.zst)"
+echo " Building Tattle Arch Linux Package (.pkg.tar.zst)"
 echo " Version: ${APP_VERSION}-${APP_RELEASE}"
 echo " Output : ${OUTPUT_DIR}"
 echo "======================================================================"

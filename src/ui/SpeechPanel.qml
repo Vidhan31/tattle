@@ -2,7 +2,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Templates as T
 import QtQuick.Layouts
-import QtScribe
+import Tattle
 import "controls"
 
 Item {
@@ -150,8 +150,8 @@ Item {
                     StyledButton {
                         id: copyPadBtn
                         text: root.showCopySuccess ? qsTr("Copied!") : qsTr("Copy")
-                        iconSource: root.showCopySuccess ? "qrc:/qt/qml/QtScribe/assets/icons/check.svg" :
-                                                           "qrc:/qt/qml/QtScribe/assets/icons/copy.svg"
+                        iconSource: root.showCopySuccess ? "qrc:/qt/qml/Tattle/assets/icons/check.svg" :
+                                                           "qrc:/qt/qml/Tattle/assets/icons/copy.svg"
                         enabled: DictationPadModel.charCount > 0
                         size: "small"
                         variant: root.showCopySuccess ? "primary" : "secondary"
@@ -165,7 +165,7 @@ Item {
                     StyledButton {
                         id: clearPadBtn
                         text: qsTr("Clear")
-                        iconSource: "qrc:/qt/qml/QtScribe/assets/icons/trash.svg"
+                        iconSource: "qrc:/qt/qml/Tattle/assets/icons/trash.svg"
                         enabled: DictationPadModel.charCount > 0
                         size: "small"
                         onClicked: {

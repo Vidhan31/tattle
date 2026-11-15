@@ -2,7 +2,7 @@
 ARG UBUNTU_VERSION=24.04
 FROM ubuntu:${UBUNTU_VERSION}@sha256:33ceb71981b602c1a7443a53469e4dba065f7503eab3078a2d7a57a2ab987517 AS builder
 
-ARG APP_NAME=qtscribe
+ARG APP_NAME=tattle
 ARG QT_VERSION=6.11.2
 ARG QT_ARCH=linux_gcc_64
 
@@ -102,7 +102,7 @@ RUN git clone https://github.com/frankosterfeld/qtkeychain.git /tmp/qtkeychain-s
 RUN git clone https://github.com/handy-computer/transcribe.cpp.git /opt/transcribe-src && \
     git -C /opt/transcribe-src checkout 275cd50d2c4104c204009a197ac091b9687668e5
 
-# Build QtScribe application and package Debian package with CPack
+# Build Tattle application and package Debian package with CPack
 WORKDIR /build
 COPY . /build/src-tree
 
@@ -117,12 +117,12 @@ WORKDIR /build/build
 RUN cmake -S /build/src-tree -B /build/build -G Ninja \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_PREFIX_PATH="${QT_DIR}" \
-        -DCMAKE_INSTALL_PREFIX="/opt/qtscribe" \
+        -DCMAKE_INSTALL_PREFIX="/opt/tattle" \
         -DENABLE_QT_DEPLOYMENT=ON \
         -DENABLE_CPACK_DEB=ON \
         -DENABLE_VULKAN=ON \
         -DFETCHCONTENT_SOURCE_DIR_TRANSCRIBE=/opt/transcribe-src \
-        ${APP_VERSION:+-DQTSCRIBE_VERSION=${APP_VERSION}} && \
+        ${APP_VERSION:+-DTATTLE_VERSION=${APP_VERSION}} && \
     cmake --build /build/build && \
     QT_QPA_PLATFORM=offscreen ctest --test-dir /build/build --output-on-failure && \
     cpack -G DEB
@@ -143,52 +143,52 @@ RUN set -eux; \
     echo "--- Testing clean package installation via dpkg ---"; \
     dpkg -i "${DEB_PACKAGE}"; \
     \
-    echo "--- Checking installed binaries in /opt/qtscribe/bin ---"; \
-    test -x /opt/qtscribe/bin/qtscribe; \
-    test -x /opt/qtscribe/bin/qtscribed; \
-    test -x /opt/qtscribe/bin/keyinjectord; \
-    test -f /opt/qtscribe/bin/qt.conf; \
+    echo "--- Checking installed binaries in /opt/tattle/bin ---"; \
+    test -x /opt/tattle/bin/tattle; \
+    test -x /opt/tattle/bin/tattled; \
+    test -x /opt/tattle/bin/keyinjectord; \
+    test -f /opt/tattle/bin/qt.conf; \
     \
     echo "--- Checking system wl-clipboard tools ---"; \
     test -x "$(which wl-copy)"; \
     test -x "$(which wl-paste)"; \
     \
     echo "--- Checking symlinks in /usr/bin ---"; \
-    test -L /usr/bin/qtscribe; \
-    test "$(readlink -f /usr/bin/qtscribe)" = "/opt/qtscribe/bin/qtscribe"; \
-    test -L /usr/bin/qtscribed; \
-    test "$(readlink -f /usr/bin/qtscribed)" = "/opt/qtscribe/bin/qtscribed"; \
+    test -L /usr/bin/tattle; \
+    test "$(readlink -f /usr/bin/tattle)" = "/opt/tattle/bin/tattle"; \
+    test -L /usr/bin/tattled; \
+    test "$(readlink -f /usr/bin/tattled)" = "/opt/tattle/bin/tattled"; \
     test -L /usr/bin/keyinjectord; \
-    test "$(readlink -f /usr/bin/keyinjectord)" = "/opt/qtscribe/bin/keyinjectord"; \
+    test "$(readlink -f /usr/bin/keyinjectord)" = "/opt/tattle/bin/keyinjectord"; \
     \
     echo "--- Checking desktop file & icons in /usr/share ---"; \
-    test -f /usr/share/applications/io.github.qtscribe.desktop; \
-    desktop-file-validate /usr/share/applications/io.github.qtscribe.desktop; \
-    test -f /usr/share/applications/io.github.qtscribe.daemon.desktop; \
-    desktop-file-validate /usr/share/applications/io.github.qtscribe.daemon.desktop; \
-    test -f /etc/xdg/autostart/io.github.qtscribe.daemon.desktop; \
-    desktop-file-validate /etc/xdg/autostart/io.github.qtscribe.daemon.desktop; \
-    test -f /usr/share/icons/hicolor/512x512/apps/qtscribe.png; \
-    test -f /usr/share/icons/hicolor/512x512/apps/io.github.qtscribe.png; \
+    test -f /usr/share/applications/io.github.tattle.desktop; \
+    desktop-file-validate /usr/share/applications/io.github.tattle.desktop; \
+    test -f /usr/share/applications/io.github.tattle.daemon.desktop; \
+    desktop-file-validate /usr/share/applications/io.github.tattle.daemon.desktop; \
+    test -f /etc/xdg/autostart/io.github.tattle.daemon.desktop; \
+    desktop-file-validate /etc/xdg/autostart/io.github.tattle.daemon.desktop; \
+    test -f /usr/share/icons/hicolor/512x512/apps/tattle.png; \
+    test -f /usr/share/icons/hicolor/512x512/apps/io.github.tattle.png; \
     \
     echo "--- Checking keyinjectord capability (cap_dac_override) ---"; \
-    getcap /opt/qtscribe/bin/keyinjectord | grep -E 'cap_dac_override'; \
+    getcap /opt/tattle/bin/keyinjectord | grep -E 'cap_dac_override'; \
     \
     echo "--- Checking Wayland platform plugin ---"; \
-    test -f /opt/qtscribe/plugins/platforms/libqwayland.so || \
-    test -f /opt/qtscribe/plugins/platforms/libqwayland-generic.so || \
-    test -f /opt/qtscribe/plugins/platforms/libqwayland-egl.so; \
+    test -f /opt/tattle/plugins/platforms/libqwayland.so || \
+    test -f /opt/tattle/plugins/platforms/libqwayland-generic.so || \
+    test -f /opt/tattle/plugins/platforms/libqwayland-egl.so; \
     \
     echo "--- Asserting complete absence of X11/XCB plugins & libraries ---"; \
-    test -z "$(find /opt/qtscribe -name "*xcb*")"; \
-    test -z "$(find /opt/qtscribe -name "*X11*")"; \
-    test -z "$(find /opt/qtscribe -name "*eglfs*")"; \
+    test -z "$(find /opt/tattle -name "*xcb*")"; \
+    test -z "$(find /opt/tattle -name "*X11*")"; \
+    test -z "$(find /opt/tattle -name "*eglfs*")"; \
     \
     echo "--- Checking Qt companion ICU libraries ---"; \
-    find /opt/qtscribe -name "libicui18n.so*" | grep .; \
+    find /opt/tattle -name "libicui18n.so*" | grep .; \
     \
     echo "--- Verifying that lib/ contains ONLY Qt6, qtkeychain, and Qt-bundled ICU libraries ---"; \
-    NON_QT_LIBS=$(find /opt/qtscribe -type f -name "*.so*" \
+    NON_QT_LIBS=$(find /opt/tattle -type f -name "*.so*" \
         ! -path "*/plugins/*" \
         ! -path "*/qml/*" \
         ! -name "libQt6*" \
@@ -202,9 +202,9 @@ RUN set -eux; \
     fi; \
     \
     echo "--- Testing package removal and cleanup ---"; \
-    dpkg -r qtscribe; \
-    test ! -e /usr/bin/qtscribe; \
-    test ! -e /usr/bin/qtscribed; \
+    dpkg -r tattle; \
+    test ! -e /usr/bin/tattle; \
+    test ! -e /usr/bin/tattled; \
     test ! -e /usr/bin/keyinjectord; \
     echo "Debian package validation succeeded cleanly!"
 

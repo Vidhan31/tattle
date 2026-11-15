@@ -121,7 +121,7 @@ QString ModelCatalogModel::modelsDirectory() {
             return directory;
         }
     }
-    return QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + u"/qtscribe/models"_s;
+    return QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + u"/tattle/models"_s;
 }
 
 QString ModelCatalogModel::selectedModelName() const {

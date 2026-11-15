@@ -1,4 +1,4 @@
-add_library(qtscribe_core STATIC
+add_library(tattle_core STATIC
     ApplicationContext.h
     ApplicationContext.cpp
     AbstractSttClient.h
@@ -89,7 +89,7 @@ add_library(qtscribe_core STATIC
     LinuxNotificationService.cpp
 )
 
-target_include_directories(qtscribe_core
+target_include_directories(tattle_core
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_SOURCE_DIR}/src
@@ -97,7 +97,7 @@ target_include_directories(qtscribe_core
         ${transcribe_SOURCE_DIR}/include
 )
 
-target_link_libraries(qtscribe_core
+target_link_libraries(tattle_core
     PUBLIC
         transcribe
         miniaudio
@@ -107,20 +107,20 @@ target_link_libraries(qtscribe_core
         Qt6::DBus
         Qt6Keychain::Qt6Keychain
     PRIVATE
-        qtscribe::compiler_flags
+        tattle::compiler_flags
 )
 
 if(GGML_VULKAN AND TARGET Vulkan::Vulkan)
-    target_link_libraries(qtscribe_core PRIVATE Vulkan::Vulkan)
+    target_link_libraries(tattle_core PRIVATE Vulkan::Vulkan)
 endif()
 
-target_compile_definitions(qtscribe_core
+target_compile_definitions(tattle_core
     PRIVATE
-        QTSCRIBE_VERSION="${PROJECT_VERSION}"
+        TATTLE_VERSION="${PROJECT_VERSION}"
 )
 
-qt_add_resources(qtscribe_core "qtscribe_core_audio_assets"
-    PREFIX "/qt/qml/QtScribe/assets"
+qt_add_resources(tattle_core "tattle_core_audio_assets"
+    PREFIX "/qt/qml/Tattle/assets"
     BASE "${CMAKE_SOURCE_DIR}/assets"
     FILES
         ${CMAKE_SOURCE_DIR}/assets/chime_start.wav

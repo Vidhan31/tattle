@@ -1,6 +1,6 @@
 %global debug_package %{nil}
 
-Name:           qtscribe
+Name:           tattle
 Version:        %{?version}%{!?version:1.0.0}
 Release:        %{?release}%{!?release:1}%{?dist}
 Summary:        Fast and modern speech-to-text desktop application
@@ -39,7 +39,7 @@ Requires:       vulkan-loader%{?_isa}
 Requires:       wl-clipboard
 
 %description
-QtScribe is a fast, lightweight speech-to-text desktop application
+Tattle is a fast, lightweight speech-to-text desktop application
 built with Qt 6 and QML, offering global shortcuts, audio dictation,
 and seamless desktop integration on Wayland environments (Plasma 6+, GNOME 49+).
 
@@ -58,22 +58,22 @@ and seamless desktop integration on Wayland environments (Plasma 6+, GNOME 49+).
 %cmake_install
 
 %check
-desktop-file-validate %{buildroot}%{_datadir}/applications/io.github.qtscribe.desktop
-desktop-file-validate %{buildroot}%{_datadir}/applications/io.github.qtscribe.daemon.desktop
-desktop-file-validate %{buildroot}%{_sysconfdir}/xdg/autostart/io.github.qtscribe.daemon.desktop
+desktop-file-validate %{buildroot}%{_datadir}/applications/io.github.tattle.desktop
+desktop-file-validate %{buildroot}%{_datadir}/applications/io.github.tattle.daemon.desktop
+desktop-file-validate %{buildroot}%{_sysconfdir}/xdg/autostart/io.github.tattle.daemon.desktop
 QT_QPA_PLATFORM=offscreen %ctest
 
 %files
 %license LICENSE
 %doc README.md
-%{_bindir}/qtscribe
-%{_bindir}/qtscribed
+%{_bindir}/tattle
+%{_bindir}/tattled
 %caps(cap_dac_override=p) %{_bindir}/keyinjectord
-%{_datadir}/applications/io.github.qtscribe.desktop
-%{_datadir}/applications/io.github.qtscribe.daemon.desktop
-%{_sysconfdir}/xdg/autostart/io.github.qtscribe.daemon.desktop
-%{_datadir}/icons/hicolor/*/apps/io.github.qtscribe.png
-%{_datadir}/icons/hicolor/*/apps/qtscribe.png
+%{_datadir}/applications/io.github.tattle.desktop
+%{_datadir}/applications/io.github.tattle.daemon.desktop
+%{_sysconfdir}/xdg/autostart/io.github.tattle.daemon.desktop
+%{_datadir}/icons/hicolor/*/apps/io.github.tattle.png
+%{_datadir}/icons/hicolor/*/apps/tattle.png
 
 %changelog
 * Mon Nov 09 2026 Vidhan Raut <rautvidhan31@gmail.com> - 1.0.0-1

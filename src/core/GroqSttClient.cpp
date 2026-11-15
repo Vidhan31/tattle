@@ -23,17 +23,17 @@
 using namespace Qt::StringLiterals;
 using namespace std::chrono_literals;
 
-#ifndef QTSCRIBE_VERSION
-#define QTSCRIBE_VERSION "0.0.0-dev"
+#ifndef TATTLE_VERSION
+#define TATTLE_VERSION "0.0.0-dev"
 #endif
 
 namespace {
 GroqSttClient* s_groqInstance = nullptr;
 
 QString groqUserAgent() {
-    const QString appVer = QCoreApplication::applicationVersion().isEmpty() ? u"" QTSCRIBE_VERSION ""_s
+    const QString appVer = QCoreApplication::applicationVersion().isEmpty() ? u"" TATTLE_VERSION ""_s
                                                                             : QCoreApplication::applicationVersion();
-    return u"QtScribe/%1 (Linux; Qt %2)"_s.arg(appVer, QString::fromUtf8(QT_VERSION_STR));
+    return u"Tattle/%1 (Linux; Qt %2)"_s.arg(appVer, QString::fromUtf8(QT_VERSION_STR));
 }
 } // namespace
 
@@ -44,7 +44,7 @@ GroqSttClient::GroqSttClient(QObject* parent)
     }
 
     auto* defaultStore = new ApiKeyStore(this);
-    defaultStore->setStorageKeys(u"QtScribe"_s, u"groq_api_key"_s, SettingsKeys::kGroqSettingsKey.toString());
+    defaultStore->setStorageKeys(u"Tattle"_s, u"groq_api_key"_s, SettingsKeys::kGroqSettingsKey.toString());
     setKeyStore(defaultStore);
     m_ownsKeyStore = true;
 

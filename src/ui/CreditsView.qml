@@ -2,7 +2,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import QtScribe
+import Tattle
 import "controls"
 
 Item {
@@ -103,7 +103,7 @@ Item {
                     spacing: Theme.spacingMd
 
                     Image {
-                        source: "qrc:/qt/qml/QtScribe/assets/speech-to-text-64.png"
+                        source: "qrc:/qt/qml/Tattle/assets/speech-to-text-64.png"
                         sourceSize: Qt.size(44, 44)
                         Layout.preferredWidth: 44
                         Layout.preferredHeight: 44
@@ -120,7 +120,7 @@ Item {
                             spacing: Theme.spacingSm
 
                             StyledText {
-                                text: qsTr("QtScribe")
+                                text: qsTr("Tattle")
                                 variant: "heading"
                             }
 

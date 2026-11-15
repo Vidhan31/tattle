@@ -2,7 +2,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Templates as T
 import QtQuick.Layouts
-import QtScribe
+import Tattle
 import "controls"
 
 T.Dialog {
@@ -48,7 +48,7 @@ T.Dialog {
 
             StyledText {
                 text: qsTr(
-                          "QtScribe uses clipboard paste injection simulating Ctrl+Shift+V to insert transcribed speech directly into your active applications on Wayland.")
+                          "Tattle uses clipboard paste injection simulating Ctrl+Shift+V to insert transcribed speech directly into your active applications on Wayland.")
                 variant: "body"
                 wrapMode: Text.WordWrap
                 Layout.fillWidth: true
@@ -74,7 +74,7 @@ T.Dialog {
                         spacing: Theme.spacingSm
 
                         StyledIcon {
-                            source: "qrc:/qt/qml/QtScribe/assets/icons/check.svg"
+                            source: "qrc:/qt/qml/Tattle/assets/icons/check.svg"
                             color: Theme.colorSuccess
                             size: 18
                             Layout.alignment: Qt.AlignTop
@@ -115,7 +115,7 @@ T.Dialog {
                         spacing: Theme.spacingSm
 
                         StyledIcon {
-                            source: "qrc:/qt/qml/QtScribe/assets/icons/info.svg"
+                            source: "qrc:/qt/qml/Tattle/assets/icons/info.svg"
                             color: Theme.colorWarning
                             size: 18
                             Layout.alignment: Qt.AlignTop
@@ -156,7 +156,7 @@ T.Dialog {
                         spacing: Theme.spacingSm
 
                         StyledIcon {
-                            source: "qrc:/qt/qml/QtScribe/assets/icons/keyboard.svg"
+                            source: "qrc:/qt/qml/Tattle/assets/icons/keyboard.svg"
                             color: Theme.accentColor
                             size: 18
                             Layout.alignment: Qt.AlignTop
@@ -197,7 +197,7 @@ T.Dialog {
                         spacing: Theme.spacingSm
 
                         StyledIcon {
-                            source: "qrc:/qt/qml/QtScribe/assets/icons/copy.svg"
+                            source: "qrc:/qt/qml/Tattle/assets/icons/copy.svg"
                             color: Theme.accentColor
                             size: 18
                             Layout.alignment: Qt.AlignTop

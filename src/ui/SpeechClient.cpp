@@ -10,9 +10,9 @@
 
 using namespace Qt::StringLiterals;
 
-static const auto kServiceName = u"io.github.qtscribe.SpeechService"_s;
-static const auto kObjectPath = u"/io/github/qtscribe/SpeechService"_s;
-static const auto kInterface = u"io.github.qtscribe.SpeechService"_s;
+static const auto kServiceName = u"io.github.tattle.SpeechService"_s;
+static const auto kObjectPath = u"/io/github/tattle/SpeechService"_s;
+static const auto kInterface = u"io.github.tattle.SpeechService"_s;
 
 SpeechClient::SpeechClient(QObject* parent)
     : QObject(parent) {
@@ -27,8 +27,8 @@ SpeechClient::SpeechClient(QObject* parent)
     m_autoSwitchOffline = settings.value(SettingsKeys::kSpeechAutoSwitchOffline.toString(), true).toBool();
     m_statusMessage = tr("Connecting to service…");
 
-    const bool disableRemoteAttach = !qEnvironmentVariableIsEmpty("QTSCRIBE_DISABLE_REMOTE_ATTACH") &&
-                                     qEnvironmentVariable("QTSCRIBE_DISABLE_REMOTE_ATTACH") != "0";
+    const bool disableRemoteAttach = !qEnvironmentVariableIsEmpty("TATTLE_DISABLE_REMOTE_ATTACH") &&
+                                     qEnvironmentVariable("TATTLE_DISABLE_REMOTE_ATTACH") != "0";
     if (disableRemoteAttach) {
         m_statusMessage = tr("Background service offline");
         return;

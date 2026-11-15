@@ -41,7 +41,7 @@ add_executable(keyinjectord
 target_link_libraries(keyinjectord PRIVATE
     PkgConfig::LIBEVDEV
     PkgConfig::LIBCAP
-    qtscribe::compiler_flags
+    tattle::compiler_flags
 )
 
 option(KEYINJECTORD_DEV_AUTH "Enable relaxed launcher authorization for development/testing" OFF)

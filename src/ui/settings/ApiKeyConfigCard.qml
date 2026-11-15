@@ -2,7 +2,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Templates as T
 import QtQuick.Layouts
-import QtScribe
+import Tattle
 import "../controls"
 
 StyledCard {
@@ -59,7 +59,7 @@ StyledCard {
 
                     StyledIcon {
                         anchors.centerIn: parent
-                        source: "qrc:/qt/qml/QtScribe/assets/icons/check.svg"
+                        source: "qrc:/qt/qml/Tattle/assets/icons/check.svg"
                         size: 10
                         color: Theme.textOnAccent
                         visible: showKeyCheck.checked
@@ -79,7 +79,7 @@ StyledCard {
             StyledButton {
                 id: saveKeyBtn
                 text: qsTr("Save")
-                iconSource: "qrc:/qt/qml/QtScribe/assets/icons/save.svg"
+                iconSource: "qrc:/qt/qml/Tattle/assets/icons/save.svg"
                 variant: "primary"
                 size: "medium"
                 Layout.alignment: Qt.AlignVCenter

@@ -27,7 +27,7 @@ private slots:
         QVERIFY(store.apiKey().isEmpty());
         QVERIFY(!store.apiKeySet());
         QVERIFY(!store.isLoading());
-        QCOMPARE(store.keychainService(), u"QtScribe"_s);
+        QCOMPARE(store.keychainService(), u"Tattle"_s);
         QCOMPARE(store.keychainKey(), u"groq_api_key"_s);
         QCOMPARE(store.settingsKey(), u"Cloud/Providers/Groq/ApiKey"_s);
     }
@@ -68,7 +68,7 @@ private slots:
         }
 
         ApiKeyStore store;
-        store.setStorageKeys(u"QtScribeIsolatedTestSvc"_s, u"unused_nonexistent_key_9999"_s,
+        store.setStorageKeys(u"TattleIsolatedTestSvc"_s, u"unused_nonexistent_key_9999"_s,
                              u"Cloud/Providers/Groq/ApiKey"_s);
 
         // Ensure key load happens
@@ -105,7 +105,7 @@ private slots:
 
     void testClearCachedKeyWhenReloadFindsNoKey() {
         ApiKeyStore store;
-        store.setStorageKeys(u"QtScribeIsolatedTestSvc"_s, u"unused_nonexistent_key_9999"_s,
+        store.setStorageKeys(u"TattleIsolatedTestSvc"_s, u"unused_nonexistent_key_9999"_s,
                              u"Test/ApiKey"_s);
 
         {

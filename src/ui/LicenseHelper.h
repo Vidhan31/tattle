@@ -20,7 +20,7 @@ public:
         if (!m_cachedLicenseText.isEmpty()) {
             return m_cachedLicenseText;
         }
-        QFile file(QStringLiteral(":/qt/qml/QtScribe/license/LICENSE"));
+        QFile file(QStringLiteral(":/qt/qml/Tattle/license/LICENSE"));
         if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
             m_cachedLicenseText = QString::fromUtf8(file.readAll());
             return m_cachedLicenseText;

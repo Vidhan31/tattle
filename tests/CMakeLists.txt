@@ -20,26 +20,26 @@ else()
     set(QT_TEST_LD_PREPEND "")
 endif()
 
-set(QTSCRIBE_TEST_ENVIRONMENT
+set(TATTLE_TEST_ENVIRONMENT
     "QT_QPA_PLATFORM=offscreen"
     "QT_MEDIA_BACKEND=null"
-    "QTSCRIBE_DISABLE_REMOTE_ATTACH=1"
+    "TATTLE_DISABLE_REMOTE_ATTACH=1"
     "LD_LIBRARY_PATH=${QT_TEST_LD_PREPEND}$ENV{LD_LIBRARY_PATH}"
 )
 
 if(ENABLE_ASAN_UBSAN)
-    list(APPEND QTSCRIBE_TEST_ENVIRONMENT
+    list(APPEND TATTLE_TEST_ENVIRONMENT
         "ASAN_OPTIONS=detect_leaks=1:halt_on_error=1"
         "LSAN_OPTIONS=suppressions=${CMAKE_SOURCE_DIR}/tests/sanitizers/lsan.supp"
         "UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:suppressions=${CMAKE_SOURCE_DIR}/tests/sanitizers/ubsan.supp"
     )
 elseif(ENABLE_TSAN)
-    list(APPEND QTSCRIBE_TEST_ENVIRONMENT
+    list(APPEND TATTLE_TEST_ENVIRONMENT
         "TSAN_OPTIONS=halt_on_error=1:second_deadlock_stack=1:suppressions=${CMAKE_SOURCE_DIR}/tests/sanitizers/tsan.supp"
     )
 endif()
 
-function(add_qtscribe_test name)
+function(add_tattle_test name)
     cmake_parse_arguments(PARSE_ARGV 1 ARG "" "TEST_NAME" "SOURCES;LIBRARIES;DEFINITIONS;INCLUDES")
 
     set(target "test_${name}")
@@ -65,8 +65,8 @@ function(add_qtscribe_test name)
 
     target_link_libraries(${target}
         PRIVATE
-            qtscribe_core
-            qtscribe::compiler_flags
+            tattle_core
+            tattle::compiler_flags
             Qt6::Core
             Qt6::Test
             ${ARG_LIBRARIES}
@@ -84,22 +84,22 @@ function(add_qtscribe_test name)
 
     add_test(NAME ${ctest_name} COMMAND ${target})
     set_tests_properties(${ctest_name} PROPERTIES
-        ENVIRONMENT "${QTSCRIBE_TEST_ENVIRONMENT};XDG_CONFIG_HOME=${CMAKE_CURRENT_BINARY_DIR}/test_xdg_config/${ctest_name};XDG_DATA_HOME=${CMAKE_CURRENT_BINARY_DIR}/test_xdg_data/${ctest_name}"
+        ENVIRONMENT "${TATTLE_TEST_ENVIRONMENT};XDG_CONFIG_HOME=${CMAKE_CURRENT_BINARY_DIR}/test_xdg_config/${ctest_name};XDG_DATA_HOME=${CMAKE_CURRENT_BINARY_DIR}/test_xdg_data/${ctest_name}"
         TIMEOUT 30
     )
 endfunction()
 
-add_qtscribe_test(transcribe_pipeline
+add_tattle_test(transcribe_pipeline
     TEST_NAME TranscribePipelineTest
     LIBRARIES Qt6::Gui Qt6::Multimedia Qt6::Network
 )
 
-add_qtscribe_test(transcribe_model_manager
+add_tattle_test(transcribe_model_manager
     TEST_NAME TranscribeModelManagerTest
     LIBRARIES Qt6::Network
 )
 
-add_qtscribe_test(dictation_coordinator
+add_tattle_test(dictation_coordinator
     TEST_NAME DictationCoordinatorTest
     SOURCES
         test_dictation_coordinator.cpp
@@ -113,12 +113,12 @@ add_qtscribe_test(dictation_coordinator
     LIBRARIES Qt6::Gui Qt6::Multimedia Qt6::Network Qt6::DBus
 )
 
-add_qtscribe_test(http_request_runner
+add_tattle_test(http_request_runner
     TEST_NAME HttpRequestRunnerTest
     LIBRARIES Qt6::Network
 )
 
-add_qtscribe_test(ipc_server
+add_tattle_test(ipc_server
     TEST_NAME IpcServerTest
     SOURCES
         test_ipc_server.cpp
@@ -137,17 +137,17 @@ add_qtscribe_test(ipc_server
         KEYINJECTORD_DEV_AUTH=1
 )
 
-add_qtscribe_test(groq_stt_client
+add_tattle_test(groq_stt_client
     TEST_NAME GroqSttClientTest
     LIBRARIES Qt6::Network
 )
 
-add_qtscribe_test(network_tls
+add_tattle_test(network_tls
     TEST_NAME NetworkTlsTest
     LIBRARIES Qt6::Network
 )
 
-add_qtscribe_test(status_notifier
+add_tattle_test(status_notifier
     TEST_NAME StatusNotifierTest
     LIBRARIES Qt6::Gui Qt6::Network Qt6::DBus
 )
@@ -155,12 +155,12 @@ set_tests_properties(StatusNotifierTest PROPERTIES
     RESOURCE_LOCK dbus_session
 )
 
-add_qtscribe_test(application_context
+add_tattle_test(application_context
     TEST_NAME ApplicationContextTest
     LIBRARIES Qt6::Gui Qt6::Multimedia Qt6::Network Qt6::DBus
 )
 
-add_qtscribe_test(cloud_provider_model
+add_tattle_test(cloud_provider_model
     TEST_NAME CloudProviderModelTest
     SOURCES
         test_cloud_provider_model.cpp
@@ -175,7 +175,7 @@ add_qtscribe_test(cloud_provider_model
         Qt6::DBus
 )
 
-add_qtscribe_test(model_catalog_model
+add_tattle_test(model_catalog_model
     TEST_NAME ModelCatalogModelTest
     SOURCES
         test_model_catalog_model.cpp
@@ -189,37 +189,37 @@ add_qtscribe_test(model_catalog_model
         Qt6::DBus
 )
 
-add_qtscribe_test(gemini_stt_client
+add_tattle_test(gemini_stt_client
     TEST_NAME GeminiSttClientTest
     LIBRARIES Qt6::Network
 )
 
-add_qtscribe_test(meta_musa_stt_client
+add_tattle_test(meta_musa_stt_client
     TEST_NAME MetaMusaSttClientTest
     LIBRARIES Qt6::Network
 )
 
-add_qtscribe_test(cloud_stt_router
+add_tattle_test(cloud_stt_router
     TEST_NAME CloudSttRouterTest
     LIBRARIES Qt6::Network
 )
 
-add_qtscribe_test(linux_notification_service
+add_tattle_test(linux_notification_service
     TEST_NAME LinuxNotificationServiceTest
     LIBRARIES Qt6::Gui Qt6::DBus
 )
 
-add_qtscribe_test(text_injector
+add_tattle_test(text_injector
     TEST_NAME TextInjectorTest
     LIBRARIES Qt6::Network
 )
 
-add_qtscribe_test(settings_manager
+add_tattle_test(settings_manager
     TEST_NAME SettingsManagerTest
     LIBRARIES Qt6::Network Qt6::DBus
 )
 
-add_qtscribe_test(daemon_diagnostic_model
+add_tattle_test(daemon_diagnostic_model
     TEST_NAME DaemonDiagnosticModelTest
     SOURCES
         test_daemon_diagnostic_model.cpp
@@ -234,22 +234,22 @@ add_qtscribe_test(daemon_diagnostic_model
         Qt6::DBus
 )
 
-add_qtscribe_test(composite_stt_engine
+add_tattle_test(composite_stt_engine
     TEST_NAME CompositeSttEngineTest
     LIBRARIES Qt6::Network Qt6::DBus
 )
 
-add_qtscribe_test(notification_presenter
+add_tattle_test(notification_presenter
     TEST_NAME NotificationPresenterTest
     LIBRARIES Qt6::Gui Qt6::Multimedia Qt6::Network Qt6::DBus
 )
 
-add_qtscribe_test(cloud_response_parser
+add_tattle_test(cloud_response_parser
     TEST_NAME CloudResponseParserTest
     LIBRARIES Qt6::Network
 )
 
-add_qtscribe_test(history_repository
+add_tattle_test(history_repository
     TEST_NAME HistoryRepositoryTest
     SOURCES
         test_history_repository.cpp
@@ -257,7 +257,7 @@ add_qtscribe_test(history_repository
         Qt6::Core
 )
 
-add_qtscribe_test(transcription_model
+add_tattle_test(transcription_model
     TEST_NAME TranscriptionModelTest
     SOURCES
         test_transcription_model.cpp
@@ -272,11 +272,11 @@ add_qtscribe_test(transcription_model
         Qt6::DBus
 )
 
-add_qtscribe_test(api_key_store
+add_tattle_test(api_key_store
     TEST_NAME ApiKeyStoreTest
 )
 
-add_qtscribe_test(clipboard_manager
+add_tattle_test(clipboard_manager
     TEST_NAME ClipboardManagerTest
 )
 
@@ -284,12 +284,12 @@ add_test(NAME WaylandOnlyPackagingTest
     COMMAND bash "${CMAKE_SOURCE_DIR}/scripts/ci/check-wayland-only.sh"
 )
 set_tests_properties(WaylandOnlyPackagingTest PROPERTIES
-    ENVIRONMENT "${QTSCRIBE_TEST_ENVIRONMENT}"
+    ENVIRONMENT "${TATTLE_TEST_ENVIRONMENT}"
 )
 
 add_test(NAME NoQtCopyRelocTest
-    COMMAND bash "${CMAKE_SOURCE_DIR}/scripts/ci/check-no-qt-copy-reloc.sh" "$<TARGET_FILE:qtscribe>"
+    COMMAND bash "${CMAKE_SOURCE_DIR}/scripts/ci/check-no-qt-copy-reloc.sh" "$<TARGET_FILE:tattle>"
 )
 set_tests_properties(NoQtCopyRelocTest PROPERTIES
-    ENVIRONMENT "${QTSCRIBE_TEST_ENVIRONMENT}"
+    ENVIRONMENT "${TATTLE_TEST_ENVIRONMENT}"
 )

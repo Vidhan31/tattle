@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 FROM archlinux:base-devel@sha256:61f7de2dd88cc4ba1fe36c24cfe1a503c3936984492d6405eeab013ce6ac68c5 AS builder
 
-ARG APP_NAME=qtscribe
+ARG APP_NAME=tattle
 
 # Initialize pacman keyring and install build + runtime dependencies
 RUN pacman-key --init && \
@@ -51,7 +51,7 @@ WORKDIR /build
 # Copy source tree and packaging templates
 COPY --chown=builduser:builduser . /build/src-tree
 COPY --chown=builduser:builduser packaging/arch/PKGBUILD /build/PKGBUILD
-COPY --chown=builduser:builduser packaging/arch/qtscribe.install /build/qtscribe.install
+COPY --chown=builduser:builduser packaging/arch/tattle.install /build/tattle.install
 
 RUN chown -R builduser:builduser /build
 
@@ -123,15 +123,15 @@ RUN set -eux; \
     echo "============================================================"; \
     echo "Validating installed binaries & capabilities:"; \
     echo "============================================================"; \
-    test -x /usr/bin/qtscribe; \
-    test -x /usr/bin/qtscribed; \
+    test -x /usr/bin/tattle; \
+    test -x /usr/bin/tattled; \
     test -x /usr/bin/keyinjectord; \
-    test -f /usr/share/applications/io.github.qtscribe.desktop; \
-    desktop-file-validate /usr/share/applications/io.github.qtscribe.desktop; \
-    test -f /usr/share/applications/io.github.qtscribe.daemon.desktop; \
-    desktop-file-validate /usr/share/applications/io.github.qtscribe.daemon.desktop; \
-    test -f /etc/xdg/autostart/io.github.qtscribe.daemon.desktop; \
-    desktop-file-validate /etc/xdg/autostart/io.github.qtscribe.daemon.desktop; \
+    test -f /usr/share/applications/io.github.tattle.desktop; \
+    desktop-file-validate /usr/share/applications/io.github.tattle.desktop; \
+    test -f /usr/share/applications/io.github.tattle.daemon.desktop; \
+    desktop-file-validate /usr/share/applications/io.github.tattle.daemon.desktop; \
+    test -f /etc/xdg/autostart/io.github.tattle.daemon.desktop; \
+    desktop-file-validate /etc/xdg/autostart/io.github.tattle.daemon.desktop; \
     getcap /usr/bin/keyinjectord | grep -E 'cap_dac_override[+=]p'
 
 FROM scratch AS export

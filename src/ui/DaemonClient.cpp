@@ -6,7 +6,7 @@
 
 using namespace Qt::StringLiterals;
 
-static const auto kServiceName = u"io.github.qtscribe.SpeechService"_s;
+static const auto kServiceName = u"io.github.tattle.SpeechService"_s;
 
 DaemonClient::DaemonClient(QObject* parent)
     : QObject(parent) {

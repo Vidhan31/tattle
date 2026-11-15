@@ -1,7 +1,7 @@
 pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Layouts
-import QtScribe
+import Tattle
 import "controls"
 
 Item {
@@ -52,7 +52,7 @@ Item {
             StyledButton {
                 id: clearHistoryBtn
                 text: qsTr("Clear History")
-                iconSource: "qrc:/qt/qml/QtScribe/assets/icons/trash.svg"
+                iconSource: "qrc:/qt/qml/Tattle/assets/icons/trash.svg"
                 size: "small"
                 enabled: TranscriptionModel.count > 0
                 onClicked: {
@@ -210,8 +210,8 @@ Item {
                             StyledButton {
                                 id: copyBtn
                                 text: delegateItem.isCopied ? qsTr("Copied!") : qsTr("Copy")
-                                iconSource: delegateItem.isCopied ? "qrc:/qt/qml/QtScribe/assets/icons/check.svg" :
-                                                                    "qrc:/qt/qml/QtScribe/assets/icons/copy.svg"
+                                iconSource: delegateItem.isCopied ? "qrc:/qt/qml/Tattle/assets/icons/check.svg" :
+                                                                    "qrc:/qt/qml/Tattle/assets/icons/copy.svg"
                                 size: "small"
                                 variant: delegateItem.isCopied ? "primary" : "secondary"
                                 customAccentColor: delegateItem.isCopied ? Theme.colorSuccess : "transparent"

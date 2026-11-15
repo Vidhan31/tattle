@@ -2,7 +2,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Templates as T
 import QtQuick.Layouts
-import QtScribe
+import Tattle
 import "../controls"
 
 StyledCard {
@@ -96,7 +96,7 @@ StyledCard {
             StyledButton {
                 id: clearVocabBtn
                 text: qsTr("Clear")
-                iconSource: "qrc:/qt/qml/QtScribe/assets/icons/trash.svg"
+                iconSource: "qrc:/qt/qml/Tattle/assets/icons/trash.svg"
                 enabled: vocabArea.text.length > 0
                 size: "small"
                 onClicked: {
@@ -109,7 +109,7 @@ StyledCard {
             StyledButton {
                 id: saveVocabBtn
                 text: qsTr("Save")
-                iconSource: "qrc:/qt/qml/QtScribe/assets/icons/save.svg"
+                iconSource: "qrc:/qt/qml/Tattle/assets/icons/save.svg"
                 size: "small"
                 variant: "primary"
                 onClicked: {

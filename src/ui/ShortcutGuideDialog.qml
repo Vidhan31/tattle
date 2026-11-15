@@ -2,7 +2,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Templates as T
 import QtQuick.Layouts
-import QtScribe
+import Tattle
 import "controls"
 
 T.Dialog {
@@ -42,7 +42,7 @@ T.Dialog {
 
         StyledText {
             text: qsTr(
-                      "Your desktop environment does not support the XDG Global Shortcuts portal directly, but you can easily set up a system-wide hotkey using the QtScribe CLI command:")
+                      "Your desktop environment does not support the XDG Global Shortcuts portal directly, but you can easily set up a system-wide hotkey using the Tattle CLI command:")
             variant: "body"
             wrapMode: Text.WordWrap
             Layout.fillWidth: true
@@ -61,7 +61,7 @@ T.Dialog {
                 anchors.margins: Theme.spacingSm
 
                 StyledText {
-                    text: "qtscribe --toggle"
+                    text: "tattle --toggle"
                     fontFamily: "mono"
                     customWeight: Font.Bold
                     colorRole: "accent"
@@ -71,11 +71,11 @@ T.Dialog {
                 StyledButton {
                     id: copyCmdBtn
                     text: qsTr("Copy Command")
-                    iconSource: "qrc:/qt/qml/QtScribe/assets/icons/copy.svg"
+                    iconSource: "qrc:/qt/qml/Tattle/assets/icons/copy.svg"
                     variant: "flat"
                     size: "small"
                     onClicked: {
-                        TranscriptionModel.copyToClipboard("qtscribe --toggle");
+                        TranscriptionModel.copyToClipboard("tattle --toggle");
                     }
                 }
             }
@@ -93,7 +93,7 @@ T.Dialog {
 
             StyledText {
                 text: qsTr(
-                          "1. Open <b>Settings → Keyboard → View and Customize Shortcuts</b>.<br>2. Scroll down to <b>Custom Shortcuts</b> and click <b>+</b>.<br>3. Set Name to <i>QtScribe</i>, Command to <code>qtscribe --toggle</code>, and Shortcut to <b>Ctrl+Shift+Space</b>.")
+                          "1. Open <b>Settings → Keyboard → View and Customize Shortcuts</b>.<br>2. Scroll down to <b>Custom Shortcuts</b> and click <b>+</b>.<br>3. Set Name to <i>Tattle</i>, Command to <code>tattle --toggle</code>, and Shortcut to <b>Ctrl+Shift+Space</b>.")
                 textFormat: Text.StyledText
                 variant: "caption"
                 colorRole: "secondary"

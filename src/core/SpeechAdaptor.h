@@ -7,7 +7,7 @@ class DictationCoordinator;
 
 class SpeechAdaptor : public QDBusAbstractAdaptor {
     Q_OBJECT
-    Q_CLASSINFO("D-Bus Interface", "io.github.qtscribe.SpeechService")
+    Q_CLASSINFO("D-Bus Interface", "io.github.tattle.SpeechService")
 
     Q_PROPERTY(int activeBackend READ activeBackend WRITE setActiveBackend NOTIFY activeBackendChanged)
     Q_PROPERTY(int recordingMode READ recordingMode WRITE setRecordingMode NOTIFY recordingModeChanged)

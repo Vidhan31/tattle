@@ -31,7 +31,7 @@ private:
 };
 
 void TestDaemonDiagnosticModel::initTestCase() {
-    qputenv("QTSCRIBE_DISABLE_REMOTE_ATTACH", "1");
+    qputenv("TATTLE_DISABLE_REMOTE_ATTACH", "1");
     QCoreApplication::setOrganizationName(u"QTranscribeTestOrg"_s);
     QCoreApplication::setApplicationName(u"QTranscribeTestApp_DaemonDiagnosticModel"_s);
     QSettings settings;
@@ -109,7 +109,7 @@ void TestDaemonDiagnosticModel::testDaemonClientCanRecordOffline() {
     QVERIFY(!client.canRecord());
 
     QSignalSpy canRecordSpy(&client, &DaemonClient::canRecordChanged);
-    QMetaObject::invokeMethod(&client, "onServiceUnregistered", Q_ARG(QString, u"io.github.qtscribe.SpeechService"_s));
+    QMetaObject::invokeMethod(&client, "onServiceUnregistered", Q_ARG(QString, u"io.github.tattle.SpeechService"_s));
     QCOMPARE(canRecordSpy.count(), 1);
     QVERIFY(!client.canRecord());
 }
@@ -125,7 +125,7 @@ void TestDaemonDiagnosticModel::testDaemonClientFocusCaching() {
 }
 
 void TestDaemonDiagnosticModel::testDaemonClientHonorsDisableRemoteAttach() {
-    qputenv("QTSCRIBE_DISABLE_REMOTE_ATTACH", "1");
+    qputenv("TATTLE_DISABLE_REMOTE_ATTACH", "1");
     DaemonClient client;
     QVERIFY(!client.isConnected());
     QVERIFY(!client.canRecord());

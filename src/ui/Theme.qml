@@ -2,7 +2,7 @@ pragma Singleton
 pragma ComponentBehavior: Bound
 pragma ValueTypeBehavior: Addressable
 import QtQuick
-import QtScribe
+import Tattle
 
 QtObject {
     id: root

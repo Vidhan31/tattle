@@ -25,17 +25,17 @@
 using namespace Qt::StringLiterals;
 using namespace std::chrono_literals;
 
-#ifndef QTSCRIBE_VERSION
-#define QTSCRIBE_VERSION "0.0.0-dev"
+#ifndef TATTLE_VERSION
+#define TATTLE_VERSION "0.0.0-dev"
 #endif
 
 namespace {
 GeminiSttClient* s_geminiInstance = nullptr;
 
 QString geminiUserAgent() {
-    const QString appVer = QCoreApplication::applicationVersion().isEmpty() ? u"" QTSCRIBE_VERSION ""_s
+    const QString appVer = QCoreApplication::applicationVersion().isEmpty() ? u"" TATTLE_VERSION ""_s
                                                                             : QCoreApplication::applicationVersion();
-    return u"QtScribe/%1 (Linux; Qt %2)"_s.arg(appVer, QString::fromUtf8(QT_VERSION_STR));
+    return u"Tattle/%1 (Linux; Qt %2)"_s.arg(appVer, QString::fromUtf8(QT_VERSION_STR));
 }
 } // namespace
 
@@ -46,7 +46,7 @@ GeminiSttClient::GeminiSttClient(QObject* parent)
     }
 
     auto* defaultStore = new ApiKeyStore(this);
-    defaultStore->setStorageKeys(u"QtScribe"_s, u"gemini_api_key"_s, SettingsKeys::kGeminiSettingsKey.toString());
+    defaultStore->setStorageKeys(u"Tattle"_s, u"gemini_api_key"_s, SettingsKeys::kGeminiSettingsKey.toString());
     setKeyStore(defaultStore);
     m_ownsKeyStore = true;
 

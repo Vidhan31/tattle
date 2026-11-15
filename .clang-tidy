@@ -1,5 +1,5 @@
 ---
-# QtScribe clang-tidy configuration
+# Tattle clang-tidy configuration
 # Incremental adoption strategy: high-confidence bugprone & performance checks treated as errors.
 Checks: >
   -*,

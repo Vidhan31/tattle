@@ -194,16 +194,16 @@ void TestNotificationPresenter::testNoMicrophoneNotificationAndClear() {
 
 void TestNotificationPresenter::testFailoverNotifications() {
     emit m_sttEngine->failoverTriggered();
-    QCOMPARE(m_service->m_lastTitle, u"QtScribe: Switched to Offline Dictation"_s);
+    QCOMPARE(m_service->m_lastTitle, u"Tattle: Switched to Offline Dictation"_s);
 
     emit m_sttEngine->onlineRestored();
-    QCOMPARE(m_service->m_lastTitle, u"QtScribe: Internet Connection Restored"_s);
+    QCOMPARE(m_service->m_lastTitle, u"Tattle: Internet Connection Restored"_s);
 
     emit m_sttEngine->offlineModelRequired();
-    QCOMPARE(m_service->m_lastTitle, u"QtScribe: Offline Model Required"_s);
+    QCOMPARE(m_service->m_lastTitle, u"Tattle: Offline Model Required"_s);
 
     emit m_sttEngine->networkDisconnectedDuringSession();
-    QCOMPARE(m_service->m_lastTitle, u"QtScribe: Network Disconnected"_s);
+    QCOMPARE(m_service->m_lastTitle, u"Tattle: Network Disconnected"_s);
 }
 
 void TestNotificationPresenter::testActionInvokedRouting() {

@@ -7,7 +7,7 @@ class SystemService;
 
 class SystemAdaptor : public QDBusAbstractAdaptor {
     Q_OBJECT
-    Q_CLASSINFO("D-Bus Interface", "io.github.qtscribe.SystemService")
+    Q_CLASSINFO("D-Bus Interface", "io.github.tattle.SystemService")
 
     Q_PROPERTY(bool pushToTalkSupported READ pushToTalkSupported NOTIFY shortcutStatusChanged)
     Q_PROPERTY(bool shortcutAvailable READ shortcutAvailable NOTIFY shortcutStatusChanged)

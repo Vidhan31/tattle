@@ -55,7 +55,7 @@ bool ModelDownloader::startDownload(const QString& modelId, const QString& model
     QNetworkRequest request {QUrl(downloadUrl)};
     request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
     QHttpHeaders headers;
-    headers.append(QHttpHeaders::WellKnownHeader::UserAgent, u"QtScribe/1.0 (Linux; Wayland)"_s);
+    headers.append(QHttpHeaders::WellKnownHeader::UserAgent, u"Tattle/1.0 (Linux; Wayland)"_s);
     request.setHeaders(headers);
 
     qCDebug(lcSpeech) << "ModelDownloader: Starting download for" << modelId << "from" << downloadUrl;

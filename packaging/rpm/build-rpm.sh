@@ -11,7 +11,7 @@ APP_RELEASE="${3:-1}"
 OUTPUT_DIR="${REPO_ROOT}/dist/rpm"
 
 echo "======================================================================"
-echo " Building QtScribe RPM for Fedora (${FEDORA_VERSION})"
+echo " Building Tattle RPM for Fedora (${FEDORA_VERSION})"
 echo " Version: ${APP_VERSION}-${APP_RELEASE}"
 echo " Output : ${OUTPUT_DIR}"
 echo "======================================================================"

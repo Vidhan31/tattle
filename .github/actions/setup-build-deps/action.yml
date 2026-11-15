@@ -1,5 +1,5 @@
-name: "Setup QtScribe Build Dependencies"
-description: "Install common Linux apt build dependencies for QtScribe"
+name: "Setup Tattle Build Dependencies"
+description: "Install common Linux apt build dependencies for Tattle"
 inputs:
   extra-packages:
     description: "Additional packages to install"

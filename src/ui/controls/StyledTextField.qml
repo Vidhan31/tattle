@@ -1,7 +1,7 @@
 pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Templates as T
-import QtScribe
+import Tattle
 
 T.TextField {
     id: root

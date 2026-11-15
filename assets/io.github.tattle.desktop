@@ -1,9 +1,9 @@
 [Desktop Entry]
 Type=Application
-Name=QtScribe
-Exec=qtscribe
-Icon=io.github.qtscribe
+Name=Tattle
+Exec=tattle
+Icon=io.github.tattle
 Categories=Utility;
 Terminal=false
-StartupWMClass=io.github.qtscribe
+StartupWMClass=io.github.tattle
 Comment=Speech to Text Application

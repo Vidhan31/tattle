@@ -1,4 +1,4 @@
-# QtScribe
+# Tattle
 
 Voice typing for Wayland. Press a shortcut, speak, and your words appear directly in the active input field.
 
@@ -9,7 +9,7 @@ Offline transcription runs locally on your device, keeping your audio private. Y
 > - Google Gemini: [aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey)
 
 <p align="center">
-  <img src="assets/screenshots/Qtscribe-Screenshots-1.png" alt="QtScribe main window" width="800" />
+  <img src="assets/screenshots/Tattle-Screenshots-1.png" alt="Tattle main window" width="800" />
 </p>
 
 ---
@@ -17,16 +17,16 @@ Offline transcription runs locally on your device, keeping your audio private. Y
 ## Screenshots
 
 <p align="center">
-  <img src="assets/screenshots/Qtscribe-Screenshots-3.png" alt="Offline speech engine settings" width="400" />
-  <img src="assets/screenshots/Qtscribe-Screenshots-4.png" alt="Local model library" width="400" />
+  <img src="assets/screenshots/Tattle-Screenshots-3.png" alt="Offline speech engine settings" width="400" />
+  <img src="assets/screenshots/Tattle-Screenshots-4.png" alt="Local model library" width="400" />
 </p>
 <p align="center">
-  <img src="assets/screenshots/Qtscribe-Screenshots-5.png" alt="Cloud provider configuration" width="400" />
-  <img src="assets/screenshots/Qtscribe-Screenshots-6.png" alt="Language and custom vocabulary" width="400" />
+  <img src="assets/screenshots/Tattle-Screenshots-5.png" alt="Cloud provider configuration" width="400" />
+  <img src="assets/screenshots/Tattle-Screenshots-6.png" alt="Language and custom vocabulary" width="400" />
 </p>
 <p align="center">
-  <img src="assets/screenshots/Qtscribe-Screenshots-8.png" alt="Audio device settings" width="400" />
-  <img src="assets/screenshots/Qtscribe-Screenshots-9.png" alt="Shortcut configuration" width="400" />
+  <img src="assets/screenshots/Tattle-Screenshots-8.png" alt="Audio device settings" width="400" />
+  <img src="assets/screenshots/Tattle-Screenshots-9.png" alt="Shortcut configuration" width="400" />
 </p>
 
 ---
@@ -55,40 +55,40 @@ Pre-built packages are attached to each [GitHub release](../../releases).
 ### Debian and Ubuntu (.deb)
 
 ```bash
-sudo apt install ./qtscribe_*_amd64.deb
+sudo apt install ./tattle_*_amd64.deb
 ```
 
-Installs binaries to `/usr/bin/qtscribe` and `/usr/bin/keyinjectord`, installs desktop files, and configures file capabilities on the helper daemon.
+Installs binaries to `/usr/bin/tattle` and `/usr/bin/keyinjectord`, installs desktop files, and configures file capabilities on the helper daemon.
 
 To uninstall:
 ```bash
-sudo apt remove qtscribe
+sudo apt remove tattle
 ```
 
 ### Fedora and RHEL (.rpm)
 
 ```bash
-sudo dnf install ./qtscribe-*.x86_64.rpm
+sudo dnf install ./tattle-*.x86_64.rpm
 ```
 
 To uninstall:
 ```bash
-sudo dnf remove qtscribe
+sudo dnf remove tattle
 ```
 
 ### Arch Linux (.pkg.tar.zst / AUR)
 
 ```bash
 # Pre-built package
-sudo pacman -U ./qtscribe-*-x86_64.pkg.tar.zst
+sudo pacman -U ./tattle-*-x86_64.pkg.tar.zst
 
 # AUR
-yay -S qtscribe
+yay -S tattle
 ```
 
 To uninstall:
 ```bash
-sudo pacman -R qtscribe
+sudo pacman -R tattle
 ```
 
 ---
@@ -99,26 +99,26 @@ For the best experience, use GNOME 48 or above, or KDE Plasma 6 and above. These
 
 ### Input injection and security
 
-QtScribe cannot read, intercept, or log keystrokes. It only has write access to inject transcribed text through a helper daemon writing to `/dev/uinput`.
+Tattle cannot read, intercept, or log keystrokes. It only has write access to inject transcribed text through a helper daemon writing to `/dev/uinput`.
 
 ### Push-to-talk portal support
 
-Push-to-talk mode requires the desktop compositor to implement the `org.freedesktop.portal.GlobalShortcuts` portal interface. The portal delivers press and release events, allowing the app to detect when a key is held down and released. On environments without this portal, dictation works via toggle mode using a custom shortcut mapped to `qtscribe --toggle`.
+Push-to-talk mode requires the desktop compositor to implement the `org.freedesktop.portal.GlobalShortcuts` portal interface. The portal delivers press and release events, allowing the app to detect when a key is held down and released. On environments without this portal, dictation works via toggle mode using a custom shortcut mapped to `tattle --toggle`.
 
 | Desktop environment | Status | Push-to-talk | Notes |
 | :--- | :---: | :---: | :--- |
 | **KDE Plasma 6** | Supported | Supported | Native KWallet integration, system Qt theming, and Klipper privacy flags |
 | **GNOME 48+** | Supported | Supported | Uses GNOME Keyring and Secret Service |
-| **GNOME 46** | Supported | Unsupported | Toggle mode only. Map a custom shortcut to `qtscribe --toggle` in Settings |
-| **COSMIC** (System76) | Supported | Unsupported | Toggle mode only. Map a custom shortcut to `qtscribe --toggle` in Settings |
-| **Hyprland** | Supported | Unsupported | Toggle mode only. Bind `qtscribe --toggle` in `hyprland.conf` |
-| **Sway / wlroots** | Supported | Unsupported | Toggle mode only. Bind `qtscribe --toggle` in your compositor configuration |
+| **GNOME 46** | Supported | Unsupported | Toggle mode only. Map a custom shortcut to `tattle --toggle` in Settings |
+| **COSMIC** (System76) | Supported | Unsupported | Toggle mode only. Map a custom shortcut to `tattle --toggle` in Settings |
+| **Hyprland** | Supported | Unsupported | Toggle mode only. Bind `tattle --toggle` in `hyprland.conf` |
+| **Sway / wlroots** | Supported | Unsupported | Toggle mode only. Bind `tattle --toggle` in your compositor configuration |
 
 ---
 
 ## CLI options
 
-The `qtscribe` binary supports command-line actions for scripting and window manager bindings:
+The `tattle` binary supports command-line actions for scripting and window manager bindings:
 
 | Option | Short | Description |
 | :--- | :---: | :---: |
@@ -135,13 +135,13 @@ The `qtscribe` binary supports command-line actions for scripting and window man
 ## Usage
 
 ### 1. Configure speech engine
-Open **Settings** in QtScribe:
+Open **Settings** in Tattle:
 - **Offline (default):** Download a speech model under **Offline Dictation**.
 - **Cloud:** Select your provider (Groq or Google Gemini) under **Cloud Settings**, add your API key, and choose a model. Keys are saved securely in your system keyring.
 
 ### 2. Set shortcut
 - **Plasma 6, GNOME 48+:** Approve the portal shortcut prompt on first start. Supports both toggle and push-to-talk.
-- **COSMIC, GNOME 46, Hyprland, Sway:** Bind a custom keyboard shortcut to `qtscribe --toggle` in your desktop or compositor settings.
+- **COSMIC, GNOME 46, Hyprland, Sway:** Bind a custom keyboard shortcut to `tattle --toggle` in your desktop or compositor settings.
 
 ### 3. Dictate
 - **Push-to-talk (Portal DEs):** Focus any input field, hold your shortcut, speak, and release.
@@ -151,7 +151,7 @@ Open **Settings** in QtScribe:
 
 ## Tips
 
-- **Mouse bindings.** Bind `qtscribe --toggle` to an extra mouse button using `input-remapper` or Piper for toggle dictation.
+- **Mouse bindings.** Bind `tattle --toggle` to an extra mouse button using `input-remapper` or Piper for toggle dictation.
 - **Pre-injection delay.** If an application drops the first keystroke after switching focus, increase the delay slider in **System & Typing**.
 
 ---
@@ -161,22 +161,22 @@ Open **Settings** in QtScribe:
 - **No text typed into target field:**
   - Verify the destination input field has active keyboard focus.
   - If using a local development build, ensure capabilities were granted: `sudo setcap cap_dac_override+ep build/keyinjectord`.
-  - Run `qtscribe` in your terminal to view debug logs.
+  - Run `tattle` in your terminal to view debug logs.
 - **Push-to-talk does not work:**
-  - Push-to-talk requires a desktop environment with `org.freedesktop.portal.GlobalShortcuts` (KDE Plasma 6, GNOME 48+). On GNOME 46, COSMIC, Hyprland, or Sway, use toggle mode with `qtscribe --toggle`.
+  - Push-to-talk requires a desktop environment with `org.freedesktop.portal.GlobalShortcuts` (KDE Plasma 6, GNOME 48+). On GNOME 46, COSMIC, Hyprland, or Sway, use toggle mode with `tattle --toggle`.
 - **Global shortcut does not fire on GNOME 46, Hyprland, or Sway:**
-  - The desktop portal shortcut interface is not supported on these compositors. Add a native desktop shortcut that executes `qtscribe --toggle`.
+  - The desktop portal shortcut interface is not supported on these compositors. Add a native desktop shortcut that executes `tattle --toggle`.
 - **Local model fails to load:**
-  - Verify that the model download completed under `~/.local/share/qtscribe/models/`.
+  - Verify that the model download completed under `~/.local/share/tattle/models/`.
   - Check log output for Vulkan driver errors. If your GPU driver lacks compute support, inference falls back to CPU threads automatically.
 - **Cloud API errors:**
   - Check your API key and network connection. Free tier keys are subject to provider rate limits.
 - **Prompted for password on startup:**
-  - This is expected. Your system asks for your password to unlock the keyring (GNOME Keyring or KWallet) so QtScribe can read stored API keys.
+  - This is expected. Your system asks for your password to unlock the keyring (GNOME Keyring or KWallet) so Tattle can read stored API keys.
 - **Keyring unlocked warning or errors:**
   - Ensure `gnome-keyring-daemon` or `kwalletd` is running and unlocked for your user session.
 - **Clipboard contents overwritten:**
-  - If `keyinjectord` cannot access `/dev/uinput`, QtScribe falls back to clipboard paste. Non-text data (such as image clips) cannot be restored after pasting. Ensure `keyinjectord` has proper capabilities set.
+  - If `keyinjectord` cannot access `/dev/uinput`, Tattle falls back to clipboard paste. Non-text data (such as image clips) cannot be restored after pasting. Ensure `keyinjectord` has proper capabilities set.
 
 ---
 
@@ -287,7 +287,7 @@ cmake --build --preset build-debug
 Build only the GUI when you work on QML or views:
 
 ```bash
-cmake --build --preset build-debug --target qtscribe
+cmake --build --preset build-debug --target tattle
 ```
 
 Build only the helper daemon when you work on `src/keyinjectord/`:
@@ -350,7 +350,7 @@ Packaging scripts live in [`packaging/`](packaging/) and need Docker Buildx. The
 
 ```bash
 ./packaging/deb/build-deb.sh 24.04 1.0.0
-sudo apt install ./dist/deb/qtscribe_1.0.0_amd64.deb
+sudo apt install ./dist/deb/tattle_1.0.0_amd64.deb
 ```
 
 Omit the args to build with defaults from `VERSION`:
@@ -365,7 +365,7 @@ Omit the args to build with defaults from `VERSION`:
 
 ```bash
 ./packaging/rpm/build-rpm.sh 44 1.0.0 1
-sudo dnf install ./dist/rpm/qtscribe-1.0.0-1.fc44.x86_64.rpm
+sudo dnf install ./dist/rpm/tattle-1.0.0-1.fc44.x86_64.rpm
 ```
 
 Omit the args to build with defaults from `VERSION`:
@@ -380,7 +380,7 @@ Omit the args to build with defaults from `VERSION`:
 
 ```bash
 ./packaging/arch/build-arch.sh 1.0.0 1
-sudo pacman -U ./dist/arch/qtscribe-1.0.0-1-x86_64.pkg.tar.zst
+sudo pacman -U ./dist/arch/tattle-1.0.0-1-x86_64.pkg.tar.zst
 ```
 
 Omit the args to build with defaults from `VERSION`:
@@ -399,12 +399,12 @@ Each release attaches SLSA build provenance, a CycloneDX SBOM (`bom.json`), a `S
 sha256sum -c SHA256SUMS.txt
 
 # 2. Verify SLSA provenance / SBOM attestation (requires gh)
-gh attestation verify ./qtscribe_<version>_amd64.deb -R Vidhan31/qtscribe
+gh attestation verify ./tattle_<version>_amd64.deb -R Vidhan31/tattle
 
 # 3. Verify publisher signature bundle (requires cosign)
 cosign verify-blob \
-  --bundle ./qtscribe_<version>_amd64.deb.sigstore.json \
-  --certificate-identity-regexp 'https://github.com/Vidhan31/qtscribe.*' \
+  --bundle ./tattle_<version>_amd64.deb.sigstore.json \
+  --certificate-identity-regexp 'https://github.com/Vidhan31/tattle.*' \
   --certificate-oidc-issuer https://token.actions.githubusercontent.com \
-  ./qtscribe_<version>_amd64.deb
+  ./tattle_<version>_amd64.deb
 ```

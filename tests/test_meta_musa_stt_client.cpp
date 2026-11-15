@@ -47,15 +47,15 @@ private slots:
         QSignalSpy spyKeywords(&client, &MetaMusaSttClient::keywordsChanged);
 
         client.setSelectedModel(u"muse-voice-transcribe-1.0"_s);
-        client.setKeywords(u"QtScribe, Wayland, PyTorch"_s);
+        client.setKeywords(u"Tattle, Wayland, PyTorch"_s);
 
         QCOMPARE(client.selectedModel(), u"muse-voice-transcribe-1.0"_s);
-        QCOMPARE(client.keywords(), u"QtScribe, Wayland, PyTorch"_s);
+        QCOMPARE(client.keywords(), u"Tattle, Wayland, PyTorch"_s);
 
         QCOMPARE(spyKeywords.count(), 1);
 
         QSettings settings;
-        QCOMPARE(settings.value(u"MetaMusa/Keywords"_s).toString(), u"QtScribe, Wayland, PyTorch"_s);
+        QCOMPARE(settings.value(u"MetaMusa/Keywords"_s).toString(), u"Tattle, Wayland, PyTorch"_s);
     }
 
     void testApiKeyDelegationAndActivateLazyLoad() {
@@ -280,7 +280,7 @@ private slots:
 
         MetaMusaSttClient client;
         client.setApiKey(u"LLM_valid_key"_s);
-        client.setKeywords(u"QtScribe, Wayland, Voice"_s);
+        client.setKeywords(u"Tattle, Wayland, Voice"_s);
 
         auto* mockNam = new MockNetworkAccessManager(&client);
         mockNam->nextStatusCode = 200;
@@ -352,7 +352,7 @@ private slots:
 
         const QJsonArray keywordsArr = jsonObj.value(u"keywords"_s).toArray();
         QCOMPARE(keywordsArr.size(), 3);
-        QCOMPARE(keywordsArr.at(0).toString(), u"QtScribe"_s);
+        QCOMPARE(keywordsArr.at(0).toString(), u"Tattle"_s);
         QCOMPARE(keywordsArr.at(1).toString(), u"Wayland"_s);
         QCOMPARE(keywordsArr.at(2).toString(), u"Voice"_s);
 

@@ -1,6 +1,6 @@
 pragma ComponentBehavior: Bound
 import QtQuick
-import QtScribe
+import Tattle
 
 Text {
     id: root
