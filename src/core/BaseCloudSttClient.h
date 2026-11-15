@@ -32,7 +32,7 @@ public:
     void setNetworkAccessManager(QNetworkAccessManager* nam);
     [[nodiscard]] QNetworkAccessManager* networkAccessManager() const noexcept;
 
-    void setSettingsManager(SettingsManager* settings);
+    virtual void setSettingsManager(SettingsManager* settings);
     [[nodiscard]] SettingsManager* settingsManager() const noexcept;
 
     QString apiKey() const;

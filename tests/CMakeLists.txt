@@ -78,11 +78,13 @@ function(add_qtscribe_test name)
 
     set_target_properties(${target} PROPERTIES
         INTERPROCEDURAL_OPTIMIZATION FALSE
+        CXX_CLANG_TIDY ""
+        C_CLANG_TIDY ""
     )
 
     add_test(NAME ${ctest_name} COMMAND ${target})
     set_tests_properties(${ctest_name} PROPERTIES
-        ENVIRONMENT "${QTSCRIBE_TEST_ENVIRONMENT};XDG_CONFIG_HOME=${CMAKE_CURRENT_BINARY_DIR}/test_xdg_config/${ctest_name}"
+        ENVIRONMENT "${QTSCRIBE_TEST_ENVIRONMENT};XDG_CONFIG_HOME=${CMAKE_CURRENT_BINARY_DIR}/test_xdg_config/${ctest_name};XDG_DATA_HOME=${CMAKE_CURRENT_BINARY_DIR}/test_xdg_data/${ctest_name}"
         TIMEOUT 30
     )
 endfunction()

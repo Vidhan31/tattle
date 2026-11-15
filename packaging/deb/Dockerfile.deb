@@ -3,7 +3,7 @@ ARG UBUNTU_VERSION=24.04
 FROM ubuntu:${UBUNTU_VERSION}@sha256:33ceb71981b602c1a7443a53469e4dba065f7503eab3078a2d7a57a2ab987517 AS builder
 
 ARG APP_NAME=qtscribe
-ARG QT_VERSION=6.11.1
+ARG QT_VERSION=6.11.2
 ARG QT_ARCH=linux_gcc_64
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -47,10 +47,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     wl-clipboard \
     && rm -rf /var/lib/apt/lists/*
 
-# Install latest CMake via official Kitware Linux installer
-# SHA256 sourced from https://github.com/Kitware/CMake/releases/download/v4.4.3/cmake-4.4.3-SHA-256.txt
-ARG CMAKE_VERSION=4.4.3
-ARG CMAKE_SHA256=6decbd2f268e48ed405c5b40563b0334c903209e61fe4ecad460b00c60b27e79
+# Install pinned CMake via official Kitware Linux installer
+# SHA256 sourced from https://github.com/Kitware/CMake/releases/download/v4.3.0/cmake-4.3.0-SHA-256.txt
+ARG CMAKE_VERSION=4.3.0
+ARG CMAKE_SHA256=c59f5915c76b7881160238ccb16b4991ac76bf8e7872e7b3d40bb1d502c86a6b
 RUN curl -fsSL "https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}-linux-x86_64.sh" -o /tmp/cmake-install.sh && \
     echo "${CMAKE_SHA256}  /tmp/cmake-install.sh" | sha256sum -c - && \
     chmod +x /tmp/cmake-install.sh && \
@@ -65,7 +65,7 @@ ARG AQTINSTALL_SHA256=e88dbd87226f276fdd5d05347a44578d390d93a7f176e9476fbda0a7c9
 RUN pip3 install --no-cache-dir --break-system-packages \
     "https://files.pythonhosted.org/packages/7f/70/849fa1005fa197fc28a744fd69598ab9da883b737a1ab9461d88721ddd0b/aqtinstall-${AQTINSTALL_VERSION}-py3-none-any.whl#sha256=${AQTINSTALL_SHA256}"
 
-# Install Qt 6.11.1 with multimedia module (qtsvg and qtwayland client are included in base)
+# Install Qt 6.11.2 with multimedia module (qtsvg and qtwayland client are included in base)
 RUN mkdir -p /opt/Qt && \
     aqt install-qt linux desktop ${QT_VERSION} ${QT_ARCH} \
         -m qtmultimedia \
@@ -81,11 +81,11 @@ RUN set -eux; \
     test -f "${QT_DIR}/lib/libQt6Core.so"; \
     test -f "${QT_DIR}/plugins/platforms/libqwayland.so" || test -f "${QT_DIR}/plugins/platforms/libqwayland-generic.so"
 
-# Build QtKeychain from source against Qt 6.11.1
-# Pinned to 0.17.0 — commit 875f77d9f61bd97fd84cca47ce3bc71186dfbd09
+# Build QtKeychain from source against Qt 6.11.2
+# Pinned to 0.18.0 — commit e86bc3cbb50b172be61ed857803a372412b6ad85
 WORKDIR /tmp/qtkeychain-build
 RUN git clone https://github.com/frankosterfeld/qtkeychain.git /tmp/qtkeychain-src && \
-    git -C /tmp/qtkeychain-src checkout 875f77d9f61bd97fd84cca47ce3bc71186dfbd09 && \
+    git -C /tmp/qtkeychain-src checkout e86bc3cbb50b172be61ed857803a372412b6ad85 && \
     cmake -S /tmp/qtkeychain-src -B /tmp/qtkeychain-build -G Ninja \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_PREFIX_PATH="${QT_DIR}" \

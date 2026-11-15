@@ -22,7 +22,7 @@ public:
     QString keywords() const;
     void setKeywords(const QString& keywords);
 
-    void setSettingsManager(SettingsManager* settings);
+    void setSettingsManager(SettingsManager* settings) override;
     void loadSettings() override;
 
 signals:

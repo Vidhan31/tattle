@@ -24,7 +24,7 @@ public:
     QString customPrompt() const;
     void setCustomPrompt(const QString& prompt);
 
-    void setSettingsManager(SettingsManager* settings);
+    void setSettingsManager(SettingsManager* settings) override;
     void loadSettings() override;
 
     using BaseCloudSttClient::transcribe;
