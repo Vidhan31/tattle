@@ -105,16 +105,16 @@ jobs:
             echo "CMake is current."
           fi
 
-      - name: Check whisper.cpp latest tag
+      - name: Check transcribe.cpp latest tag
         run: |
-          PINNED="v1.9.5"
-          LATEST=$(curl -fsSL https://api.github.com/repos/ggml-org/whisper.cpp/releases/latest | python3 -c "import sys,json; print(json.load(sys.stdin)['tag_name'])")
+          PINNED="v0.4.2"
+          LATEST=$(curl -fsSL https://api.github.com/repos/handy-computer/transcribe.cpp/releases/latest | python3 -c "import sys,json; print(json.load(sys.stdin)['tag_name'])")
           echo "Pinned : ${PINNED}"
           echo "Latest : ${LATEST}"
           if [ "${PINNED}" != "${LATEST}" ]; then
-            echo "::warning::whisper.cpp has a new release (${LATEST}). Evaluate and update GIT_TAG in CMakeLists.txt and git checkout in Dockerfiles."
+            echo "::warning::transcribe.cpp has a new release (${LATEST}). Evaluate and update GIT_TAG in CMakeLists.txt and git checkout in Dockerfiles."
           else
-            echo "whisper.cpp is current."
+            echo "transcribe.cpp is current."
           fi
 
       - name: Check qtkeychain latest tag
