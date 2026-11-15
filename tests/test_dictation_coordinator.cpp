@@ -271,6 +271,8 @@ private slots:
     void testPushToTalkUnsupportedFallback();
     void testDictationPadModelDirect();
     void testAudioFeedbackPlayerDirect();
+    void testStateChangeSignalGuards();
+    void testAudioFeedbackChimeLifecycle();
     void testSystemHealthMonitorDirect();
     void testAutoSwitchOfflineWhenNetworkLost();
     void testAutoSwitchOfflineDeferredDuringRecording();
@@ -600,14 +602,94 @@ void TestDictationCoordinator::testDictationPadModelDirect() {
 void TestDictationCoordinator::testAudioFeedbackPlayerDirect() {
     AudioFeedbackPlayer player;
     QSignalSpy soundSpy(&player, &AudioFeedbackPlayer::soundEnabledChanged);
+    QSignalSpy startSpy(&player, &AudioFeedbackPlayer::startSoundPlayed);
+    QSignalSpy stopSpy(&player, &AudioFeedbackPlayer::stopSoundPlayed);
+
+    player.playStartSound();
+    QCOMPARE(startSpy.count(), 1);
+
+    player.playStopSound();
+    QCOMPARE(stopSpy.count(), 1);
 
     player.setSoundEnabled(false);
     QCOMPARE(soundSpy.count(), 1);
     QVERIFY(!player.soundEnabled());
 
+    player.playStartSound();
+    player.playStopSound();
+    QCOMPARE(startSpy.count(), 1);
+    QCOMPARE(stopSpy.count(), 1);
+
     player.setSoundEnabled(true);
     QCOMPARE(soundSpy.count(), 2);
     QVERIFY(player.soundEnabled());
+}
+
+void TestDictationCoordinator::testStateChangeSignalGuards() {
+    m_coordinator->setActiveBackend(DictationCoordinator::TranscriptionBackend::Cloud);
+    m_llmClient->setEnabled(true);
+    m_groqClient->m_autoRespond = true;
+    m_groqClient->m_simulatedText = u"signal guard test"_s;
+
+    QSignalSpy recordingSpy(m_coordinator, &DictationCoordinator::recordingChanged);
+    QSignalSpy transcribingSpy(m_coordinator, &DictationCoordinator::transcribingChanged);
+    QSignalSpy enhancingSpy(m_coordinator, &DictationCoordinator::enhancingChanged);
+
+    // 1. Idle -> Recording
+    m_coordinator->startRecording();
+    QCOMPARE(recordingSpy.count(), 1);
+    QCOMPARE(transcribingSpy.count(), 0);
+    QCOMPARE(enhancingSpy.count(), 0);
+
+    // 2. Recording -> Transcribing -> Enhancing
+    m_coordinator->stopRecording();
+    QCOMPARE(recordingSpy.count(), 2);
+    QCOMPARE(transcribingSpy.count(), 2);
+    QCOMPARE(enhancingSpy.count(), 1);
+
+    // 3. Enhancing -> Idle (completion and injection)
+    emit m_llmClient->enhancementReady(u"Enhanced signal guard test."_s);
+    // Crucial check: recording was false and remains false, so recordingChanged must NOT emit
+    QCOMPARE(recordingSpy.count(), 2);
+    QCOMPARE(transcribingSpy.count(), 2);
+    QCOMPARE(enhancingSpy.count(), 2);
+    QCOMPARE(m_coordinator->dictationState(), DictationCoordinator::DictationState::Idle);
+}
+
+void TestDictationCoordinator::testAudioFeedbackChimeLifecycle() {
+    m_coordinator->setActiveBackend(DictationCoordinator::TranscriptionBackend::Cloud);
+    m_llmClient->setEnabled(true);
+    m_groqClient->m_autoRespond = true;
+    m_groqClient->m_simulatedText = u"lifecycle audio feedback"_s;
+
+    // Connect feedback player to recordingChanged exactly as ApplicationContext does
+    connect(m_coordinator, &DictationCoordinator::recordingChanged, this, [this]() {
+        if (m_coordinator && m_feedbackPlayer) {
+            if (m_coordinator->recording()) {
+                m_feedbackPlayer->playStartSound();
+            } else {
+                m_feedbackPlayer->playStopSound();
+            }
+        }
+    });
+
+    QSignalSpy startSoundSpy(m_feedbackPlayer, &AudioFeedbackPlayer::startSoundPlayed);
+    QSignalSpy stopSoundSpy(m_feedbackPlayer, &AudioFeedbackPlayer::stopSoundPlayed);
+
+    // Starting recording plays the start chime exactly once
+    m_coordinator->startRecording();
+    QCOMPARE(startSoundSpy.count(), 1);
+    QCOMPARE(stopSoundSpy.count(), 0);
+
+    // Stopping recording plays the stop chime exactly once
+    m_coordinator->stopRecording();
+    QCOMPARE(startSoundSpy.count(), 1);
+    QCOMPARE(stopSoundSpy.count(), 1);
+
+    // During enhancement and paste/injection, NO spurious stop chimes must be triggered
+    emit m_llmClient->enhancementReady(u"Enhanced lifecycle text."_s);
+    QCOMPARE(startSoundSpy.count(), 1);
+    QCOMPARE(stopSoundSpy.count(), 1);
 }
 
 void TestDictationCoordinator::testSystemHealthMonitorDirect() {

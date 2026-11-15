@@ -907,12 +907,27 @@ void DictationCoordinator::onShortcutDeactivated(const QString& shortcutId) {
 
 void DictationCoordinator::setState(DictationState state) {
     if (m_state != state) {
+        const bool wasRecording = recording();
+        const bool wasTranscribing = transcribing();
+        const bool wasEnhancing = enhancing();
+        const bool wasCanRecord = canRecord();
+
         m_state = state;
+
         emit dictationStateChanged();
-        emit recordingChanged();
-        emit transcribingChanged();
-        emit enhancingChanged();
-        emit canRecordChanged();
+
+        if (wasRecording != recording()) {
+            emit recordingChanged();
+        }
+        if (wasTranscribing != transcribing()) {
+            emit transcribingChanged();
+        }
+        if (wasEnhancing != enhancing()) {
+            emit enhancingChanged();
+        }
+        if (wasCanRecord != canRecord()) {
+            emit canRecordChanged();
+        }
     }
 }
 
