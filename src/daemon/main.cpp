@@ -20,12 +20,12 @@
 using namespace Qt::StringLiterals;
 using namespace std::chrono_literals;
 
-#ifndef QTSCRIBE_VERSION
-#define QTSCRIBE_VERSION "0.0.0-dev"
+#ifndef TATTLE_VERSION
+#define TATTLE_VERSION "0.0.0-dev"
 #endif
 
 /**
- * @brief Application entry point for the headless QtScribe background daemon.
+ * @brief Application entry point for the headless Tattle background daemon.
  *
  * Configures core application metadata, parses command line options, initializes
  * the application context (speech pipeline, models, audio, and shortcuts), and
@@ -33,13 +33,13 @@ using namespace std::chrono_literals;
  */
 int main(int argc, char* argv[]) {
     QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName(u"QtScribe"_s);
-    QCoreApplication::setApplicationVersion(u"" QTSCRIBE_VERSION ""_s);
-    QCoreApplication::setOrganizationName(u"QtScribe"_s);
-    QCoreApplication::setOrganizationDomain(u"io.github.qtscribe"_s);
+    QCoreApplication::setApplicationName(u"Tattle"_s);
+    QCoreApplication::setApplicationVersion(u"" TATTLE_VERSION ""_s);
+    QCoreApplication::setOrganizationName(u"Tattle"_s);
+    QCoreApplication::setOrganizationDomain(u"io.github.tattle"_s);
 
     QCommandLineParser parser;
-    parser.setApplicationDescription(u"QtScribe Daemon — Headless Speech-to-Text service"_s);
+    parser.setApplicationDescription(u"Tattle Daemon — Headless Speech-to-Text service"_s);
     parser.addHelpOption();
     parser.addVersionOption();
 
@@ -77,26 +77,26 @@ int main(int argc, char* argv[]) {
     }();
 
     if (!QDBusConnection::sessionBus().isConnected()) {
-        qCCritical(lcSpeech) << "qtscribed: Failed to connect to D-Bus session bus. Exiting.";
+        qCCritical(lcSpeech) << "tattled: Failed to connect to D-Bus session bus. Exiting.";
         return 1;
     }
 
-    if (!QDBusConnection::sessionBus().registerService(u"io.github.qtscribe.SpeechService"_s)) {
+    if (!QDBusConnection::sessionBus().registerService(u"io.github.tattle.SpeechService"_s)) {
         if (!command.isEmpty()) {
             return DBusService::sendRemoteCommand(command) ? 0 : 1;
         }
         if (parser.isSet(showOption)) {
             return DBusService::sendRemoteCommand(u"showWindow"_s) ? 0 : 1;
         }
-        qCWarning(lcSpeech) << "qtscribed: Another daemon instance is already active on D-Bus. Exiting.";
+        qCWarning(lcSpeech) << "tattled: Another daemon instance is already active on D-Bus. Exiting.";
         return 0;
     }
 
     const auto launchGui = [](const QStringList& args = {}) {
-        const QString kGuiService = u"io.github.qtscribe.SettingsGui"_s;
+        const QString kGuiService = u"io.github.tattle.SettingsGui"_s;
         auto* busIface = QDBusConnection::sessionBus().interface();
         if (busIface && busIface->isServiceRegistered(kGuiService)) {
-            QDBusInterface guiIface(kGuiService, u"/io/github/qtscribe/SettingsGui"_s, kGuiService,
+            QDBusInterface guiIface(kGuiService, u"/io/github/tattle/SettingsGui"_s, kGuiService,
                                     QDBusConnection::sessionBus());
             if (guiIface.isValid()) {
                 const int secIdx = args.indexOf(u"--section"_s);
@@ -109,8 +109,8 @@ int main(int argc, char* argv[]) {
             }
         }
         const QString appDir = QCoreApplication::applicationDirPath();
-        const QString guiInAppDir = appDir + u"/qtscribe"_s;
-        const QString guiExec = QFile::exists(guiInAppDir) ? guiInAppDir : u"qtscribe"_s;
+        const QString guiInAppDir = appDir + u"/tattle"_s;
+        const QString guiExec = QFile::exists(guiInAppDir) ? guiInAppDir : u"tattle"_s;
         QProcess::startDetached(guiExec, args);
     };
 
@@ -130,12 +130,12 @@ int main(int argc, char* argv[]) {
         QObject::connect(systemService, &SystemService::requestQuitApp, &app, &QCoreApplication::quit);
 
         QObject::connect(systemService, &SystemService::requestShowWindow, [launchGui]() {
-            qCDebug(lcSpeech) << "qtscribed: Launching QtScribe GUI on request";
+            qCDebug(lcSpeech) << "tattled: Launching Tattle GUI on request";
             launchGui({});
         });
 
         QObject::connect(systemService, &SystemService::requestNavigate, [launchGui](const QString& section) {
-            qCDebug(lcSpeech) << "qtscribed: Launching QtScribe GUI navigating to" << section;
+            qCDebug(lcSpeech) << "tattled: Launching Tattle GUI navigating to" << section;
             launchGui({u"--section"_s, section});
         });
     }

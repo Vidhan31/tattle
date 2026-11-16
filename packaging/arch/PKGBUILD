@@ -1,6 +1,6 @@
 # shellcheck shell=bash
 # Maintainer: Vidhan31 <rautvidhan31@gmail.com>
-pkgname=qtscribe
+pkgname=tattle
 pkgver=1.0.0
 pkgrel=1
 pkgdesc="Fast and modern speech-to-text desktop application"
@@ -57,8 +57,8 @@ build() {
 }
 
 check() {
-  desktop-file-validate "${srcdir}/${pkgname}-${pkgver}/assets/io.github.qtscribe.desktop"
-  desktop-file-validate "${srcdir}/${pkgname}-${pkgver}/assets/io.github.qtscribe.daemon.desktop"
+  desktop-file-validate "${srcdir}/${pkgname}-${pkgver}/assets/io.github.tattle.desktop"
+  desktop-file-validate "${srcdir}/${pkgname}-${pkgver}/assets/io.github.tattle.daemon.desktop"
   QT_QPA_PLATFORM=offscreen ctest --test-dir build --output-on-failure
 }
 

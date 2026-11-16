@@ -160,7 +160,7 @@ void CloudProviderModel::initializeProviders() {
         .name = tr("Groq Cloud"),
         .description =
             tr("Ultra-fast cloud Whisper speech recognition and LLM text enhancement powered by Groq LPU compute."),
-        .iconSource = u"qrc:/qt/qml/QtScribe/assets/icons/sparkles.svg"_s,
+        .iconSource = u"qrc:/qt/qml/Tattle/assets/icons/sparkles.svg"_s,
         .componentSource = u"providers/GroqProviderSettings.qml"_s,
         .websiteUrl = u"https://console.groq.com/keys"_s,
         .isDefault = true,
@@ -171,7 +171,7 @@ void CloudProviderModel::initializeProviders() {
         .name = tr("Google Gemini"),
         .description =
             tr("Next-generation speech recognition with Gemini 3.5 Transcribe featuring built-in smart formatting."),
-        .iconSource = u"qrc:/qt/qml/QtScribe/assets/icons/sparkles.svg"_s,
+        .iconSource = u"qrc:/qt/qml/Tattle/assets/icons/sparkles.svg"_s,
         .componentSource = u"providers/GeminiProviderSettings.qml"_s,
         .websiteUrl = u"https://aistudio.google.com/app/apikey"_s,
         .isDefault = false,
@@ -181,7 +181,7 @@ void CloudProviderModel::initializeProviders() {
         .id = u"meta-musa"_s,
         .name = tr("Meta Musa"),
         .description = tr("High-accuracy multilingual speech transcription powered by Meta Muse Voice Transcribe."),
-        .iconSource = u"qrc:/qt/qml/QtScribe/assets/icons/sparkles.svg"_s,
+        .iconSource = u"qrc:/qt/qml/Tattle/assets/icons/sparkles.svg"_s,
         .componentSource = u"providers/MetaMusaProviderSettings.qml"_s,
         .websiteUrl = u"https://dev.meta.ai/"_s,
         .isDefault = false,

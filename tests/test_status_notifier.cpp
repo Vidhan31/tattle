@@ -85,10 +85,10 @@ void TestStatusNotifier::testRegistrationAndProperties() {
 
     QVERIFY(sniInterface.isValid());
     QCOMPARE(sniInterface.property("Category").toString(), u"ApplicationStatus"_s);
-    QCOMPARE(sniInterface.property("Id").toString(), u"qtscribe"_s);
-    QCOMPARE(sniInterface.property("Title").toString(), u"QtScribe"_s);
+    QCOMPARE(sniInterface.property("Id").toString(), u"tattle"_s);
+    QCOMPARE(sniInterface.property("Title").toString(), u"Tattle"_s);
     QCOMPARE(sniInterface.property("Status").toString(), u"Active"_s);
-    QCOMPARE(sniInterface.property("IconName").toString(), u"io.github.qtscribe"_s);
+    QCOMPARE(sniInterface.property("IconName").toString(), u"io.github.tattle"_s);
     QCOMPARE(sniInterface.property("Menu").value<QDBusObjectPath>().path(), u"/MenuBar"_s);
 }
 

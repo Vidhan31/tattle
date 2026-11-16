@@ -51,11 +51,11 @@ private slots:
 
         client.setSelectedModel(u"gemini-3.5-transcribe"_s);
         client.setMode(u"verbatim"_s);
-        client.setCustomVocabulary(u"QtScribe, Wayland, CMake"_s);
+        client.setCustomVocabulary(u"Tattle, Wayland, CMake"_s);
 
         QCOMPARE(client.selectedModel(), u"gemini-3.5-transcribe"_s);
         QCOMPARE(client.mode(), u"verbatim"_s);
-        QCOMPARE(client.customVocabulary(), u"QtScribe, Wayland, CMake"_s);
+        QCOMPARE(client.customVocabulary(), u"Tattle, Wayland, CMake"_s);
         QCOMPARE(client.handlesSmartFormatting(), false);
 
         QCOMPARE(spyMode.count(), 1);
@@ -63,7 +63,7 @@ private slots:
 
         QSettings settings;
         QCOMPARE(settings.value(u"Gemini/Mode"_s).toString(), u"verbatim"_s);
-        QCOMPARE(settings.value(u"Gemini/CustomVocabulary"_s).toString(), u"QtScribe, Wayland, CMake"_s);
+        QCOMPARE(settings.value(u"Gemini/CustomVocabulary"_s).toString(), u"Tattle, Wayland, CMake"_s);
     }
 
     void testApiKeyDelegationAndActivateLazyLoad() {

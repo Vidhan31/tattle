@@ -10,16 +10,16 @@
 
 using namespace Qt::StringLiterals;
 
-static const auto kServiceName = u"io.github.qtscribe.SpeechService"_s;
-static const auto kObjectPath = u"/io/github/qtscribe/SpeechService"_s;
-static const auto kInterface = u"io.github.qtscribe.SettingsService"_s;
+static const auto kServiceName = u"io.github.tattle.SpeechService"_s;
+static const auto kObjectPath = u"/io/github/tattle/SpeechService"_s;
+static const auto kInterface = u"io.github.tattle.SettingsService"_s;
 
 SettingsClient::SettingsClient(QObject* parent)
     : QObject(parent) {
     s_instance = this;
 
-    const bool disableRemoteAttach = !qEnvironmentVariableIsEmpty("QTSCRIBE_DISABLE_REMOTE_ATTACH") &&
-                                     qEnvironmentVariable("QTSCRIBE_DISABLE_REMOTE_ATTACH") != "0";
+    const bool disableRemoteAttach = !qEnvironmentVariableIsEmpty("TATTLE_DISABLE_REMOTE_ATTACH") &&
+                                     qEnvironmentVariable("TATTLE_DISABLE_REMOTE_ATTACH") != "0";
     if (disableRemoteAttach) {
         return;
     }

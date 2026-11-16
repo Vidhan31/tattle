@@ -48,7 +48,7 @@ private:
     bool m_apiKeyLoaded = false;
     bool m_isLoadingApiKey = false;
 
-    static constexpr QStringView kKeychainService = u"QtScribe";
+    static constexpr QStringView kKeychainService = u"Tattle";
     static constexpr QStringView kKeychainKey = u"groq_api_key";
     static constexpr QStringView kSettingsApiKey = SettingsKeys::kGroqSettingsKey;
     static constexpr QStringView kLegacySettingsApiKey = SettingsKeys::kGroqLegacySettingsKey;

@@ -2,7 +2,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Templates as T
 import QtQuick.Layouts
-import QtScribe
+import Tattle
 import "../controls"
 import ".."
 
@@ -144,7 +144,7 @@ Item {
 
                                 StyledIcon {
                                     anchors.centerIn: parent
-                                    source: "qrc:/qt/qml/QtScribe/assets/icons/speech.svg"
+                                    source: "qrc:/qt/qml/Tattle/assets/icons/speech.svg"
                                     size: 16
                                     color: toggleModeCard.isSelected ? Theme.accentColor : Theme.textSecondary
                                 }
@@ -260,7 +260,7 @@ Item {
 
                                 StyledIcon {
                                     anchors.centerIn: parent
-                                    source: "qrc:/qt/qml/QtScribe/assets/icons/mic.svg"
+                                    source: "qrc:/qt/qml/Tattle/assets/icons/mic.svg"
                                     size: 16
                                     color: pttModeCard.isSelected ? Theme.accentColor : Theme.textSecondary
                                 }
@@ -660,7 +660,7 @@ Item {
                     spacing: Theme.spacingSm
 
                     StyledIcon {
-                        source: "qrc:/qt/qml/QtScribe/assets/icons/keyboard.svg"
+                        source: "qrc:/qt/qml/Tattle/assets/icons/keyboard.svg"
                         color: Theme.accentColor
                         size: 16
                         Layout.alignment: Qt.AlignVCenter
@@ -711,7 +711,7 @@ Item {
 
                 StyledText {
                     text: qsTr(
-                              "On desktop environments without integrated clipboard history (like GNOME or wlroots compositors), dictation injects text by simulating Ctrl+Shift+V clipboard paste. QtScribe automatically restores copied plain text, but non-text clipboard items (such as images, screenshots, or files) cannot be restored and will be lost unless you paste and save them first.\n\nWe strongly recommend installing or enabling a clipboard manager (such as Klipper on KDE Plasma, Clipboard Indicator or GPaste on GNOME, or cliphist on wlroots/Hyprland) to preserve your media clipboard history. Please also ensure your active applications accept Ctrl+Shift+V for pasting.")
+                              "On desktop environments without integrated clipboard history (like GNOME or wlroots compositors), dictation injects text by simulating Ctrl+Shift+V clipboard paste. Tattle automatically restores copied plain text, but non-text clipboard items (such as images, screenshots, or files) cannot be restored and will be lost unless you paste and save them first.\n\nWe strongly recommend installing or enabling a clipboard manager (such as Klipper on KDE Plasma, Clipboard Indicator or GPaste on GNOME, or cliphist on wlroots/Hyprland) to preserve your media clipboard history. Please also ensure your active applications accept Ctrl+Shift+V for pasting.")
                     variant: "caption"
                     colorRole: "secondary"
                     wrapMode: Text.WordWrap
@@ -798,7 +798,7 @@ Item {
 
                                 StyledText {
                                     anchors.centerIn: parent
-                                    text: "qtscribe --toggle"
+                                    text: "tattle --toggle"
                                     fontFamily: "mono"
                                     variant: "caption"
                                     customWeight: Font.Bold
@@ -809,10 +809,10 @@ Item {
                             StyledButton {
                                 id: copyCliBtn
                                 text: qsTr("Copy")
-                                iconSource: "qrc:/qt/qml/QtScribe/assets/icons/copy.svg"
+                                iconSource: "qrc:/qt/qml/Tattle/assets/icons/copy.svg"
                                 size: "small"
                                 onClicked: {
-                                    DictationPadModel.copyTextToClipboard("qtscribe --toggle");
+                                    DictationPadModel.copyTextToClipboard("tattle --toggle");
                                 }
                             }
                         }

@@ -176,7 +176,7 @@ jobs:
             packaging/deb/postinst \
             packaging/deb/prerm \
             packaging/deb/postrm \
-            packaging/arch/qtscribe.install \
+            packaging/arch/tattle.install \
             packaging/arch/PKGBUILD \
             scripts/ci/check-wayland-only.sh
 
@@ -185,7 +185,7 @@ jobs:
           docker run --rm \
             -v "${GITHUB_WORKSPACE}/packaging/arch:/pkg:ro" \
             archlinux:base-devel@sha256:61f7de2dd88cc4ba1fe36c24cfe1a503c3936984492d6405eeab013ce6ac68c5 \
-            bash -c "useradd -m u && cp /pkg/PKGBUILD /pkg/qtscribe.install /home/u/ && chown -R u:u /home/u && su u -c 'cd /home/u && makepkg --printsrcinfo'" > /tmp/generated-srcinfo
+            bash -c "useradd -m u && cp /pkg/PKGBUILD /pkg/tattle.install /home/u/ && chown -R u:u /home/u && su u -c 'cd /home/u && makepkg --printsrcinfo'" > /tmp/generated-srcinfo
           if ! diff -u packaging/arch/.SRCINFO /tmp/generated-srcinfo; then
             echo "ERROR: packaging/arch/.SRCINFO is out of sync with PKGBUILD."
             echo "Regenerate with: makepkg --printsrcinfo > packaging/arch/.SRCINFO"
@@ -321,7 +321,7 @@ jobs:
 
       - name: Run Clang-Tidy on first-party targets
         run: |
-          ninja -C build qtscribe_core keyinjectord qtscribe qtscribed
+          ninja -C build tattle_core keyinjectord tattle tattled
           ccache --show-stats
 
   sanitizers:

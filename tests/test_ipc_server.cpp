@@ -234,16 +234,16 @@ private slots:
 
         keyinjectord::AuthResult res = keyinjectord::AuthResult::Success;
 
-        QVERIFY(!keyinjectord::validateExecutableTopology("/tmp/qtscribe", selfPath, &res));
+        QVERIFY(!keyinjectord::validateExecutableTopology("/tmp/tattle", selfPath, &res));
         QCOMPARE(res, keyinjectord::AuthResult::UntrustedLocation);
 
-        QVERIFY(!keyinjectord::validateExecutableTopology("/var/tmp/qtscribe", selfPath, &res));
+        QVERIFY(!keyinjectord::validateExecutableTopology("/var/tmp/tattle", selfPath, &res));
         QCOMPARE(res, keyinjectord::AuthResult::UntrustedLocation);
 
-        QVERIFY(!keyinjectord::validateExecutableTopology("/dev/shm/qtscribe", selfPath, &res));
+        QVERIFY(!keyinjectord::validateExecutableTopology("/dev/shm/tattle", selfPath, &res));
         QCOMPARE(res, keyinjectord::AuthResult::UntrustedLocation);
 
-        QVERIFY(!keyinjectord::validateExecutableTopology("/run/user/1000/qtscribe", selfPath, &res));
+        QVERIFY(!keyinjectord::validateExecutableTopology("/run/user/1000/tattle", selfPath, &res));
         QCOMPARE(res, keyinjectord::AuthResult::UntrustedLocation);
     }
 
@@ -252,7 +252,7 @@ private slots:
         QVERIFY(!selfPath.empty());
 
         keyinjectord::AuthResult res = keyinjectord::AuthResult::Success;
-        std::filesystem::path deletedParent = "/usr/bin/qtscribe (deleted)";
+        std::filesystem::path deletedParent = "/usr/bin/tattle (deleted)";
         QVERIFY(!keyinjectord::validateExecutableTopology(deletedParent, selfPath, &res));
         QCOMPARE(res, keyinjectord::AuthResult::DeletedExecutable);
 
@@ -271,12 +271,12 @@ private slots:
         QCOMPARE(res, keyinjectord::AuthResult::UnauthorizedExecutable);
     }
 
-    void testValidateExecutableTopologyAcceptsQtscribed() {
+    void testValidateExecutableTopologyAcceptsTattled() {
         const std::filesystem::path selfPath = currentExePath();
         QVERIFY(!selfPath.empty());
 
         keyinjectord::AuthResult res = keyinjectord::AuthResult::InvalidFd;
-        std::filesystem::path daemonPath = selfPath.parent_path() / "qtscribed";
+        std::filesystem::path daemonPath = selfPath.parent_path() / "tattled";
         const bool existed = std::filesystem::exists(daemonPath);
         if (!existed) {
             FILE* f = fopen(daemonPath.c_str(), "w");
@@ -293,12 +293,12 @@ private slots:
         QVERIFY(ok);
     }
 
-    void testValidateExecutableTopologyRejectsQtscribeGui() {
+    void testValidateExecutableTopologyRejectsTattleGui() {
         const std::filesystem::path selfPath = currentExePath();
         QVERIFY(!selfPath.empty());
 
         keyinjectord::AuthResult res = keyinjectord::AuthResult::Success;
-        std::filesystem::path guiPath = selfPath.parent_path() / "qtscribe";
+        std::filesystem::path guiPath = selfPath.parent_path() / "tattle";
         const bool existed = std::filesystem::exists(guiPath);
         if (!existed) {
             FILE* f = fopen(guiPath.c_str(), "w");
@@ -330,7 +330,7 @@ private slots:
 
         std::filesystem::path nestedDir = selfPath.parent_path() / "test_nested_dir";
         std::filesystem::create_directories(nestedDir);
-        std::filesystem::path nestedBinary = nestedDir / "qtscribed";
+        std::filesystem::path nestedBinary = nestedDir / "tattled";
 
         FILE* f = fopen(nestedBinary.c_str(), "w");
         QVERIFY(f != nullptr);
@@ -358,7 +358,7 @@ private slots:
         QVERIFY(fSelf != nullptr);
         fclose(fSelf);
 
-        std::filesystem::path mockParent = testDir / "qtscribed";
+        std::filesystem::path mockParent = testDir / "tattled";
         FILE* fParent = fopen(mockParent.c_str(), "w");
         QVERIFY(fParent != nullptr);
         fclose(fParent);
@@ -386,7 +386,7 @@ private slots:
         QVERIFY(fSelf != nullptr);
         fclose(fSelf);
 
-        std::filesystem::path mockParent = testDir / "qtscribed";
+        std::filesystem::path mockParent = testDir / "tattled";
         FILE* fParent = fopen(mockParent.c_str(), "w");
         QVERIFY(fParent != nullptr);
         fclose(fParent);
@@ -415,7 +415,7 @@ private slots:
         QVERIFY(fSelf != nullptr);
         fclose(fSelf);
 
-        std::filesystem::path mockParent = testDir / "qtscribed";
+        std::filesystem::path mockParent = testDir / "tattled";
         FILE* fParent = fopen(mockParent.c_str(), "w");
         QVERIFY(fParent != nullptr);
         fclose(fParent);
@@ -462,7 +462,7 @@ private slots:
         QVERIFY(fSelf != nullptr);
         fclose(fSelf);
 
-        std::filesystem::path mockParent = parentDir / "qtscribed";
+        std::filesystem::path mockParent = parentDir / "tattled";
         FILE* fParent = fopen(mockParent.c_str(), "w");
         QVERIFY(fParent != nullptr);
         fclose(fParent);
@@ -657,10 +657,10 @@ private slots:
         QVERIFY(keyinjectord::FsSecurityChecker::isUntrustedPath("/var/tmp/nested/binary"));
         QVERIFY(keyinjectord::FsSecurityChecker::isUntrustedPath("/dev/shm"));
         QVERIFY(keyinjectord::FsSecurityChecker::isUntrustedPath("/dev/shm/test"));
-        QVERIFY(keyinjectord::FsSecurityChecker::isUntrustedPath("/run/user/1000/qtscribe"));
+        QVERIFY(keyinjectord::FsSecurityChecker::isUntrustedPath("/run/user/1000/tattle"));
 
-        QVERIFY(!keyinjectord::FsSecurityChecker::isUntrustedPath("/usr/bin/qtscribe"));
-        QVERIFY(!keyinjectord::FsSecurityChecker::isUntrustedPath("/opt/qtscribe"));
+        QVERIFY(!keyinjectord::FsSecurityChecker::isUntrustedPath("/usr/bin/tattle"));
+        QVERIFY(!keyinjectord::FsSecurityChecker::isUntrustedPath("/opt/tattle"));
     }
 };
 

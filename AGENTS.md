@@ -7,7 +7,7 @@
   - Debug (`build/`): `cmake --preset linux-qt6-debug` and `cmake --build --preset build-debug`
   - Release (`build-release/`): `cmake --preset linux-qt6-release` and `cmake --build --preset build-release`
   - RelWithDebInfo (`build-relwithdebinfo/`): `cmake --preset linux-qt6-relwithdebinfo` and `cmake --build --preset build-relwithdebinfo`
-- Pass `--target <name>` (such as `qtscribe` or `keyinjectord`) to rebuild only the changed module.
+- Pass `--target <name>` (such as `tattle` or `keyinjectord`) to rebuild only the changed module. If you run the full build preset, inform the user so that the user can set the keyinjectord capability again.
 - Keep `-DENABLE_VULKAN=OFF` (the default) for faster local builds.
 
 ## Testing

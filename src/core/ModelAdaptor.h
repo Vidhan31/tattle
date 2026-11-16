@@ -7,7 +7,7 @@ class ModelService;
 
 class ModelAdaptor : public QDBusAbstractAdaptor {
     Q_OBJECT
-    Q_CLASSINFO("D-Bus Interface", "io.github.qtscribe.ModelService")
+    Q_CLASSINFO("D-Bus Interface", "io.github.tattle.ModelService")
 
     Q_PROPERTY(bool isModelLoaded READ isModelLoaded NOTIFY modelStatusChanged)
     Q_PROPERTY(bool isModelBusy READ isModelBusy NOTIFY modelStatusChanged)

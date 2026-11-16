@@ -2,7 +2,7 @@ pragma ComponentBehavior: Bound
 pragma ValueTypeBehavior: Addressable
 import QtQuick
 import QtQuick.Layouts
-import QtScribe
+import Tattle
 import "controls"
 
 Rectangle {

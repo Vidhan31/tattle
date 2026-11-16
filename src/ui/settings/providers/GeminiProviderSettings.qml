@@ -1,7 +1,7 @@
 pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Layouts
-import QtScribe
+import Tattle
 import "../../controls"
 import ".."
 
@@ -110,7 +110,7 @@ Item {
             description: qsTr("Provide specialized terminology to bias recognition")
             fieldLabel: qsTr("Custom Vocabulary")
             placeholderText: qsTr(
-                                 "Comma-separated or newline-separated terms, e.g. QtScribe, Wayland, Qt6, CMake, Kubernetes, Gemini...")
+                                 "Comma-separated or newline-separated terms, e.g. Tattle, Wayland, Qt6, CMake, Kubernetes, Gemini...")
             vocabulary: AppSettings.geminiCustomVocabulary
             maxCharacters: 0
             onVocabularySaved: text => {

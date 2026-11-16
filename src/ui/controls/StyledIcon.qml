@@ -1,7 +1,7 @@
 pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Effects
-import QtScribe
+import Tattle
 
 Item {
     id: root

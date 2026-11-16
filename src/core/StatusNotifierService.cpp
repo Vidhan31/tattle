@@ -106,11 +106,11 @@ QString StatusNotifierItemAdaptor::category() {
 }
 
 QString StatusNotifierItemAdaptor::id() {
-    return u"qtscribe"_s;
+    return u"tattle"_s;
 }
 
 QString StatusNotifierItemAdaptor::title() {
-    return u"QtScribe"_s;
+    return u"Tattle"_s;
 }
 
 QString StatusNotifierItemAdaptor::status() {
@@ -134,7 +134,7 @@ bool StatusNotifierItemAdaptor::itemIsMenu() {
 }
 
 QString StatusNotifierItemAdaptor::iconName() {
-    return u"io.github.qtscribe"_s;
+    return u"io.github.tattle"_s;
 }
 
 KDbusImageVector StatusNotifierItemAdaptor::iconPixmap() {
@@ -164,8 +164,8 @@ QString StatusNotifierItemAdaptor::attentionMovieName() {
 KDbusToolTipStruct StatusNotifierItemAdaptor::toolTip() const {
     KDbusToolTipStruct tip;
     const bool rec = m_service->controller() && m_service->controller()->recording();
-    tip.icon = u"io.github.qtscribe"_s;
-    tip.title = u"QtScribe"_s;
+    tip.icon = u"io.github.tattle"_s;
+    tip.title = u"Tattle"_s;
     tip.subTitle = rec ? u"Recording..."_s : u"Ready"_s;
     return tip;
 }
@@ -240,7 +240,7 @@ bool DBusMenuAdaptor::AboutToShowGroup(const QList<int>& ids, QList<int>& update
 QDBusVariant DBusMenuAdaptor::GetProperty(int id, const QString& name) {
     if (id == 1) {
         if (name == u"label"_s) {
-            return QDBusVariant(u"Open QtScribe"_s);
+            return QDBusVariant(u"Open Tattle"_s);
         }
         if (name == u"enabled"_s) {
             return QDBusVariant(true);
@@ -284,7 +284,7 @@ uint DBusMenuAdaptor::GetLayout(int parentId, int recursionDepth, const QStringL
 
     DBusMenuLayoutItem showItem;
     showItem.id = 1;
-    showItem.properties[u"label"_s] = u"Open QtScribe"_s;
+    showItem.properties[u"label"_s] = u"Open Tattle"_s;
     showItem.properties[u"enabled"_s] = true;
     showItem.properties[u"visible"_s] = true;
 
@@ -314,7 +314,7 @@ DBusMenuItemList DBusMenuAdaptor::GetGroupProperties(const QList<int>& ids, cons
         DBusMenuItem item;
         item.id = id;
         if (id == 1) {
-            item.properties[u"label"_s] = u"Open QtScribe"_s;
+            item.properties[u"label"_s] = u"Open Tattle"_s;
             item.properties[u"enabled"_s] = true;
             item.properties[u"visible"_s] = true;
         } else if (id == 2) {

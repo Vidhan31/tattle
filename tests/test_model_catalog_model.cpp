@@ -56,8 +56,8 @@ private slots:
 };
 
 void TestModelCatalogModel::initTestCase() {
-    QCoreApplication::setApplicationName(u"QtScribeTestApp_ModelCatalogModel"_s);
-    qputenv("QTSCRIBE_DISABLE_REMOTE_ATTACH", "1");
+    QCoreApplication::setApplicationName(u"TattleTestApp_ModelCatalogModel"_s);
+    qputenv("TATTLE_DISABLE_REMOTE_ATTACH", "1");
 }
 
 void TestModelCatalogModel::testProgressUpdatesInPlace() {

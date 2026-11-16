@@ -9,7 +9,7 @@ class SettingsService;
 
 class SettingsAdaptor : public QDBusAbstractAdaptor {
     Q_OBJECT
-    Q_CLASSINFO("D-Bus Interface", "io.github.qtscribe.SettingsService")
+    Q_CLASSINFO("D-Bus Interface", "io.github.tattle.SettingsService")
 
 public:
     explicit SettingsAdaptor(SettingsService* service, QObject* parent);

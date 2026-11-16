@@ -1,11 +1,11 @@
 [Desktop Entry]
 Type=Application
-Name=QtScribe Daemon
-Exec=qtscribed
-Icon=io.github.qtscribe
+Name=Tattle Daemon
+Exec=tattled
+Icon=io.github.tattle
 Categories=Utility;
 Terminal=false
-StartupWMClass=io.github.qtscribe.daemon
+StartupWMClass=io.github.tattle.daemon
 NoDisplay=true
 Comment=Speech to Text Background Daemon
 X-GNOME-Autostart-enabled=true

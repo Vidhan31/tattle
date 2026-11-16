@@ -22,7 +22,7 @@ UinputDevice::UinputDevice(int uinputFd)
         throw std::runtime_error("libevdev_new() failed");
     }
 
-    libevdev_set_name(m_dev, "qtscribe-virtual-kbd");
+    libevdev_set_name(m_dev, "tattle-virtual-kbd");
     libevdev_set_id_bustype(m_dev, BUS_USB);
     libevdev_set_id_vendor(m_dev, 0x1234);
     libevdev_set_id_product(m_dev, 0x5678);

@@ -1,7 +1,7 @@
 pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Layouts
-import QtScribe
+import Tattle
 import "../controls"
 
 StyledCard {
@@ -61,7 +61,7 @@ StyledCard {
 
                         StyledIcon {
                             anchors.centerIn: parent
-                            source: "qrc:/qt/qml/QtScribe/assets/icons/sparkles.svg"
+                            source: "qrc:/qt/qml/Tattle/assets/icons/sparkles.svg"
                             size: 16
                             color: cloudOptionCard.isSelected ? Theme.accentColor : Theme.textSecondary
                         }
@@ -178,7 +178,7 @@ StyledCard {
 
                         StyledIcon {
                             anchors.centerIn: parent
-                            source: "qrc:/qt/qml/QtScribe/assets/icons/bolt.svg"
+                            source: "qrc:/qt/qml/Tattle/assets/icons/bolt.svg"
                             size: 16
                             color: offlineOptionCard.isSelected ? Theme.accentColor : Theme.textSecondary
                         }

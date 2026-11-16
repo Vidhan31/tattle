@@ -17,7 +17,7 @@ class TestTranscriptionModel : public QObject {
     Q_OBJECT
 
 private slots:
-    void initTestCase() { qputenv("QTSCRIBE_DISABLE_REMOTE_ATTACH", "1"); }
+    void initTestCase() { qputenv("TATTLE_DISABLE_REMOTE_ATTACH", "1"); }
 
     void testSourceModelRejectsEmptyAndWhitespace() {
         TranscriptionSourceModel source;

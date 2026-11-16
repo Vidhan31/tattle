@@ -15,8 +15,8 @@ class TestSettingsManager : public QObject {
 
 private slots:
     void initTestCase() {
-        QCoreApplication::setOrganizationName(u"QtScribeTest"_s);
-        QCoreApplication::setApplicationName(u"QtScribeTest_SettingsManager"_s);
+        QCoreApplication::setOrganizationName(u"TattleTest"_s);
+        QCoreApplication::setApplicationName(u"TattleTest_SettingsManager"_s);
     }
 
     void cleanup() {

@@ -4,20 +4,20 @@ set -e
 case "$1" in
     configure)
         if command -v setcap >/dev/null 2>&1; then
-            if [ -f "/opt/qtscribe/bin/keyinjectord" ]; then
-                setcap cap_dac_override+ep /opt/qtscribe/bin/keyinjectord || true
+            if [ -f "/opt/tattle/bin/keyinjectord" ]; then
+                setcap cap_dac_override+ep /opt/tattle/bin/keyinjectord || true
             fi
         fi
 
         if [ -d "/usr/bin" ]; then
-            if [ -f "/opt/qtscribe/bin/qtscribe" ]; then
-                ln -sf /opt/qtscribe/bin/qtscribe /usr/bin/qtscribe
+            if [ -f "/opt/tattle/bin/tattle" ]; then
+                ln -sf /opt/tattle/bin/tattle /usr/bin/tattle
             fi
-            if [ -f "/opt/qtscribe/bin/qtscribed" ]; then
-                ln -sf /opt/qtscribe/bin/qtscribed /usr/bin/qtscribed
+            if [ -f "/opt/tattle/bin/tattled" ]; then
+                ln -sf /opt/tattle/bin/tattled /usr/bin/tattled
             fi
-            if [ -f "/opt/qtscribe/bin/keyinjectord" ]; then
-                ln -sf /opt/qtscribe/bin/keyinjectord /usr/bin/keyinjectord
+            if [ -f "/opt/tattle/bin/keyinjectord" ]; then
+                ln -sf /opt/tattle/bin/keyinjectord /usr/bin/keyinjectord
             fi
         fi
 

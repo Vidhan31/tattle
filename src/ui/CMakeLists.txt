@@ -1,10 +1,10 @@
 set_source_files_properties(Theme.qml PROPERTIES QT_QML_SINGLETON_TYPE TRUE)
 
-qt_add_library(qtscribe_ui STATIC)
-qt_add_qml_module(qtscribe_ui
-    URI QtScribe
+qt_add_library(tattle_ui STATIC)
+qt_add_qml_module(tattle_ui
+    URI Tattle
     VERSION 1.0
-    OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/QtScribe"
+    OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Tattle"
     IMPORTS
         QtQuick
         QtQuick.Controls
@@ -73,15 +73,15 @@ qt_add_qml_module(qtscribe_ui
         settings/SystemSettingsPage.qml
 )
 
-qt_add_resources(qtscribe_ui "qtscribe_license"
-    PREFIX "/qt/qml/QtScribe/license"
+qt_add_resources(tattle_ui "tattle_license"
+    PREFIX "/qt/qml/Tattle/license"
     BASE "${CMAKE_SOURCE_DIR}"
     FILES
         ${CMAKE_SOURCE_DIR}/LICENSE
 )
 
-qt_add_resources(qtscribe_ui "qtscribe_assets"
-    PREFIX "/qt/qml/QtScribe/assets"
+qt_add_resources(tattle_ui "tattle_assets"
+    PREFIX "/qt/qml/Tattle/assets"
     BASE "${CMAKE_SOURCE_DIR}/assets"
     FILES
         ${CMAKE_SOURCE_DIR}/assets/speech-to-text-16.png
@@ -109,18 +109,18 @@ qt_add_resources(qtscribe_ui "qtscribe_assets"
         ${CMAKE_SOURCE_DIR}/assets/icons/refresh.svg
 )
 
-target_include_directories(qtscribe_ui
+target_include_directories(tattle_ui
     PUBLIC
         ${CMAKE_SOURCE_DIR}/src/ui
         ${CMAKE_SOURCE_DIR}/src
 )
 
-target_compile_definitions(qtscribe_ui
+target_compile_definitions(tattle_ui
     PRIVATE
-        QTSCRIBE_VERSION="${PROJECT_VERSION}"
+        TATTLE_VERSION="${PROJECT_VERSION}"
 )
 
-target_link_libraries(qtscribe_ui
+target_link_libraries(tattle_ui
     PUBLIC
         Qt6::Gui
         Qt6::Qml
@@ -132,10 +132,10 @@ target_link_libraries(qtscribe_ui
         Qt6::DBus
         Qt6Keychain::Qt6Keychain
     PRIVATE
-        qtscribe::compiler_flags
+        tattle::compiler_flags
 )
 
-target_precompile_headers(qtscribe_ui
+target_precompile_headers(tattle_ui
     PRIVATE
         <QGuiApplication>
         <QQmlApplicationEngine>

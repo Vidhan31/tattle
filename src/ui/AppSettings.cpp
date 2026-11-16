@@ -12,7 +12,7 @@
 using namespace Qt::StringLiterals;
 
 namespace {
-constexpr auto kKeychainService = "QtScribe";
+constexpr auto kKeychainService = "Tattle";
 
 constexpr auto kGroqKeychainKey = "groq_api_key";
 const auto kGroqSettingsKey = SettingsKeys::kGroqSettingsKey.toString();

@@ -2,7 +2,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Templates as T
 import QtQuick.Layouts
-import QtScribe
+import Tattle
 import "../../controls"
 import ".."
 
@@ -173,7 +173,7 @@ Item {
                         spacing: Theme.spacingSm
 
                         StyledIcon {
-                            source: "qrc:/qt/qml/QtScribe/assets/icons/key.svg"
+                            source: "qrc:/qt/qml/Tattle/assets/icons/key.svg"
                             size: 14
                             color: root.activeSubTab === 0 ? Theme.accentColor : Theme.textSecondary
                         }
@@ -210,7 +210,7 @@ Item {
                         spacing: Theme.spacingSm
 
                         StyledIcon {
-                            source: "qrc:/qt/qml/QtScribe/assets/icons/sparkles.svg"
+                            source: "qrc:/qt/qml/Tattle/assets/icons/sparkles.svg"
                             size: 14
                             color: root.activeSubTab === 1 ? Theme.accentColor : Theme.textSecondary
                         }
@@ -310,7 +310,7 @@ Item {
                 title: qsTr("Custom Vocabulary")
                 description: qsTr("Guide the cloud transcriber with specialized acronyms, names, or terminology")
                 fieldLabel: qsTr("Custom Prompt / Words")
-                placeholderText: qsTr("e.g. QtScribe, Wayland, Qt6, CMake, JSON, PyTorch, Neovim, kubectl...")
+                placeholderText: qsTr("e.g. Tattle, Wayland, Qt6, CMake, JSON, PyTorch, Neovim, kubectl...")
                 vocabulary: AppSettings.groqCustomPrompt
                 maxCharacters: 800
                 onVocabularySaved: text => {
@@ -557,7 +557,7 @@ Item {
                         StyledButton {
                             id: clearPromptBtn
                             text: qsTr("Clear")
-                            iconSource: "qrc:/qt/qml/QtScribe/assets/icons/trash.svg"
+                            iconSource: "qrc:/qt/qml/Tattle/assets/icons/trash.svg"
                             enabled: customPromptArea.text.length > 0
                             size: "small"
                             onClicked: {
@@ -569,7 +569,7 @@ Item {
                         StyledButton {
                             id: savePromptBtn
                             text: qsTr("Save")
-                            iconSource: "qrc:/qt/qml/QtScribe/assets/icons/save.svg"
+                            iconSource: "qrc:/qt/qml/Tattle/assets/icons/save.svg"
                             size: "small"
                             variant: "primary"
                             onClicked: {

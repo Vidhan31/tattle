@@ -2,7 +2,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Templates as T
 import QtQuick.Layouts
-import QtScribe
+import Tattle
 import "controls"
 
 StyledCard {
@@ -110,7 +110,7 @@ StyledCard {
                             anchors.centerIn: parent
                             width: 24
                             height: 24
-                            source: "qrc:/qt/qml/QtScribe/assets/icons/mic.svg"
+                            source: "qrc:/qt/qml/Tattle/assets/icons/mic.svg"
                             sourceSize.width: 24
                             sourceSize.height: 24
                             visible: !DaemonClient.recording && !DaemonClient.isBusy
@@ -121,7 +121,7 @@ StyledCard {
                             anchors.centerIn: parent
                             width: 22
                             height: 22
-                            source: "qrc:/qt/qml/QtScribe/assets/icons/stop.svg"
+                            source: "qrc:/qt/qml/Tattle/assets/icons/stop.svg"
                             sourceSize.width: 22
                             sourceSize.height: 22
                             visible: DaemonClient.recording
@@ -132,7 +132,7 @@ StyledCard {
                             anchors.centerIn: parent
                             width: 24
                             height: 24
-                            source: "qrc:/qt/qml/QtScribe/assets/icons/spinner.svg"
+                            source: "qrc:/qt/qml/Tattle/assets/icons/spinner.svg"
                             sourceSize.width: 24
                             sourceSize.height: 24
                             visible: DaemonClient.isBusy

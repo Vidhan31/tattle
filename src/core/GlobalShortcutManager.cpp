@@ -85,7 +85,7 @@ void GlobalShortcutManager::requestShortcuts() {
 }
 
 namespace {
-const auto kApplicationId = u"io.github.qtscribe"_s;
+const auto kApplicationId = u"io.github.tattle"_s;
 } // namespace
 
 void GlobalShortcutManager::registerHostApp() {

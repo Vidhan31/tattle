@@ -201,7 +201,7 @@ qreal SystemService::microphoneTestLevel() const noexcept {
 
 void SystemService::testTextInjection() {
     if (m_injector) {
-        m_injector->inject(u"Hello from QtScribe!"_s);
+        m_injector->inject(u"Hello from Tattle!"_s);
     }
 }
 

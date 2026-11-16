@@ -1,5 +1,5 @@
 name: Release Deployment
-run-name: QtScribe ${{ inputs.tag_name || github.ref_name }}
+run-name: Tattle ${{ inputs.tag_name || github.ref_name }}
 
 on:
   push:
@@ -236,7 +236,7 @@ jobs:
         uses: softprops/action-gh-release@8a0cd651e5b2365bd640854a3fa5dfc70e4875f3 # v3.0.4
         with:
           tag_name: ${{ needs.resolve-version.outputs.tag }}
-          name: QtScribe ${{ needs.resolve-version.outputs.tag }}
+          name: Tattle ${{ needs.resolve-version.outputs.tag }}
           body: ${{ steps.changelog_reader.outputs.changes }}
           generate_release_notes: ${{ steps.changelog_reader.outputs.changes == '' }}
           draft: ${{ github.event.inputs.draft || false }}

@@ -7,17 +7,17 @@
 
 using namespace Qt::StringLiterals;
 
-static const auto kServiceName = u"io.github.qtscribe.SpeechService"_s;
-static const auto kObjectPath = u"/io/github/qtscribe/SpeechService"_s;
-static const auto kInterface = u"io.github.qtscribe.SystemService"_s;
+static const auto kServiceName = u"io.github.tattle.SpeechService"_s;
+static const auto kObjectPath = u"/io/github/tattle/SpeechService"_s;
+static const auto kInterface = u"io.github.tattle.SystemService"_s;
 
 SystemClient::SystemClient(QObject* parent)
     : QObject(parent) {
     s_instance = this;
     connect(this, &SystemClient::textInjectionStatusChanged, this, &SystemClient::directTypingStatusChanged);
 
-    const bool disableRemoteAttach = !qEnvironmentVariableIsEmpty("QTSCRIBE_DISABLE_REMOTE_ATTACH") &&
-                                     qEnvironmentVariable("QTSCRIBE_DISABLE_REMOTE_ATTACH") != "0";
+    const bool disableRemoteAttach = !qEnvironmentVariableIsEmpty("TATTLE_DISABLE_REMOTE_ATTACH") &&
+                                     qEnvironmentVariable("TATTLE_DISABLE_REMOTE_ATTACH") != "0";
     if (disableRemoteAttach) {
         return;
     }

@@ -2,7 +2,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Templates as T
 import QtQuick.Layouts
-import QtScribe
+import Tattle
 import ".."
 import "../controls"
 
@@ -177,7 +177,7 @@ Item {
                     spacing: Theme.spacingSm
 
                     StyledIcon {
-                        source: "qrc:/qt/qml/QtScribe/assets/icons/info.svg"
+                        source: "qrc:/qt/qml/Tattle/assets/icons/info.svg"
                         size: 14
                         color: Theme.textSecondary
                         Layout.alignment: Qt.AlignVCenter
@@ -221,7 +221,7 @@ Item {
 
                     StyledButton {
                         text: qsTr("Refresh")
-                        iconSource: "qrc:/qt/qml/QtScribe/assets/icons/refresh.svg"
+                        iconSource: "qrc:/qt/qml/Tattle/assets/icons/refresh.svg"
                         size: "small"
                         variant: "flat"
                         onClicked: {

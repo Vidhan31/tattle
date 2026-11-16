@@ -88,7 +88,7 @@ void ApplicationContext::initializeHeadless(bool startServices) {
 
             if (QDBusConnection::sessionBus().isConnected()) {
                 auto* guiWatcher =
-                    new QDBusServiceWatcher(u"io.github.qtscribe.SettingsGui"_s, QDBusConnection::sessionBus(),
+                    new QDBusServiceWatcher(u"io.github.tattle.SettingsGui"_s, QDBusConnection::sessionBus(),
                                             QDBusServiceWatcher::WatchForUnregistration, this);
                 connect(guiWatcher, &QDBusServiceWatcher::serviceUnregistered, this, [this](const QString&) {
                     if (m_dictationCoordinator) {

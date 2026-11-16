@@ -8,9 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
-- **Breaking rename:** application renamed from QTranscribe (`qtranscribe`) to QtScribe (`qtscribe`).
-  New binary `qtscribe`, app ID `io.github.qtscribe`, D-Bus service `io.github.qtscribe.SpeechService`.
-  No migration: settings, keychain entries, and models stored under the old `qtranscribe` names are orphaned;
+- **Breaking rename:** application renamed from QtScribe (`qtscribe`) to Tattle (`tattle`).
+  New binary `tattle`, app ID `io.github.tattle`, D-Bus service `io.github.tattle.SpeechService`.
+  No migration: settings, keychain entries, and models stored under the old `qtscribe` names are orphaned;
   reconfigure API keys and re-download models after upgrading.
 
 ## [1.0.0] - 2026-11-09

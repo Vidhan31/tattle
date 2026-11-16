@@ -1,24 +1,24 @@
-qt_add_executable(qtscribed
+qt_add_executable(tattled
     main.cpp
 )
 
-target_compile_definitions(qtscribed
+target_compile_definitions(tattled
     PRIVATE
-        QTSCRIBE_VERSION="${PROJECT_VERSION}"
+        TATTLE_VERSION="${PROJECT_VERSION}"
 )
 
-target_include_directories(qtscribed
+target_include_directories(tattled
     PRIVATE
         ${CMAKE_SOURCE_DIR}/src
         ${CMAKE_SOURCE_DIR}/src/core
 )
 
-target_link_libraries(qtscribed
+target_link_libraries(tattled
     PRIVATE
-        qtscribe_core
-        qtscribe::compiler_flags
+        tattle_core
+        tattle::compiler_flags
 )
 
-install(TARGETS qtscribed
+install(TARGETS tattled
     DESTINATION ${CMAKE_INSTALL_BINDIR}
 )

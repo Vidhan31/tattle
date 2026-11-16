@@ -12,16 +12,16 @@
 
 using namespace Qt::StringLiterals;
 
-static const auto kServiceName = u"io.github.qtscribe.SpeechService"_s;
-static const auto kObjectPath = u"/io/github/qtscribe/SpeechService"_s;
-static const auto kInterface = u"io.github.qtscribe.ModelService"_s;
+static const auto kServiceName = u"io.github.tattle.SpeechService"_s;
+static const auto kObjectPath = u"/io/github/tattle/SpeechService"_s;
+static const auto kInterface = u"io.github.tattle.ModelService"_s;
 
 ModelClient::ModelClient(QObject* parent)
     : QObject(parent) {
     s_instance = this;
 
     m_computeDevice = u"CPU (SIMD)"_s;
-    m_modelsDirectory = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + u"/qtscribe/models"_s;
+    m_modelsDirectory = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + u"/tattle/models"_s;
     const QSettings settings;
     const QString id =
         settings.value(SettingsKeys::kTranscribeSelectedModel.toString(), u"whisper-base.en"_s).toString();
@@ -29,8 +29,8 @@ ModelClient::ModelClient(QObject* parent)
     m_modelPath = m_modelsDirectory + u"/"_s + m_modelFileName;
     m_isModelInstalled = QFile::exists(m_modelPath);
 
-    const bool disableRemoteAttach = !qEnvironmentVariableIsEmpty("QTSCRIBE_DISABLE_REMOTE_ATTACH") &&
-                                     qEnvironmentVariable("QTSCRIBE_DISABLE_REMOTE_ATTACH") != "0";
+    const bool disableRemoteAttach = !qEnvironmentVariableIsEmpty("TATTLE_DISABLE_REMOTE_ATTACH") &&
+                                     qEnvironmentVariable("TATTLE_DISABLE_REMOTE_ATTACH") != "0";
     if (disableRemoteAttach) {
         return;
     }

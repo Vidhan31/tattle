@@ -37,7 +37,7 @@ fi
 
 echo "Validating QML AOT compilation statistics from: $STATS_FILE"
 
-SUMMARY=$(grep -E "(Total results|Module QtScribe):" "$STATS_FILE" | tail -n 1 || true)
+SUMMARY=$(grep -E "(Total results|Module Tattle):" "$STATS_FILE" | tail -n 1 || true)
 if [ -n "$SUMMARY" ]; then
     echo "Summary: $SUMMARY"
 fi
