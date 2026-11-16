@@ -11,7 +11,7 @@ on:
   workflow_call:
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ci-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -43,6 +43,8 @@ jobs:
           filters: |
             cpp:
               - 'src/**/*.{cpp,h}'
+              - 'src/**/CMakeLists.txt'
+              - 'src/**/CMakePresets.json'
               - 'tests/**'
               - 'cmake/**'
               - 'CMakeLists.txt'
@@ -161,7 +163,7 @@ jobs:
 
       - name: Run hadolint on Dockerfiles
         run: |
-          docker run --rm -v "${GITHUB_WORKSPACE}:/mnt:ro" -w /mnt hadolint/hadolint:latest hadolint \
+          docker run --rm -v "${GITHUB_WORKSPACE}:/mnt:ro" -w /mnt hadolint/hadolint:2.12.0@sha256:30a8fd2e785ab6176eed53f74769e04f125afb2f74a6c52aef7d463583b6d45e hadolint \
             packaging/deb/Dockerfile.deb \
             packaging/rpm/Dockerfile.rpm \
             packaging/arch/Dockerfile.arch
@@ -251,12 +253,17 @@ jobs:
           cp build/.rcc/qmlcache/all_aotstats.txt build/all_aotstats.txt
           ccache --show-stats
 
+      - name: Validate QML AOT compilation
+        run: |
+          STRICT_AOT=1 bash scripts/ci/check-aot-stats.sh build
+
       - name: Upload QML AOT stats artifact
+        if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: qml-aotstats
           path: build/all_aotstats.txt
-          if-no-files-found: error
+          if-no-files-found: warn
 
   analyze:
     name: Static Analysis (clang-tidy)
