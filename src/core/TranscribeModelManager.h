@@ -49,6 +49,7 @@ class TranscribeModelManager : public QAbstractListModel {
     Q_PROPERTY(QString availableDiskSpaceFormatted READ availableDiskSpaceFormatted NOTIFY diskSpaceChanged FINAL)
 
 public:
+    // NOLINTNEXTLINE(performance-enum-size) QML-registered enums need int backing for qmlcachegen AOT
     enum Roles {
         IdRole = Qt::UserRole + 1,
         NameRole,
