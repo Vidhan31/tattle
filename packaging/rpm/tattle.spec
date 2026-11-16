@@ -6,7 +6,7 @@ Release:        %{?release}%{!?release:1}%{?dist}
 Summary:        Fast and modern speech-to-text desktop application
 
 License:        GPL-3.0-or-later
-URL:            https://github.com/Vidhan31/qtscribe
+URL:            https://github.com/Vidhan31/tattle
 Source0:        %{name}-%{version}.tar.gz
 
 BuildRequires:  gcc-c++

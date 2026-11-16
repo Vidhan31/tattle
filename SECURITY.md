@@ -13,7 +13,7 @@ Only the latest release and the `main` branch receive security updates.
 
 Do not report security vulnerabilities in public issues or discussions.
 
-Report vulnerabilities through [GitHub Private Vulnerability Reporting](https://github.com/Vidhan31/qtscribe/security/advisories/new).
+Report vulnerabilities through [GitHub Private Vulnerability Reporting](https://github.com/Vidhan31/tattle/security/advisories/new).
 
 Include:
 - Issue description and security impact

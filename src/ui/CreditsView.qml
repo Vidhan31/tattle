@@ -144,9 +144,9 @@ Item {
                         }
 
                         StyledText {
-                            text: '<a href="https://github.com/Vidhan31/qtscribe" style="color: '
+                            text: '<a href="https://github.com/Vidhan31/tattle" style="color: '
                                   + Theme.accentColor.toString()
-                                  + '; text-decoration: none;">github.com/Vidhan31/qtscribe ↗</a>'
+                                  + '; text-decoration: none;">github.com/Vidhan31/tattle ↗</a>'
                             textFormat: Text.StyledText
                             variant: "caption"
                             customWeight: Font.Medium
