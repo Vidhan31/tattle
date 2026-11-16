@@ -23,7 +23,7 @@
  *
  * @param wavData Input byte array containing RIFF/WAVE header and sample payload.
  * @param outPcmf32 Output vector receiving normalized [-1.0f, 1.0f] PCM samples.
- * @param targetSampleRate Target sampling rate in Hz (typically 16000 for Whisper).
+ * @param targetSampleRate Target sampling rate in Hz (typically 16000 for speech recognition).
  * @return true if decoding succeeded and produced valid PCM frames; false otherwise.
  */
 bool WavDecoder::decode(const QByteArray& wavData, std::vector<float>& outPcmf32, uint32_t targetSampleRate) {

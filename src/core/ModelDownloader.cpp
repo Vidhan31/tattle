@@ -125,7 +125,8 @@ QString ModelDownloader::lastError() const {
 }
 
 void ModelDownloader::onDownloadReadyRead() {
-    if (!m_currentReply || !m_partFile || !m_partFile->isOpen() || m_downloadingModelId.isEmpty()) {
+    if (!m_currentReply || !m_currentReply->isOpen() || !m_currentReply->isReadable() || !m_partFile ||
+        !m_partFile->isOpen() || m_downloadingModelId.isEmpty()) {
         return;
     }
 
@@ -213,6 +214,14 @@ void ModelDownloader::onDownloadFinished() {
     const QString errorString = m_currentReply->errorString();
     const QString abortReason = m_downloadAbortReason;
 
+    if (m_currentReply->isOpen() && m_currentReply->isReadable() && m_partFile && m_partFile->isOpen()) {
+        const QByteArray chunk = m_currentReply->readAll();
+        if (!chunk.isEmpty()) {
+            m_partFile->write(chunk);
+        }
+    }
+
+    m_currentReply->disconnect(this);
     m_currentReply->deleteLater();
     m_currentReply = nullptr;
 
@@ -252,15 +261,17 @@ void ModelDownloader::onDownloadFinished() {
                     const QByteArray header = verifyFile.read(4);
                     verifyFile.close();
 
-                    constexpr quint32 kGgmlMagic = 0x67676d6c;
+                    constexpr quint32 kGgufMagic = 0x46554747; // "GGUF" in little-endian
+                    constexpr quint32 kGgmlMagic = 0x67676d6c; // "ggml" in little-endian
                     quint32 magicVal = 0;
                     if (header.size() == 4) {
                         std::memcpy(&magicVal, header.constData(), 4);
                     }
 
-                    if (magicVal != kGgmlMagic) {
+                    if (magicVal != kGgufMagic && magicVal != kGgmlMagic) {
                         failureMessage =
-                            tr("Download integrity check failed for %1: invalid GGML model format.").arg(modelName);
+                            tr("Download integrity check failed for %1: invalid model format (expected GGUF).")
+                                .arg(modelName);
                     } else {
                         QFile::remove(finalPath);
                         if (QFile::rename(partPath, finalPath)) {

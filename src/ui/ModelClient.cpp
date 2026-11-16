@@ -23,8 +23,9 @@ ModelClient::ModelClient(QObject* parent)
     m_computeDevice = u"CPU (SIMD)"_s;
     m_modelsDirectory = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + u"/qtscribe/models"_s;
     const QSettings settings;
-    const QString id = settings.value(SettingsKeys::kWhisperSelectedModel.toString(), u"tiny.en"_s).toString();
-    m_modelFileName = QString(u"ggml-%1.bin"_s).arg(id);
+    const QString id =
+        settings.value(SettingsKeys::kTranscribeSelectedModel.toString(), u"whisper-base.en"_s).toString();
+    m_modelFileName = id.endsWith(u".gguf"_s) ? id : QString(u"%1-Q8_0.gguf"_s).arg(id);
     m_modelPath = m_modelsDirectory + u"/"_s + m_modelFileName;
     m_isModelInstalled = QFile::exists(m_modelPath);
 
@@ -181,6 +182,14 @@ void ModelClient::checkModelDiskSpace() {
     if (m_interface && m_interface->isValid()) {
         m_interface->call(QDBus::NoBlock, u"checkModelDiskSpace"_s);
     }
+}
+
+void ModelClient::clearModelCatalogLastError() {
+    if (m_interface && m_interface->isValid()) {
+        m_interface->call(QDBus::NoBlock, u"clearModelCatalogLastError"_s);
+    }
+    m_modelCatalogLastError.clear();
+    emit modelCatalogChanged();
 }
 
 void ModelClient::onServiceRegistered(const QString& serviceName) {

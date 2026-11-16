@@ -524,6 +524,12 @@ void DaemonClient::checkModelDiskSpace() {
     }
 }
 
+void DaemonClient::clearModelCatalogLastError() {
+    if (m_modelClient) {
+        m_modelClient->clearModelCatalogLastError();
+    }
+}
+
 void DaemonClient::onServiceRegistered(const QString& serviceName) {
     if (m_speechClient) {
         QMetaObject::invokeMethod(m_speechClient, "onServiceRegistered", Q_ARG(QString, serviceName));

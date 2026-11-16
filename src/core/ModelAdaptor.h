@@ -62,6 +62,7 @@ public slots:
     bool deleteModel(const QString& modelId);
     void refreshModelCatalog();
     void checkModelDiskSpace();
+    void clearModelCatalogLastError();
 
 private:
     ModelService* m_service;

@@ -1,9 +1,9 @@
-#include "WhisperSttClient.h"
+#include "TranscribeSttClient.h"
 
 #include "LoggingCategories.h"
 
-#include "WhisperModelManager.h"
-#include "WhisperWorker.h"
+#include "TranscribeModelManager.h"
+#include "TranscribeWorker.h"
 
 #include <QCoreApplication>
 #include <QDir>
@@ -13,21 +13,24 @@
 
 using namespace Qt::StringLiterals;
 
-WhisperSttClient::WhisperSttClient(QObject* parent)
+TranscribeSttClient::TranscribeSttClient(QObject* parent)
     : AbstractOfflineSttClient(parent)
-    , m_worker(new WhisperWorker()) {
+    , m_worker(new TranscribeWorker()) {
     m_worker->moveToThread(&m_workerThread);
 
-    connect(this, &WhisperSttClient::requestLoadModel, m_worker, &WhisperWorker::loadModel, Qt::QueuedConnection);
-    connect(this, &WhisperSttClient::requestUnloadModel, m_worker, &WhisperWorker::unloadModel, Qt::QueuedConnection);
-    connect(this, &WhisperSttClient::requestTranscribe, m_worker, &WhisperWorker::transcribe, Qt::QueuedConnection);
+    connect(this, &TranscribeSttClient::requestLoadModel, m_worker, &TranscribeWorker::loadModel, Qt::QueuedConnection);
+    connect(this, &TranscribeSttClient::requestUnloadModel, m_worker, &TranscribeWorker::unloadModel,
+            Qt::QueuedConnection);
+    connect(this, &TranscribeSttClient::requestTranscribe, m_worker, &TranscribeWorker::transcribe,
+            Qt::QueuedConnection);
 
-    connect(m_worker, &WhisperWorker::modelLoaded, this, &WhisperSttClient::onWorkerModelLoaded, Qt::QueuedConnection);
-    connect(m_worker, &WhisperWorker::modelUnloaded, this, &WhisperSttClient::onWorkerModelUnloaded,
+    connect(m_worker, &TranscribeWorker::modelLoaded, this, &TranscribeSttClient::onWorkerModelLoaded,
             Qt::QueuedConnection);
-    connect(m_worker, &WhisperWorker::transcriptionFinished, this, &WhisperSttClient::onWorkerTranscriptionFinished,
+    connect(m_worker, &TranscribeWorker::modelUnloaded, this, &TranscribeSttClient::onWorkerModelUnloaded,
             Qt::QueuedConnection);
-    connect(m_worker, &WhisperWorker::transcriptionFailed, this, &WhisperSttClient::onWorkerTranscriptionFailed,
+    connect(m_worker, &TranscribeWorker::transcriptionFinished, this,
+            &TranscribeSttClient::onWorkerTranscriptionFinished, Qt::QueuedConnection);
+    connect(m_worker, &TranscribeWorker::transcriptionFailed, this, &TranscribeSttClient::onWorkerTranscriptionFailed,
             Qt::QueuedConnection);
 
     if (auto* app = QCoreApplication::instance()) {
@@ -39,13 +42,13 @@ WhisperSttClient::WhisperSttClient(QObject* parent)
         });
     }
 
-    m_workerThread.setObjectName(u"WhisperInferenceThread"_s);
+    m_workerThread.setObjectName(u"TranscribeInferenceThread"_s);
     m_workerThread.start();
 
     QDir().mkpath(modelsDirectory());
 }
 
-WhisperSttClient::~WhisperSttClient() {
+TranscribeSttClient::~TranscribeSttClient() {
     cancel();
     if (m_worker) {
         m_worker->cancel(0);
@@ -53,41 +56,43 @@ WhisperSttClient::~WhisperSttClient() {
     m_workerThread.requestInterruption();
     m_workerThread.quit();
     if (!m_workerThread.wait()) {
-        qCWarning(lcSpeech) << "WhisperSttClient: Failed waiting for worker thread to exit";
+        qCWarning(lcSpeech) << "TranscribeSttClient: Failed waiting for worker thread to exit";
     }
     delete m_worker;
     m_worker = nullptr;
 }
 
-void WhisperSttClient::setModelManager(WhisperModelManager* manager) {
+void TranscribeSttClient::setModelManager(TranscribeModelManager* manager) {
     if (m_modelManager == manager) {
         return;
     }
 
     if (m_modelManager) {
-        disconnect(m_modelManager, &WhisperModelManager::selectedModelChanged, this,
-                   &WhisperSttClient::checkModelStatus);
-        disconnect(m_modelManager, &WhisperModelManager::modelStatusChanged, this, &WhisperSttClient::checkModelStatus);
+        disconnect(m_modelManager, &TranscribeModelManager::selectedModelChanged, this,
+                   &TranscribeSttClient::checkModelStatus);
+        disconnect(m_modelManager, &TranscribeModelManager::modelStatusChanged, this,
+                   &TranscribeSttClient::checkModelStatus);
     }
 
     m_modelManager = manager;
 
     if (m_modelManager) {
-        connect(m_modelManager, &WhisperModelManager::selectedModelChanged, this, [this]() {
+        connect(m_modelManager, &TranscribeModelManager::selectedModelChanged, this, [this]() {
             m_explicitlyUnloaded = false;
             checkModelStatus();
         });
-        connect(m_modelManager, &WhisperModelManager::modelStatusChanged, this, &WhisperSttClient::checkModelStatus);
+        connect(m_modelManager, &TranscribeModelManager::modelStatusChanged, this,
+                &TranscribeSttClient::checkModelStatus);
     }
 
     checkModelStatus();
 }
 
-WhisperModelManager* WhisperSttClient::modelManager() const {
+TranscribeModelManager* TranscribeSttClient::modelManager() const {
     return m_modelManager;
 }
 
-QString WhisperSttClient::modelsDirectory() const {
+QString TranscribeSttClient::modelsDirectory() const {
     if (m_modelManager) {
         return m_modelManager->modelsDirectory();
     }
@@ -95,23 +100,23 @@ QString WhisperSttClient::modelsDirectory() const {
     return genericData + u"/qtscribe/models"_s;
 }
 
-QString WhisperSttClient::modelFileName() const {
+QString TranscribeSttClient::modelFileName() const {
     const QString path = resolveModelPath();
     return QFileInfo(path).fileName();
 }
 
-QString WhisperSttClient::resolveModelPath() const {
+QString TranscribeSttClient::resolveModelPath() const {
     if (m_modelManager) {
         return m_modelManager->selectedModelPath();
     }
 
-    QString primary = modelsDirectory() + u"/ggml-tiny.en.bin"_s;
+    QString primary = modelsDirectory() + u"/whisper-base.en-Q8_0.gguf"_s;
     if (QFile::exists(primary)) {
         return primary;
     }
 
     const QString appData = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-    QString fallback = appData + u"/models/ggml-tiny.en.bin"_s;
+    QString fallback = appData + u"/models/whisper-base.en-Q8_0.gguf"_s;
     if (QFile::exists(fallback)) {
         return fallback;
     }
@@ -119,35 +124,35 @@ QString WhisperSttClient::resolveModelPath() const {
     return primary;
 }
 
-bool WhisperSttClient::isModelInstalled() const {
+bool TranscribeSttClient::isModelInstalled() const {
     return QFile::exists(resolveModelPath());
 }
 
-bool WhisperSttClient::isModelLoaded() const {
+bool TranscribeSttClient::isModelLoaded() const {
     return m_modelLoaded;
 }
 
-QString WhisperSttClient::modelPath() const {
+QString TranscribeSttClient::modelPath() const {
     return resolveModelPath();
 }
 
-void WhisperSttClient::loadSettings() {
+void TranscribeSttClient::loadSettings() {
     checkModelStatus();
 }
 
-QString WhisperSttClient::loadedModelPath() const {
+QString TranscribeSttClient::loadedModelPath() const {
     return m_loadedModelPath;
 }
 
-QString WhisperSttClient::computeDevice() const {
+QString TranscribeSttClient::computeDevice() const {
     return m_computeDevice.isEmpty() ? u"None (Model Unloaded)"_s : m_computeDevice;
 }
 
-QString WhisperSttClient::lastError() const {
+QString TranscribeSttClient::lastError() const {
     return m_lastError;
 }
 
-bool WhisperSttClient::isVulkanSupported() {
+bool TranscribeSttClient::isVulkanSupported() {
 #if defined(GGML_USE_VULKAN)
     return true;
 #else
@@ -155,15 +160,15 @@ bool WhisperSttClient::isVulkanSupported() {
 #endif
 }
 
-bool WhisperSttClient::isReady() const {
+bool TranscribeSttClient::isReady() const {
     return m_modelLoaded && !m_busy && (m_loadedModelPath == resolveModelPath()) && QFile::exists(m_loadedModelPath);
 }
 
-bool WhisperSttClient::isBusy() const {
+bool TranscribeSttClient::isBusy() const {
     return m_busy;
 }
 
-void WhisperSttClient::activate() {
+void TranscribeSttClient::activate() {
     m_active = true;
     m_explicitlyUnloaded = false;
     if (isModelInstalled() && (!m_modelLoaded || m_loadedModelPath != resolveModelPath()) &&
@@ -173,19 +178,19 @@ void WhisperSttClient::activate() {
     emit readyChanged();
 }
 
-void WhisperSttClient::deactivate() {
+void TranscribeSttClient::deactivate() {
     m_active = false;
     cancel();
     unloadModel();
     emit readyChanged();
 }
 
-void WhisperSttClient::checkModelStatus() {
+void TranscribeSttClient::checkModelStatus() {
     const QString targetPath = resolveModelPath();
 
     if (m_modelLoaded) {
         if (!m_loadedModelPath.isEmpty() && !QFile::exists(m_loadedModelPath)) {
-            qCDebug(lcSpeech) << "WhisperSttClient: Loaded model file no longer exists, unloading:"
+            qCDebug(lcSpeech) << "TranscribeSttClient: Loaded model file no longer exists, unloading:"
                               << m_loadedModelPath;
             unloadModel();
         } else if (m_loadedModelPath != targetPath) {
@@ -193,18 +198,18 @@ void WhisperSttClient::checkModelStatus() {
                 if (m_active && !m_explicitlyUnloaded) {
                     if (m_activeLoadRequestId == 0 || m_pendingLoadPath != targetPath) {
                         qCDebug(lcSpeech)
-                            << "WhisperSttClient: Model selection changed, reloading to target:" << targetPath;
+                            << "TranscribeSttClient: Model selection changed, reloading to target:" << targetPath;
                         loadModel(targetPath);
                     }
                 }
             } else {
-                qCDebug(lcSpeech) << "WhisperSttClient: Selected model not installed, unloading current model";
+                qCDebug(lcSpeech) << "TranscribeSttClient: Selected model not installed, unloading current model";
                 unloadModel();
             }
         }
     } else if (m_active && isModelInstalled() && !m_explicitlyUnloaded) {
         if (m_activeLoadRequestId == 0 || m_pendingLoadPath != targetPath) {
-            qCDebug(lcSpeech) << "WhisperSttClient: Installed model detected, loading target:" << targetPath;
+            qCDebug(lcSpeech) << "TranscribeSttClient: Installed model detected, loading target:" << targetPath;
             loadModel(targetPath);
         }
     }
@@ -213,7 +218,7 @@ void WhisperSttClient::checkModelStatus() {
     emit readyChanged();
 }
 
-void WhisperSttClient::loadModel(const QString& customPath) {
+void TranscribeSttClient::loadModel(const QString& customPath) {
     m_explicitlyUnloaded = false;
     m_activeUnloadRequestId = 0;
     const QString path = customPath.isEmpty() ? resolveModelPath() : customPath;
@@ -225,7 +230,7 @@ void WhisperSttClient::loadModel(const QString& customPath) {
     m_pendingLoadPath = path;
 
     if (!QFile::exists(path)) {
-        const QString err = tr("Whisper model file not found at %1. Please download it in Model Settings.").arg(path);
+        const QString err = tr("Model file not found at %1. Please download it in Model Settings.").arg(path);
         setLastError(err);
         m_activeLoadRequestId = 0;
         m_pendingLoadPath.clear();
@@ -242,7 +247,7 @@ void WhisperSttClient::loadModel(const QString& customPath) {
     emit requestLoadModel(loadId, path, true);
 }
 
-void WhisperSttClient::unloadModel() {
+void TranscribeSttClient::unloadModel() {
     m_explicitlyUnloaded = true;
     if (m_worker && m_activeLoadRequestId > 0) {
         m_worker->cancelLoad(m_activeLoadRequestId);
@@ -261,22 +266,22 @@ void WhisperSttClient::unloadModel() {
     emit requestUnloadModel(unloadId);
 }
 
-void WhisperSttClient::transcribe(const QByteArray& wavData) {
+void TranscribeSttClient::transcribe(const QByteArray& wavData) {
     if (m_busy) {
-        qCDebug(lcSpeech) << "WhisperSttClient: transcribe ignored — inference already in progress";
+        qCDebug(lcSpeech) << "TranscribeSttClient: transcribe ignored — inference already in progress";
         return;
     }
 
     if (!isReady()) {
-        qWarning() << "WhisperSttClient: transcribe called when not ready (loaded:" << m_modelLoaded << ")";
-        const QString err = tr("Offline Whisper model is not loaded or ready");
+        qCWarning(lcSpeech) << "TranscribeSttClient: transcribe called when not ready (loaded:" << m_modelLoaded << ")";
+        const QString err = tr("Offline speech model is not loaded or ready");
         setLastError(err);
         emit errorOccurred(err);
         return;
     }
 
     if (wavData.isEmpty()) {
-        qWarning() << "WhisperSttClient: Empty audio payload passed to transcribe";
+        qCWarning(lcSpeech) << "TranscribeSttClient: Empty audio payload passed to transcribe";
         const QString err = tr("No audio data to transcribe");
         setLastError(err);
         emit errorOccurred(err);
@@ -295,7 +300,7 @@ void WhisperSttClient::transcribe(const QByteArray& wavData) {
     emit requestTranscribe(reqId, wavData, QString(), QString());
 }
 
-void WhisperSttClient::cancel() {
+void TranscribeSttClient::cancel() {
     if (m_busy || m_activeRequestId != 0) {
         const uint64_t cancelledId = m_activeRequestId;
         m_activeRequestId = 0;
@@ -306,10 +311,10 @@ void WhisperSttClient::cancel() {
     }
 }
 
-void WhisperSttClient::onWorkerModelLoaded(uint64_t loadRequestId, const QString& modelPath, bool success,
-                                           const QString& error, const QString& activeDevice) {
+void TranscribeSttClient::onWorkerModelLoaded(uint64_t loadRequestId, const QString& modelPath, bool success,
+                                              const QString& error, const QString& activeDevice) {
     if (loadRequestId == 0 || loadRequestId != m_activeLoadRequestId) {
-        qCDebug(lcSpeech) << "WhisperSttClient: Discarding stale model load result for request" << loadRequestId
+        qCDebug(lcSpeech) << "TranscribeSttClient: Discarding stale model load result for request" << loadRequestId
                           << "path:" << modelPath << "(active load request:" << m_activeLoadRequestId << ")";
         return;
     }
@@ -320,7 +325,7 @@ void WhisperSttClient::onWorkerModelLoaded(uint64_t loadRequestId, const QString
     m_computeDevice = activeDevice;
     if (!success) {
         m_loadedModelPath.clear();
-        const QString err = error.isEmpty() ? tr("Failed to load whisper.cpp model") : error;
+        const QString err = error.isEmpty() ? tr("Failed to load speech model") : error;
         setLastError(err);
         emit modelLoadFailed(modelPath, err);
     } else {
@@ -340,13 +345,14 @@ void WhisperSttClient::onWorkerModelLoaded(uint64_t loadRequestId, const QString
     }
 }
 
-void WhisperSttClient::onWorkerModelUnloaded(uint64_t unloadRequestId) {
+void TranscribeSttClient::onWorkerModelUnloaded(uint64_t unloadRequestId) {
     if (m_activeLoadRequestId > 0 || (unloadRequestId != 0 && unloadRequestId != m_activeUnloadRequestId)) {
-        qCDebug(lcSpeech) << "WhisperSttClient: Discarding stale model unloaded event for request" << unloadRequestId;
+        qCDebug(lcSpeech) << "TranscribeSttClient: Discarding stale model unloaded event for request"
+                          << unloadRequestId;
         return;
     }
 
-    m_activeUnloadRequestId = 0;
+    m_activeLoadRequestId = 0;
     m_modelLoaded = false;
     m_loadedModelPath.clear();
     m_computeDevice.clear();
@@ -355,9 +361,9 @@ void WhisperSttClient::onWorkerModelUnloaded(uint64_t unloadRequestId) {
     emit readyChanged();
 }
 
-void WhisperSttClient::onWorkerTranscriptionFinished(uint64_t requestId, const QString& text) {
+void TranscribeSttClient::onWorkerTranscriptionFinished(uint64_t requestId, const QString& text) {
     if (requestId == 0 || requestId != m_activeRequestId) {
-        qCDebug(lcSpeech) << "WhisperSttClient: Discarding stale transcription finished for request" << requestId
+        qCDebug(lcSpeech) << "TranscribeSttClient: Discarding stale transcription finished for request" << requestId
                           << "(active request:" << m_activeRequestId << ")";
         return;
     }
@@ -366,7 +372,7 @@ void WhisperSttClient::onWorkerTranscriptionFinished(uint64_t requestId, const Q
     setBusy(false);
 
     if (text.isEmpty()) {
-        const QString err = tr("Whisper returned empty transcription");
+        const QString err = tr("Model returned empty transcription");
         setLastError(err);
         emit errorOccurred(err);
         return;
@@ -376,9 +382,9 @@ void WhisperSttClient::onWorkerTranscriptionFinished(uint64_t requestId, const Q
     emit transcriptionReady(text);
 }
 
-void WhisperSttClient::onWorkerTranscriptionFailed(uint64_t requestId, const QString& error) {
+void TranscribeSttClient::onWorkerTranscriptionFailed(uint64_t requestId, const QString& error) {
     if (requestId == 0 || requestId != m_activeRequestId) {
-        qCDebug(lcSpeech) << "WhisperSttClient: Discarding stale transcription failure for request" << requestId
+        qCDebug(lcSpeech) << "TranscribeSttClient: Discarding stale transcription failure for request" << requestId
                           << "(active request:" << m_activeRequestId << ")";
         return;
     }
@@ -389,7 +395,7 @@ void WhisperSttClient::onWorkerTranscriptionFailed(uint64_t requestId, const QSt
     emit errorOccurred(error);
 }
 
-void WhisperSttClient::setBusy(bool busy) {
+void TranscribeSttClient::setBusy(bool busy) {
     if (m_busy != busy) {
         m_busy = busy;
         emit busyChanged();
@@ -397,7 +403,7 @@ void WhisperSttClient::setBusy(bool busy) {
     }
 }
 
-void WhisperSttClient::setLastError(const QString& error) {
+void TranscribeSttClient::setLastError(const QString& error) {
     if (m_lastError != error) {
         m_lastError = error;
         emit lastErrorChanged();

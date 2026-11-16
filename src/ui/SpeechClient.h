@@ -44,7 +44,7 @@ public:
     Q_ENUM(DictationState)
 
     // NOLINTNEXTLINE(performance-enum-size)
-    enum class TranscriptionBackend { Cloud = 0, WhisperCpp };
+    enum class TranscriptionBackend { Cloud = 0, TranscribeCpp };
     Q_ENUM(TranscriptionBackend)
 
     // NOLINTNEXTLINE(performance-enum-size)

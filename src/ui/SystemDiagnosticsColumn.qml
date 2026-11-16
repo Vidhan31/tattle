@@ -58,19 +58,19 @@ ColumnLayout {
     }
 
     StatusBanner {
-        visible: DaemonClient.activeBackend === DaemonClient.WhisperCpp && !DaemonClient.isModelInstalled
+        visible: DaemonClient.activeBackend === DaemonClient.TranscribeCpp && !DaemonClient.isModelInstalled
         bannerType: "warning"
-        title: qsTr("Offline Whisper Model Missing")
+        title: qsTr("Offline Speech Model Missing")
         message: qsTr("Download %1 to start offline transcription.").arg(DaemonClient.modelFileName)
         actionText: qsTr("Offline Settings")
         onActionClicked: root.navigateRequested("offline")
     }
 
     StatusBanner {
-        visible: DaemonClient.activeBackend === DaemonClient.WhisperCpp && DaemonClient.isModelInstalled &&
+        visible: DaemonClient.activeBackend === DaemonClient.TranscribeCpp && DaemonClient.isModelInstalled &&
                  !DaemonClient.isModelLoaded
         bannerType: "info"
-        title: qsTr("Loading Whisper Model")
+        title: qsTr("Loading Speech Model")
         message: qsTr("Loading offline speech recognition model into memory…")
         actionText: qsTr("Offline Settings")
         onActionClicked: root.navigateRequested("offline")
@@ -103,8 +103,8 @@ ColumnLayout {
                                                                             !DaemonClient.cloudApiKeyInvalid &&
                                                                             !DaemonClient.cloudRateLimited))
         bannerType: "danger"
-        title: DaemonClient.activeBackend === DaemonClient.WhisperCpp ? qsTr("Offline Transcription Failed") : qsTr(
-                                                                            "Transcription Failed")
+        title: DaemonClient.activeBackend === DaemonClient.TranscribeCpp ? qsTr("Offline Transcription Failed") : qsTr(
+                                                                               "Transcription Failed")
         message: DaemonClient.lastError.length > 0 ? DaemonClient.lastError : qsTr(
                                                          "An error occurred during transcription.")
         actionText: qsTr("Retry Transcription")

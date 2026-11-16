@@ -49,7 +49,7 @@ public:
     Q_ENUM(DictationState)
 
     // NOLINTNEXTLINE(performance-enum-size) QML-registered enums need int backing for qmlcachegen AOT
-    enum class TranscriptionBackend { Cloud, WhisperCpp };
+    enum class TranscriptionBackend { Cloud, TranscribeCpp };
     Q_ENUM(TranscriptionBackend)
 
     // NOLINTNEXTLINE(performance-enum-size) QML-registered enums need int backing for qmlcachegen AOT
@@ -177,7 +177,7 @@ private:
     std::unique_ptr<HistoryRepository> m_ownedHistoryRepository;
     SystemService* m_systemService = nullptr;
 
-    TranscriptionBackend m_activeBackend = TranscriptionBackend::WhisperCpp;
+    TranscriptionBackend m_activeBackend = TranscriptionBackend::TranscribeCpp;
     DictationState m_state = DictationState::Idle;
     RecordingMode m_recordingMode = RecordingMode::Toggle;
     QString m_statusMessage;

@@ -3,8 +3,8 @@
 #include <QObject>
 #include <QString>
 
-class WhisperModelManager;
-class WhisperSttClient;
+class TranscribeModelManager;
+class TranscribeSttClient;
 class DictationCoordinator;
 
 class ModelService : public QObject {
@@ -31,11 +31,11 @@ public:
     explicit ModelService(QObject* parent = nullptr);
     ~ModelService() override = default;
 
-    void setModelManager(WhisperModelManager* manager);
-    [[nodiscard]] WhisperModelManager* modelManager() const noexcept;
+    void setModelManager(TranscribeModelManager* manager);
+    [[nodiscard]] TranscribeModelManager* modelManager() const noexcept;
 
-    void setWhisperClient(WhisperSttClient* client);
-    [[nodiscard]] WhisperSttClient* whisperClient() const noexcept;
+    void setTranscribeClient(TranscribeSttClient* client);
+    [[nodiscard]] TranscribeSttClient* transcribeClient() const noexcept;
 
     void setDictationCoordinator(DictationCoordinator* coordinator);
     [[nodiscard]] DictationCoordinator* dictationCoordinator() const noexcept;
@@ -67,6 +67,7 @@ public:
     bool deleteModel(const QString& modelId);
     void refreshModelCatalog();
     void checkModelDiskSpace();
+    void clearModelCatalogLastError();
 
 signals:
     void modelStatusChanged();
@@ -74,7 +75,7 @@ signals:
     void modelCatalogChanged();
 
 private:
-    WhisperModelManager* m_modelManager = nullptr;
-    WhisperSttClient* m_whisperClient = nullptr;
+    TranscribeModelManager* m_modelManager = nullptr;
+    TranscribeSttClient* m_transcribeClient = nullptr;
     DictationCoordinator* m_coordinator = nullptr;
 };

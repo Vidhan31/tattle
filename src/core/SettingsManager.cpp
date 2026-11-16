@@ -83,8 +83,15 @@ void SettingsManager::load() {
 
     SpeechConfig newSpeech;
     const QString backendStr = settings.value(SettingsKeys::kSpeechBackend.toString(), u"Cloud"_s).toString();
-    newSpeech.backend =
-        (backendStr == u"WhisperCpp"_s) ? TranscriptionBackend::WhisperCpp : TranscriptionBackend::Cloud;
+    const bool isOfflineBackend = (backendStr == u"TranscribeCpp"_s || backendStr == u"WhisperCpp"_s);
+    newSpeech.backend = isOfflineBackend ? TranscriptionBackend::TranscribeCpp : TranscriptionBackend::Cloud;
+    if (backendStr == u"WhisperCpp"_s) {
+        QSettings writeSettings;
+        writeSettings.setValue(SettingsKeys::kSpeechBackend.toString(), u"TranscribeCpp"_s);
+        writeSettings.setValue(SettingsKeys::kSpeechTranscriptionBackend.toString(),
+                               static_cast<int>(TranscriptionBackend::TranscribeCpp));
+        writeSettings.sync();
+    }
     const QString modeStr = settings.value(SettingsKeys::kSpeechRecordingMode.toString(), u"Toggle"_s).toString();
     newSpeech.recordingMode = (modeStr == u"PushToTalk"_s) ? RecordingMode::PushToTalk : RecordingMode::Toggle;
     newSpeech.autoSwitchOffline = settings.value(SettingsKeys::kSpeechAutoSwitchOffline.toString(), true).toBool();
@@ -130,8 +137,9 @@ void SettingsManager::load() {
     CloudRouterConfig newCloud;
     newCloud.activeProvider = settings.value(SettingsKeys::kCloudActiveProvider.toString(), u"groq"_s).toString();
 
-    WhisperConfig newWhisper;
-    newWhisper.selectedModel = settings.value(SettingsKeys::kWhisperSelectedModel.toString(), QString()).toString();
+    TranscribeConfig newTranscribe;
+    newTranscribe.selectedModel =
+        settings.value(SettingsKeys::kTranscribeSelectedModel.toString(), QString()).toString();
 
     const bool speechChanged = (m_speechConfig != newSpeech);
     const bool groqChanged = (m_groqSttConfig != newGroq);
@@ -142,7 +150,7 @@ void SettingsManager::load() {
     const bool audioChanged = (m_audioFeedbackConfig != newAudio);
     const bool notifyChanged = (m_notificationConfig != newNotify);
     const bool cloudChanged = (m_cloudRouterConfig != newCloud);
-    const bool whisperChanged = (m_whisperConfig != newWhisper);
+    const bool transcribeChanged = (m_transcribeConfig != newTranscribe);
 
     m_speechConfig = newSpeech;
     m_groqSttConfig = newGroq;
@@ -153,7 +161,7 @@ void SettingsManager::load() {
     m_audioFeedbackConfig = newAudio;
     m_notificationConfig = newNotify;
     m_cloudRouterConfig = newCloud;
-    m_whisperConfig = newWhisper;
+    m_transcribeConfig = newTranscribe;
 
     if (speechChanged) {
         emit speechConfigChanged(m_speechConfig);
@@ -182,15 +190,15 @@ void SettingsManager::load() {
     if (cloudChanged) {
         emit cloudRouterConfigChanged(m_cloudRouterConfig);
     }
-    if (whisperChanged) {
-        emit whisperConfigChanged(m_whisperConfig);
+    if (transcribeChanged) {
+        emit transcribeConfigChanged(m_transcribeConfig);
     }
 }
 
 void SettingsManager::save() const {
     QSettings settings;
     settings.setValue(SettingsKeys::kSpeechBackend.toString(),
-                      m_speechConfig.backend == TranscriptionBackend::WhisperCpp ? u"WhisperCpp"_s : u"Cloud"_s);
+                      m_speechConfig.backend == TranscriptionBackend::TranscribeCpp ? u"TranscribeCpp"_s : u"Cloud"_s);
     settings.setValue(SettingsKeys::kSpeechTranscriptionBackend.toString(), static_cast<int>(m_speechConfig.backend));
     settings.setValue(SettingsKeys::kSpeechRecordingMode.toString(),
                       m_speechConfig.recordingMode == RecordingMode::PushToTalk ? u"PushToTalk"_s : u"Toggle"_s);
@@ -219,7 +227,7 @@ void SettingsManager::save() const {
     settings.setValue(SettingsKeys::kAudioSoundEnabled.toString(), m_audioFeedbackConfig.soundEnabled);
     settings.setValue(SettingsKeys::kNotificationsEnabled.toString(), m_notificationConfig.notificationsEnabled);
     settings.setValue(SettingsKeys::kCloudActiveProvider.toString(), m_cloudRouterConfig.activeProvider);
-    settings.setValue(SettingsKeys::kWhisperSelectedModel.toString(), m_whisperConfig.selectedModel);
+    settings.setValue(SettingsKeys::kTranscribeSelectedModel.toString(), m_transcribeConfig.selectedModel);
     settings.sync();
 }
 
@@ -230,7 +238,7 @@ void SettingsManager::setSpeechConfig(const SpeechConfig& config) {
     m_speechConfig = config;
     QSettings settings;
     settings.setValue(SettingsKeys::kSpeechBackend.toString(),
-                      m_speechConfig.backend == TranscriptionBackend::WhisperCpp ? u"WhisperCpp"_s : u"Cloud"_s);
+                      m_speechConfig.backend == TranscriptionBackend::TranscribeCpp ? u"TranscribeCpp"_s : u"Cloud"_s);
     settings.setValue(SettingsKeys::kSpeechTranscriptionBackend.toString(), static_cast<int>(m_speechConfig.backend));
     settings.setValue(SettingsKeys::kSpeechRecordingMode.toString(),
                       m_speechConfig.recordingMode == RecordingMode::PushToTalk ? u"PushToTalk"_s : u"Toggle"_s);
@@ -244,12 +252,12 @@ void SettingsManager::setBackend(TranscriptionBackend backend) {
         m_speechConfig.backend = backend;
         QSettings settings;
         settings.setValue(SettingsKeys::kSpeechBackend.toString(),
-                          backend == TranscriptionBackend::WhisperCpp ? u"WhisperCpp"_s : u"Cloud"_s);
+                          backend == TranscriptionBackend::TranscribeCpp ? u"TranscribeCpp"_s : u"Cloud"_s);
         settings.setValue(SettingsKeys::kSpeechTranscriptionBackend.toString(), static_cast<int>(backend));
         settings.sync();
         emit speechConfigChanged(m_speechConfig);
         emit settingChanged(SettingsKeys::kSpeechBackend.toString(),
-                            backend == TranscriptionBackend::WhisperCpp ? u"WhisperCpp"_s : u"Cloud"_s);
+                            backend == TranscriptionBackend::TranscribeCpp ? u"TranscribeCpp"_s : u"Cloud"_s);
     }
 }
 
@@ -595,35 +603,36 @@ void SettingsManager::setActiveProvider(const QString& providerId) {
     }
 }
 
-void SettingsManager::setWhisperConfig(const WhisperConfig& config) {
-    if (m_whisperConfig == config) {
+void SettingsManager::setTranscribeConfig(const TranscribeConfig& config) {
+    if (m_transcribeConfig == config) {
         return;
     }
-    m_whisperConfig = config;
+    m_transcribeConfig = config;
     QSettings settings;
-    settings.setValue(SettingsKeys::kWhisperSelectedModel.toString(), m_whisperConfig.selectedModel);
+    settings.setValue(SettingsKeys::kTranscribeSelectedModel.toString(), m_transcribeConfig.selectedModel);
     settings.sync();
-    emit whisperConfigChanged(m_whisperConfig);
+    emit transcribeConfigChanged(m_transcribeConfig);
 }
 
-void SettingsManager::setWhisperSelectedModel(const QString& modelId) {
-    if (m_whisperConfig.selectedModel != modelId) {
-        m_whisperConfig.selectedModel = modelId;
+void SettingsManager::setTranscribeSelectedModel(const QString& modelId) {
+    if (m_transcribeConfig.selectedModel != modelId) {
+        m_transcribeConfig.selectedModel = modelId;
         QSettings settings;
-        settings.setValue(SettingsKeys::kWhisperSelectedModel.toString(), modelId);
+        settings.setValue(SettingsKeys::kTranscribeSelectedModel.toString(), modelId);
         settings.sync();
-        emit whisperConfigChanged(m_whisperConfig);
-        emit settingChanged(SettingsKeys::kWhisperSelectedModel.toString(), modelId);
+        emit transcribeConfigChanged(m_transcribeConfig);
+        emit settingChanged(SettingsKeys::kTranscribeSelectedModel.toString(), modelId);
     }
 }
 
 void SettingsManager::setSetting(const QString& key, const QVariant& value) {
     if (key == SettingsKeys::kSpeechBackend || key == SettingsKeys::kSpeechTranscriptionBackend) {
         if (value.metaType().id() == QMetaType::Int) {
-            setBackend(value.toInt() == 1 ? TranscriptionBackend::WhisperCpp : TranscriptionBackend::Cloud);
+            setBackend(value.toInt() == 1 ? TranscriptionBackend::TranscribeCpp : TranscriptionBackend::Cloud);
         } else {
-            setBackend(value.toString() == u"WhisperCpp"_s ? TranscriptionBackend::WhisperCpp
-                                                           : TranscriptionBackend::Cloud);
+            const QString str = value.toString();
+            setBackend((str == u"TranscribeCpp"_s || str == u"WhisperCpp"_s) ? TranscriptionBackend::TranscribeCpp
+                                                                             : TranscriptionBackend::Cloud);
         }
     } else if (key == SettingsKeys::kSpeechRecordingMode) {
         if (value.metaType().id() == QMetaType::Int) {
@@ -669,8 +678,8 @@ void SettingsManager::setSetting(const QString& key, const QVariant& value) {
         setNotificationsEnabled(value.toBool());
     } else if (key == SettingsKeys::kCloudActiveProvider) {
         setActiveProvider(value.toString());
-    } else if (key == SettingsKeys::kWhisperSelectedModel) {
-        setWhisperSelectedModel(value.toString());
+    } else if (key == SettingsKeys::kTranscribeSelectedModel) {
+        setTranscribeSelectedModel(value.toString());
     } else {
         QSettings settings;
         settings.setValue(key, value);
@@ -681,7 +690,7 @@ void SettingsManager::setSetting(const QString& key, const QVariant& value) {
 
 QVariant SettingsManager::getSetting(const QString& key, const QVariant& defaultValue) const {
     if (key == SettingsKeys::kSpeechBackend) {
-        return m_speechConfig.backend == TranscriptionBackend::WhisperCpp ? u"WhisperCpp"_s : u"Cloud"_s;
+        return m_speechConfig.backend == TranscriptionBackend::TranscribeCpp ? u"TranscribeCpp"_s : u"Cloud"_s;
     }
     if (key == SettingsKeys::kSpeechTranscriptionBackend) {
         return static_cast<int>(m_speechConfig.backend);
@@ -746,8 +755,8 @@ QVariant SettingsManager::getSetting(const QString& key, const QVariant& default
     if (key == SettingsKeys::kCloudActiveProvider) {
         return m_cloudRouterConfig.activeProvider;
     }
-    if (key == SettingsKeys::kWhisperSelectedModel) {
-        return m_whisperConfig.selectedModel;
+    if (key == SettingsKeys::kTranscribeSelectedModel) {
+        return m_transcribeConfig.selectedModel;
     }
 
     const QSettings settings;
@@ -757,7 +766,7 @@ QVariant SettingsManager::getSetting(const QString& key, const QVariant& default
 QVariantMap SettingsManager::allSettings() const {
     QVariantMap map;
     map.insert(SettingsKeys::kSpeechBackend.toString(),
-               m_speechConfig.backend == TranscriptionBackend::WhisperCpp ? u"WhisperCpp"_s : u"Cloud"_s);
+               m_speechConfig.backend == TranscriptionBackend::TranscribeCpp ? u"TranscribeCpp"_s : u"Cloud"_s);
     map.insert(SettingsKeys::kSpeechTranscriptionBackend.toString(), static_cast<int>(m_speechConfig.backend));
     map.insert(SettingsKeys::kSpeechRecordingMode.toString(),
                m_speechConfig.recordingMode == RecordingMode::PushToTalk ? u"PushToTalk"_s : u"Toggle"_s);
@@ -780,6 +789,6 @@ QVariantMap SettingsManager::allSettings() const {
     map.insert(SettingsKeys::kAudioSoundEnabled.toString(), m_audioFeedbackConfig.soundEnabled);
     map.insert(SettingsKeys::kNotificationsEnabled.toString(), m_notificationConfig.notificationsEnabled);
     map.insert(SettingsKeys::kCloudActiveProvider.toString(), m_cloudRouterConfig.activeProvider);
-    map.insert(SettingsKeys::kWhisperSelectedModel.toString(), m_whisperConfig.selectedModel);
+    map.insert(SettingsKeys::kTranscribeSelectedModel.toString(), m_transcribeConfig.selectedModel);
     return map;
 }

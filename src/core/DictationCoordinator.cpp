@@ -37,7 +37,7 @@ DictationCoordinator::DictationCoordinator(QObject* parent)
 
     setStatusMessage(tr("Ready"));
     qCDebug(lcSpeech) << "DictationCoordinator pure orchestrator constructed. Initial backend:"
-                      << (m_activeBackend == TranscriptionBackend::WhisperCpp ? "WhisperCpp" : "Cloud")
+                      << (m_activeBackend == TranscriptionBackend::TranscribeCpp ? "TranscribeCpp" : "Cloud")
                       << "mode:" << (m_recordingMode == RecordingMode::PushToTalk ? "PushToTalk" : "Toggle")
                       << "autoSwitchOffline:" << m_autoSwitchOffline;
 }
@@ -53,12 +53,12 @@ void DictationCoordinator::setSettingsManager(SettingsManager* settings) {
     if (m_settingsManager) {
         connect(m_settingsManager, &SettingsManager::speechConfigChanged, this,
                 [this](const SettingsManager::SpeechConfig& config) {
-                    const auto backend = (config.backend == SettingsManager::TranscriptionBackend::WhisperCpp)
-                                             ? TranscriptionBackend::WhisperCpp
+                    const auto backend = (config.backend == SettingsManager::TranscriptionBackend::TranscribeCpp)
+                                             ? TranscriptionBackend::TranscribeCpp
                                              : TranscriptionBackend::Cloud;
                     auto* comp = qobject_cast<CompositeSttEngine*>(m_sttEngine);
                     const bool isOfflineFallbackActive = comp && comp->isAutoSwitchedToOffline();
-                    if (!isOfflineFallbackActive || backend == TranscriptionBackend::WhisperCpp) {
+                    if (!isOfflineFallbackActive || backend == TranscriptionBackend::TranscribeCpp) {
                         setActiveBackend(backend, false);
                     }
                     m_autoSwitchOffline = config.autoSwitchOffline;
@@ -406,14 +406,15 @@ void DictationCoordinator::setActiveBackend(TranscriptionBackend backend, bool p
         m_activeBackend = backend;
         if (persistSettings) {
             if (m_settingsManager) {
-                m_settingsManager->setBackend(m_activeBackend == TranscriptionBackend::WhisperCpp
-                                                  ? SettingsManager::TranscriptionBackend::WhisperCpp
+                m_settingsManager->setBackend(m_activeBackend == TranscriptionBackend::TranscribeCpp
+                                                  ? SettingsManager::TranscriptionBackend::TranscribeCpp
                                                   : SettingsManager::TranscriptionBackend::Cloud);
             } else {
                 QSettings settings;
                 settings.setValue(SettingsKeys::kSpeechTranscriptionBackend.toString(), static_cast<int>(backend));
                 settings.setValue(SettingsKeys::kSpeechBackend.toString(),
-                                  m_activeBackend == TranscriptionBackend::WhisperCpp ? u"WhisperCpp"_s : u"Cloud"_s);
+                                  m_activeBackend == TranscriptionBackend::TranscribeCpp ? u"TranscribeCpp"_s
+                                                                                         : u"Cloud"_s);
             }
         }
         emit activeBackendChanged();
@@ -422,7 +423,7 @@ void DictationCoordinator::setActiveBackend(TranscriptionBackend backend, bool p
 }
 
 void DictationCoordinator::setActiveBackend(int backend, bool persistSettings) {
-    setActiveBackend(backend == 1 ? TranscriptionBackend::WhisperCpp : TranscriptionBackend::Cloud, persistSettings);
+    setActiveBackend(backend == 1 ? TranscriptionBackend::TranscribeCpp : TranscriptionBackend::Cloud, persistSettings);
 }
 
 bool DictationCoordinator::autoSwitchOffline() const {
@@ -495,8 +496,8 @@ void DictationCoordinator::loadSettings() {
 
     if (m_settingsManager) {
         const auto& config = m_settingsManager->speechConfig();
-        backend = (config.backend == SettingsManager::TranscriptionBackend::WhisperCpp)
-                      ? TranscriptionBackend::WhisperCpp
+        backend = (config.backend == SettingsManager::TranscriptionBackend::TranscribeCpp)
+                      ? TranscriptionBackend::TranscribeCpp
                       : TranscriptionBackend::Cloud;
         autoSwitch = config.autoSwitchOffline;
         mode = (config.recordingMode == SettingsManager::RecordingMode::PushToTalk) ? RecordingMode::PushToTalk
@@ -504,7 +505,9 @@ void DictationCoordinator::loadSettings() {
     } else {
         const QSettings settings;
         const QString backendStr = settings.value(SettingsKeys::kSpeechBackend.toString(), u"Cloud"_s).toString();
-        backend = (backendStr == u"WhisperCpp"_s) ? TranscriptionBackend::WhisperCpp : TranscriptionBackend::Cloud;
+        backend = (backendStr == u"TranscribeCpp"_s || backendStr == u"WhisperCpp"_s)
+                      ? TranscriptionBackend::TranscribeCpp
+                      : TranscriptionBackend::Cloud;
         autoSwitch = settings.value(SettingsKeys::kSpeechAutoSwitchOffline.toString(), true).toBool();
         const QString modeStr = settings.value(SettingsKeys::kSpeechRecordingMode.toString(), u"Toggle"_s).toString();
         mode = (modeStr == u"PushToTalk"_s) ? RecordingMode::PushToTalk : RecordingMode::Toggle;
@@ -513,7 +516,7 @@ void DictationCoordinator::loadSettings() {
     auto* comp = qobject_cast<CompositeSttEngine*>(m_sttEngine);
     const bool isOfflineFallbackActive = comp && comp->isAutoSwitchedToOffline();
 
-    if (!isOfflineFallbackActive || backend == TranscriptionBackend::WhisperCpp) {
+    if (!isOfflineFallbackActive || backend == TranscriptionBackend::TranscribeCpp) {
         setActiveBackend(backend, false);
     }
     setAutoSwitchOffline(autoSwitch);
@@ -828,7 +831,7 @@ void DictationCoordinator::onLlmError(const QString& error, const QString& fallb
     m_pendingRawText.clear();
     if (!rawToUse.isEmpty()) {
         completeTranscription(rawToUse);
-        setStatusMessage(tr("Ready (Used raw Whisper text)"));
+        setStatusMessage(tr("Ready (Used raw speech text)"));
     } else {
         setState(DictationState::Idle);
         setStatusMessage(tr("Ready"));

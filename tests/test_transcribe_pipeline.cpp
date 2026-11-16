@@ -8,10 +8,10 @@
 #include <QTemporaryDir>
 #include <QTest>
 
+#include "TranscribeModelManager.h"
+#include "TranscribeSttClient.h"
+#include "TranscribeWorker.h"
 #include "WavDecoder.h"
-#include "WhisperModelManager.h"
-#include "WhisperSttClient.h"
-#include "WhisperWorker.h"
 
 #include <cmath>
 #include <numbers>
@@ -53,7 +53,7 @@ QByteArray createWav(uint32_t sampleRate, uint16_t numChannels, uint16_t bitsPer
 }
 } // namespace
 
-class TestWhisperPipeline : public QObject {
+class TestTranscribePipeline : public QObject {
     Q_OBJECT
 
 private slots:
@@ -197,8 +197,8 @@ private slots:
     }
 
     void testModelSelectionSynchronization() {
-        WhisperModelManager manager;
-        WhisperSttClient client;
+        TranscribeModelManager manager;
+        TranscribeSttClient client;
 
         client.setModelManager(&manager);
 
@@ -210,7 +210,7 @@ private slots:
         QVERIFY(!client.isReady());
 
         if (manager.rowCount() > 1) {
-            const QString secondId = manager.data(manager.index(1), WhisperModelManager::IdRole).toString();
+            const QString secondId = manager.data(manager.index(1), TranscribeModelManager::IdRole).toString();
             manager.setSelectedModelId(secondId);
             QCOMPARE(manager.selectedModelId(), secondId);
             QCOMPARE(client.modelPath(), manager.selectedModelPath());
@@ -218,12 +218,12 @@ private slots:
     }
 
     void testStaleModelLoadHandling() {
-        WhisperSttClient client;
+        TranscribeSttClient client;
 
         QVERIFY(!client.isModelLoaded());
         QVERIFY(client.loadedModelPath().isEmpty());
 
-        client.loadModel(u"/nonexistent/dummy/model.bin"_s);
+        client.loadModel(u"/nonexistent/dummy/model.gguf"_s);
         QVERIFY(!client.isModelLoaded());
         QVERIFY(client.loadedModelPath().isEmpty());
 
@@ -235,24 +235,24 @@ private slots:
     void testCheckModelStatusLoadsUnloadedModel() {
         QTemporaryDir tempDir;
         QVERIFY(tempDir.isValid());
-        WhisperModelManager manager;
+        TranscribeModelManager manager;
         manager.setModelsDirectory(tempDir.path());
 
-        const QString modelFile = tempDir.path() + u"/ggml-base.en.bin"_s;
+        const QString modelFile = tempDir.path() + u"/whisper-base.en-Q8_0.gguf"_s;
         QFile f(modelFile);
         QVERIFY(f.open(QIODevice::WriteOnly));
         f.write("mock model content");
         f.close();
 
         manager.scanInstalledModels();
-        manager.setSelectedModelId(u"base.en"_s);
+        manager.setSelectedModelId(u"whisper-base.en"_s);
         QVERIFY(manager.isSelectedModelInstalled());
 
-        WhisperSttClient client;
+        TranscribeSttClient client;
         client.setModelManager(&manager);
         QVERIFY(client.isModelInstalled());
 
-        QSignalSpy spy(&client, &WhisperSttClient::requestLoadModel);
+        QSignalSpy spy(&client, &TranscribeSttClient::requestLoadModel);
         client.checkModelStatus();
         QCOMPARE(spy.count(), 0);
 
@@ -272,32 +272,32 @@ private slots:
     void testModelSelectionDuringPendingLoad() {
         QTemporaryDir tempDir;
         QVERIFY(tempDir.isValid());
-        WhisperModelManager manager;
+        TranscribeModelManager manager;
         manager.setModelsDirectory(tempDir.path());
 
-        const QString modelFileA = tempDir.path() + u"/ggml-base.en.bin"_s;
+        const QString modelFileA = tempDir.path() + u"/whisper-base.en-Q8_0.gguf"_s;
         QFile fa(modelFileA);
         QVERIFY(fa.open(QIODevice::WriteOnly));
         fa.write("model A");
         fa.close();
 
-        const QString modelFileB = tempDir.path() + u"/ggml-tiny.en.bin"_s;
+        const QString modelFileB = tempDir.path() + u"/whisper-tiny.en-Q8_0.gguf"_s;
         QFile fb(modelFileB);
         QVERIFY(fb.open(QIODevice::WriteOnly));
         fb.write("model B");
         fb.close();
 
         manager.scanInstalledModels();
-        manager.setSelectedModelId(u"base.en"_s);
+        manager.setSelectedModelId(u"whisper-base.en"_s);
 
-        WhisperSttClient client;
+        TranscribeSttClient client;
         client.setModelManager(&manager);
         client.activate();
 
-        QSignalSpy spy(&client, &WhisperSttClient::requestLoadModel);
+        QSignalSpy spy(&client, &TranscribeSttClient::requestLoadModel);
         QCOMPARE(client.modelPath(), modelFileA);
 
-        manager.setSelectedModelId(u"tiny.en"_s);
+        manager.setSelectedModelId(u"whisper-tiny.en"_s);
         QVERIFY(spy.count() >= 1);
         QCOMPARE(spy.last().at(1).toString(), modelFileB);
     }
@@ -305,16 +305,16 @@ private slots:
     void testUnloadDoesNotEraseNewerLoad() {
         QTemporaryDir tempDir;
         QVERIFY(tempDir.isValid());
-        const QString modelFile = tempDir.path() + u"/ggml-tiny.en.bin"_s;
+        const QString modelFile = tempDir.path() + u"/whisper-tiny.en-Q8_0.gguf"_s;
         QFile f(modelFile);
         QVERIFY(f.open(QIODevice::WriteOnly));
         f.write("model content");
         f.close();
 
-        WhisperSttClient client;
+        TranscribeSttClient client;
         client.unloadModel();
 
-        QSignalSpy spy(&client, &WhisperSttClient::requestLoadModel);
+        QSignalSpy spy(&client, &TranscribeSttClient::requestLoadModel);
         client.loadModel(modelFile);
         QCOMPARE(spy.count(), 1);
         const uint64_t loadId = spy.first().at(0).toULongLong();
@@ -331,21 +331,21 @@ private slots:
     void testFailedLoadDoesNotRepeatForever() {
         QTemporaryDir tempDir;
         QVERIFY(tempDir.isValid());
-        WhisperModelManager manager;
+        TranscribeModelManager manager;
         manager.setModelsDirectory(tempDir.path());
 
-        const QString modelFile = tempDir.path() + u"/ggml-tiny.en.bin"_s;
+        const QString modelFile = tempDir.path() + u"/whisper-tiny.en-Q8_0.gguf"_s;
         QFile f(modelFile);
         QVERIFY(f.open(QIODevice::WriteOnly));
         f.write("invalid content");
         f.close();
 
         manager.scanInstalledModels();
-        manager.setSelectedModelId(u"tiny.en"_s);
+        manager.setSelectedModelId(u"whisper-tiny.en"_s);
 
-        WhisperSttClient client;
+        TranscribeSttClient client;
         client.setModelManager(&manager);
-        QSignalSpy spy(&client, &WhisperSttClient::requestLoadModel);
+        QSignalSpy spy(&client, &TranscribeSttClient::requestLoadModel);
         client.activate();
         QCOMPARE(spy.count(), 1);
         const uint64_t loadId = spy.first().at(0).toULongLong();
@@ -360,14 +360,14 @@ private slots:
     void testLoadRetryAfterUnload() {
         QTemporaryDir tempDir;
         QVERIFY(tempDir.isValid());
-        const QString modelFile = tempDir.path() + u"/ggml-tiny.en.bin"_s;
+        const QString modelFile = tempDir.path() + u"/whisper-tiny.en-Q8_0.gguf"_s;
         QFile f(modelFile);
         QVERIFY(f.open(QIODevice::WriteOnly));
         f.write("content");
         f.close();
 
-        WhisperSttClient client;
-        QSignalSpy spy(&client, &WhisperSttClient::requestLoadModel);
+        TranscribeSttClient client;
+        QSignalSpy spy(&client, &TranscribeSttClient::requestLoadModel);
 
         client.loadModel(modelFile);
         QCOMPARE(spy.count(), 1);
@@ -378,16 +378,16 @@ private slots:
         const uint64_t secondLoadId = spy.at(1).at(0).toULongLong();
         QVERIFY(secondLoadId > firstLoadId);
 
-        WhisperWorker worker;
+        TranscribeWorker worker;
         worker.cancel(0);
-        QSignalSpy workerSpy(&worker, &WhisperWorker::modelLoaded);
+        QSignalSpy workerSpy(&worker, &TranscribeWorker::modelLoaded);
         worker.loadModel(secondLoadId, modelFile, false);
         QCOMPARE(workerSpy.count(), 1);
         QCOMPARE(workerSpy.first().at(0).toULongLong(), secondLoadId);
     }
 
     void testWorkerAbortLogic() {
-        WhisperWorker worker;
+        TranscribeWorker worker;
 
         QVERIFY(!worker.isAborted(1));
         QVERIFY(!worker.isAborted(0));
@@ -423,7 +423,7 @@ private slots:
     }
 
     void testVulkanSupportReporting() {
-        WhisperSttClient client;
+        TranscribeSttClient client;
 #if defined(GGML_USE_VULKAN)
         QVERIFY(client.isVulkanSupported());
 #else
@@ -433,12 +433,12 @@ private slots:
 
     void testClientLifecycleAndGracefulShutdown() {
         for (int i = 0; i < 3; ++i) {
-            auto client = std::make_unique<WhisperSttClient>();
-            client->loadModel(u"/tmp/nonexistent_test_model.bin"_s);
+            auto client = std::make_unique<TranscribeSttClient>();
+            client->loadModel(u"/tmp/nonexistent_test_model.gguf"_s);
             client->cancel();
         }
     }
 };
 
-QTEST_GUILESS_MAIN(TestWhisperPipeline)
-#include "test_whisper_pipeline.moc"
+QTEST_GUILESS_MAIN(TestTranscribePipeline)
+#include "test_transcribe_pipeline.moc"

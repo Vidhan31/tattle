@@ -35,14 +35,14 @@ add_library(qtscribe_core STATIC
     CloudSttRouter.cpp
     WavDecoder.h
     WavDecoder.cpp
-    WhisperWorker.h
-    WhisperWorker.cpp
-    WhisperSttClient.h
-    WhisperSttClient.cpp
+    TranscribeWorker.h
+    TranscribeWorker.cpp
+    TranscribeSttClient.h
+    TranscribeSttClient.cpp
     ModelDownloader.h
     ModelDownloader.cpp
-    WhisperModelManager.h
-    WhisperModelManager.cpp
+    TranscribeModelManager.h
+    TranscribeModelManager.cpp
     GroqLlmClient.h
     GroqLlmClient.cpp
     ClipboardManager.h
@@ -94,14 +94,13 @@ target_include_directories(qtscribe_core
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_SOURCE_DIR}/src
     SYSTEM PUBLIC
-        ${whisper_SOURCE_DIR}/include
-        ${whisper_SOURCE_DIR}/ggml/include
-        ${whisper_SOURCE_DIR}/examples
+        ${transcribe_SOURCE_DIR}/include
 )
 
 target_link_libraries(qtscribe_core
     PUBLIC
-        whisper
+        transcribe
+        miniaudio
         Qt6::Core
         Qt6::Network
         Qt6::Multimedia

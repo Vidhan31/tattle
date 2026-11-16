@@ -7,14 +7,16 @@
 #include <atomic>
 #include <cstdint>
 
-struct whisper_context;
+struct transcribe_model;
+struct transcribe_session;
 
-class WhisperWorker : public QObject {
+class TranscribeWorker : public QObject {
     Q_OBJECT
 
 public:
-    explicit WhisperWorker(QObject* parent = nullptr);
-    ~WhisperWorker() override;
+    explicit TranscribeWorker(QObject* parent = nullptr);
+    ~TranscribeWorker() override;
+
     void cancel(uint64_t requestId = 0);
     void cancelLoad(uint64_t loadRequestId = 0);
     void resetAbort();
@@ -34,9 +36,14 @@ signals:
     void transcriptionFailed(uint64_t requestId, const QString& error);
 
 private:
-    whisper_context* m_ctx = nullptr;
+    void cleanupContext();
+
+    transcribe_model* m_model = nullptr;
+    transcribe_session* m_session = nullptr;
     std::atomic<bool> m_abortRequested {false};
     std::atomic<uint64_t> m_cancelledRequestId {0};
     std::atomic<uint64_t> m_cancelledLoadRequestId {0};
+    std::atomic<uint64_t> m_runningRequestId {0};
     QString m_activeDevice;
+    int64_t m_maxAudioMs = 0;
 };

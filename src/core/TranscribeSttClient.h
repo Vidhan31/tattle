@@ -9,10 +9,10 @@
 
 #include <cstdint>
 
-class WhisperWorker;
-class WhisperModelManager;
+class TranscribeWorker;
+class TranscribeModelManager;
 
-class WhisperSttClient : public AbstractOfflineSttClient {
+class TranscribeSttClient : public AbstractOfflineSttClient {
     Q_OBJECT
 
     Q_PROPERTY(bool isModelInstalled READ isModelInstalled NOTIFY modelStatusChanged FINAL)
@@ -25,11 +25,11 @@ class WhisperSttClient : public AbstractOfflineSttClient {
     Q_PROPERTY(bool isVulkanSupported READ isVulkanSupported CONSTANT FINAL)
 
 public:
-    explicit WhisperSttClient(QObject* parent = nullptr);
-    ~WhisperSttClient() override;
+    explicit TranscribeSttClient(QObject* parent = nullptr);
+    ~TranscribeSttClient() override;
 
-    void setModelManager(WhisperModelManager* manager);
-    WhisperModelManager* modelManager() const;
+    void setModelManager(TranscribeModelManager* manager);
+    TranscribeModelManager* modelManager() const;
 
     bool isModelInstalled() const override;
     bool isModelLoaded() const override;
@@ -74,8 +74,8 @@ private:
     QString resolveModelPath() const;
 
     QThread m_workerThread;
-    WhisperWorker* m_worker = nullptr;
-    QPointer<WhisperModelManager> m_modelManager;
+    TranscribeWorker* m_worker = nullptr;
+    QPointer<TranscribeModelManager> m_modelManager;
 
     uint64_t m_nextLoadRequestId = 1;
     uint64_t m_activeLoadRequestId = 0;

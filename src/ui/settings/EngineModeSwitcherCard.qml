@@ -145,7 +145,7 @@ StyledCard {
                                                                                          Theme.cardBorder)
             border.width: isSelected ? 2 : 1
 
-            readonly property bool isSelected: DaemonClient.activeBackend === DaemonClient.WhisperCpp
+            readonly property bool isSelected: DaemonClient.activeBackend === DaemonClient.TranscribeCpp
 
             Behavior on color {
                 ColorAnimation {
@@ -195,7 +195,7 @@ StyledCard {
                         }
 
                         StyledText {
-                            text: qsTr("whisper.cpp Local Engine")
+                            text: qsTr("transcribe.cpp Local Engine")
                             variant: "caption"
                             colorRole: "secondary"
                         }
@@ -230,7 +230,7 @@ StyledCard {
                     }
 
                     StyledText {
-                        text: qsTr("• Uses downloaded Whisper models")
+                        text: qsTr("• Uses downloaded speech models")
                         variant: "caption"
                         colorRole: "secondary"
                     }
@@ -243,8 +243,8 @@ StyledCard {
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
                 onClicked: {
-                    if (DaemonClient.activeBackend !== DaemonClient.WhisperCpp) {
-                        DaemonClient.activeBackend = DaemonClient.WhisperCpp;
+                    if (DaemonClient.activeBackend !== DaemonClient.TranscribeCpp) {
+                        DaemonClient.activeBackend = DaemonClient.TranscribeCpp;
                     }
                 }
             }
@@ -259,7 +259,7 @@ StyledCard {
     PreferenceSwitch {
         Layout.fillWidth: true
         title: qsTr("Automatic Offline Fallback")
-        description: qsTr("Automatically switch to local whisper.cpp model when internet connectivity is lost")
+        description: qsTr("Automatically switch to local transcribe.cpp model when internet connectivity is lost")
         checked: DaemonClient.autoSwitchOffline
         onToggled: DaemonClient.autoSwitchOffline = checked
     }

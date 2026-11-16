@@ -12,7 +12,7 @@ class SettingsManager : public QObject {
 
 public:
     // NOLINTNEXTLINE(performance-enum-size) QML-registered enums need int backing for qmlcachegen AOT
-    enum class TranscriptionBackend { Cloud = 0, WhisperCpp };
+    enum class TranscriptionBackend { Cloud = 0, TranscribeCpp };
     Q_ENUM(TranscriptionBackend)
 
     // NOLINTNEXTLINE(performance-enum-size) QML-registered enums need int backing for qmlcachegen AOT
@@ -76,9 +76,9 @@ public:
         bool operator==(const CloudRouterConfig&) const = default;
     };
 
-    struct WhisperConfig {
+    struct TranscribeConfig {
         QString selectedModel;
-        bool operator==(const WhisperConfig&) const = default;
+        bool operator==(const TranscribeConfig&) const = default;
     };
 
     explicit SettingsManager(QObject* parent = nullptr);
@@ -99,7 +99,7 @@ public:
     [[nodiscard]] const AudioFeedbackConfig& audioFeedbackConfig() const noexcept { return m_audioFeedbackConfig; }
     [[nodiscard]] const NotificationConfig& notificationConfig() const noexcept { return m_notificationConfig; }
     [[nodiscard]] const CloudRouterConfig& cloudRouterConfig() const noexcept { return m_cloudRouterConfig; }
-    [[nodiscard]] const WhisperConfig& whisperConfig() const noexcept { return m_whisperConfig; }
+    [[nodiscard]] const TranscribeConfig& transcribeConfig() const noexcept { return m_transcribeConfig; }
 
     void setSpeechConfig(const SpeechConfig& config);
     void setGroqSttConfig(const GroqSttConfig& config);
@@ -110,7 +110,7 @@ public:
     void setAudioFeedbackConfig(const AudioFeedbackConfig& config);
     void setNotificationConfig(const NotificationConfig& config);
     void setCloudRouterConfig(const CloudRouterConfig& config);
-    void setWhisperConfig(const WhisperConfig& config);
+    void setTranscribeConfig(const TranscribeConfig& config);
 
     void setBackend(TranscriptionBackend backend);
     void setRecordingMode(RecordingMode mode);
@@ -139,7 +139,7 @@ public:
     void setSoundEnabled(bool enabled);
     void setNotificationsEnabled(bool enabled);
     void setActiveProvider(const QString& providerId);
-    void setWhisperSelectedModel(const QString& modelId);
+    void setTranscribeSelectedModel(const QString& modelId);
 
     void setSetting(const QString& key, const QVariant& value);
     [[nodiscard]] QVariant getSetting(const QString& key, const QVariant& defaultValue = {}) const;
@@ -155,7 +155,7 @@ signals:
     void audioFeedbackConfigChanged(const SettingsManager::AudioFeedbackConfig& config);
     void notificationConfigChanged(const SettingsManager::NotificationConfig& config);
     void cloudRouterConfigChanged(const SettingsManager::CloudRouterConfig& config);
-    void whisperConfigChanged(const SettingsManager::WhisperConfig& config);
+    void transcribeConfigChanged(const SettingsManager::TranscribeConfig& config);
     void settingChanged(const QString& key, const QVariant& value);
 
 private:
@@ -177,7 +177,7 @@ private:
     AudioFeedbackConfig m_audioFeedbackConfig;
     NotificationConfig m_notificationConfig;
     CloudRouterConfig m_cloudRouterConfig;
-    WhisperConfig m_whisperConfig;
+    TranscribeConfig m_transcribeConfig;
 
     static inline SettingsManager* s_instance = nullptr;
 };

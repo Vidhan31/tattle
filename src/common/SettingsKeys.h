@@ -9,7 +9,7 @@ inline constexpr QStringView kSpeechTranscriptionBackend = u"Speech/Transcriptio
 inline constexpr QStringView kSpeechRecordingMode = u"Speech/RecordingMode";
 inline constexpr QStringView kSpeechAutoSwitchOffline = u"Speech/AutoSwitchOffline";
 
-inline constexpr QStringView kWhisperSelectedModel = u"Whisper/SelectedModel";
+inline constexpr QStringView kTranscribeSelectedModel = u"Transcribe/SelectedModel";
 
 inline constexpr QStringView kCloudActiveProvider = u"Cloud/ActiveProvider";
 

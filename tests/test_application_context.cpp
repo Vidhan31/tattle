@@ -20,8 +20,8 @@
 #include "NotificationPresenter.h"
 #include "SystemHealthMonitor.h"
 #include "SystemService.h"
-#include "WhisperModelManager.h"
-#include "WhisperSttClient.h"
+#include "TranscribeModelManager.h"
+#include "TranscribeSttClient.h"
 
 #include <QCoreApplication>
 #include <QSettings>
@@ -67,8 +67,8 @@ void TestApplicationContext::testHeadlessInitialization() {
     QVERIFY(context.systemHealthMonitor() != nullptr);
     QVERIFY(context.audioFeedbackPlayer() != nullptr);
     QVERIFY(context.apiKeyStore() != nullptr);
-    QVERIFY(context.whisperSttClient() != nullptr);
-    QVERIFY(context.whisperModelManager() != nullptr);
+    QVERIFY(context.transcribeSttClient() != nullptr);
+    QVERIFY(context.transcribeModelManager() != nullptr);
     QVERIFY(context.groqSttClient() != nullptr);
     QVERIFY(context.geminiSttClient() != nullptr);
     QVERIFY(context.metaMusaSttClient() != nullptr);
@@ -86,13 +86,13 @@ void TestApplicationContext::testSubsystemWiringIntegrity() {
     ApplicationContext context;
     context.initializeHeadless();
 
-    QCOMPARE(context.whisperSttClient()->modelManager(), context.whisperModelManager());
+    QCOMPARE(context.transcribeSttClient()->modelManager(), context.transcribeModelManager());
     QVERIFY(context.dictationCoordinator() != nullptr);
     QCOMPARE(context.dictationCoordinator()->sttEngine(), context.compositeSttEngine());
     QCOMPARE(context.notificationPresenter()->dictationCoordinator(), context.dictationCoordinator());
     QCOMPARE(context.notificationPresenter()->compositeSttEngine(), context.compositeSttEngine());
-    QCOMPARE(context.modelService()->whisperClient(), context.whisperSttClient());
-    QCOMPARE(context.modelService()->modelManager(), context.whisperModelManager());
+    QCOMPARE(context.modelService()->transcribeClient(), context.transcribeSttClient());
+    QCOMPARE(context.modelService()->modelManager(), context.transcribeModelManager());
     QCOMPARE(context.systemService()->shortcutManager(), context.shortcutManager());
     QCOMPARE(context.systemService()->daemonConnector(), context.daemonConnector());
     QVERIFY(context.llmClient() != nullptr);

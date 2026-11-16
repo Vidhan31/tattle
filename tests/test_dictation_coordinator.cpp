@@ -288,7 +288,7 @@ private:
     SystemHealthMonitor* m_healthMonitor = nullptr;
     AudioFeedbackPlayer* m_feedbackPlayer = nullptr;
     FakeAudioRecorder* m_recorder = nullptr;
-    FakeOfflineSttClient* m_whisperClient = nullptr;
+    FakeOfflineSttClient* m_offlineClient = nullptr;
     FakeCloudSttClient* m_groqClient = nullptr;
     GroqLlmClient* m_llmClient = nullptr;
     ApiKeyStore* m_keyStore = nullptr;
@@ -319,7 +319,7 @@ void TestDictationCoordinator::init() {
     m_healthMonitor->setNetworkOnlineForTesting(true);
     m_feedbackPlayer = new AudioFeedbackPlayer(this);
     m_recorder = new FakeAudioRecorder(this);
-    m_whisperClient = new FakeOfflineSttClient(this);
+    m_offlineClient = new FakeOfflineSttClient(this);
     m_groqClient = new FakeCloudSttClient(this);
     m_keyStore = new ApiKeyStore(this);
     m_keyStore->setApiKey(u"gsk_mock_api_key_for_testing"_s);
@@ -331,7 +331,7 @@ void TestDictationCoordinator::init() {
     m_notificationService = new FakeNotificationService(this);
 
     m_sttEngine = new CompositeSttEngine(this);
-    m_sttEngine->setWhisperClient(m_whisperClient);
+    m_sttEngine->setTranscribeClient(m_offlineClient);
     m_sttEngine->setCloudClient(m_groqClient);
     m_sttEngine->setHealthMonitor(m_healthMonitor);
     m_sttEngine->setAudioRecorder(m_recorder);
@@ -363,7 +363,7 @@ void TestDictationCoordinator::cleanup() {
     delete m_healthMonitor;
     delete m_feedbackPlayer;
     delete m_recorder;
-    delete m_whisperClient;
+    delete m_offlineClient;
     delete m_groqClient;
     delete m_llmClient;
     delete m_keyStore;
@@ -390,8 +390,8 @@ void TestDictationCoordinator::testInitialState() {
 }
 
 void TestDictationCoordinator::testBackendRegistrationAndSwitching() {
-    m_coordinator->setActiveBackend(DictationCoordinator::TranscriptionBackend::WhisperCpp);
-    QCOMPARE(m_coordinator->activeBackend(), DictationCoordinator::TranscriptionBackend::WhisperCpp);
+    m_coordinator->setActiveBackend(DictationCoordinator::TranscriptionBackend::TranscribeCpp);
+    QCOMPARE(m_coordinator->activeBackend(), DictationCoordinator::TranscriptionBackend::TranscribeCpp);
     QCOMPARE(m_coordinator->activeSttClient(), m_sttEngine);
 
     QSignalSpy backendSpy(m_coordinator, &DictationCoordinator::activeBackendChanged);
@@ -402,8 +402,8 @@ void TestDictationCoordinator::testBackendRegistrationAndSwitching() {
 }
 
 void TestDictationCoordinator::testRecordingLifecycleSuccess() {
-    m_coordinator->setActiveBackend(DictationCoordinator::TranscriptionBackend::WhisperCpp);
-    m_whisperClient->m_simulatedText = u"Hello from whisper.cpp"_s;
+    m_coordinator->setActiveBackend(DictationCoordinator::TranscriptionBackend::TranscribeCpp);
+    m_offlineClient->m_simulatedText = u"Hello from transcribe.cpp"_s;
 
     QSignalSpy stateSpy(m_coordinator, &DictationCoordinator::dictationStateChanged);
     QSignalSpy finishSpy(m_coordinator, &DictationCoordinator::transcriptionFinished);
@@ -417,13 +417,13 @@ void TestDictationCoordinator::testRecordingLifecycleSuccess() {
     m_coordinator->stopRecording();
 
     QCOMPARE(finishSpy.count(), 1);
-    QCOMPARE(finishSpy.first().at(0).toString(), u"Hello from whisper.cpp"_s);
+    QCOMPARE(finishSpy.first().at(0).toString(), u"Hello from transcribe.cpp"_s);
     QCOMPARE(m_coordinator->dictationState(), DictationCoordinator::DictationState::Idle);
-    QCOMPARE(m_coordinator->lastTranscription(), u"Hello from whisper.cpp"_s);
-    QCOMPARE(m_padModel->text(), u"Hello from whisper.cpp"_s);
+    QCOMPARE(m_coordinator->lastTranscription(), u"Hello from transcribe.cpp"_s);
+    QCOMPARE(m_padModel->text(), u"Hello from transcribe.cpp"_s);
     QCOMPARE(m_historyModel->rowCount(), 1);
     QCOMPARE(m_injector->m_injectCount, 1);
-    QCOMPARE(m_injector->m_injectedText, u"Hello from whisper.cpp"_s);
+    QCOMPARE(m_injector->m_injectedText, u"Hello from transcribe.cpp"_s);
 }
 
 void TestDictationCoordinator::testRecordingNoMicrophone() {
@@ -463,7 +463,7 @@ void TestDictationCoordinator::testLlmEnhancementErrorFallback() {
     m_coordinator->setActiveBackend(DictationCoordinator::TranscriptionBackend::Cloud);
     m_llmClient->setEnabled(true);
     m_groqClient->m_autoRespond = true;
-    m_groqClient->m_simulatedText = u"Raw whisper transcript"_s;
+    m_groqClient->m_simulatedText = u"Raw speech transcript"_s;
 
     QSignalSpy warningSpy(m_coordinator, &DictationCoordinator::llmFallbackWarningTriggered);
     QSignalSpy finishSpy(m_coordinator, &DictationCoordinator::transcriptionFinished);
@@ -473,11 +473,11 @@ void TestDictationCoordinator::testLlmEnhancementErrorFallback() {
 
     QCOMPARE(m_coordinator->dictationState(), DictationCoordinator::DictationState::Enhancing);
 
-    emit m_llmClient->errorOccurred(u"API Rate limit"_s, u"Raw whisper transcript"_s);
+    emit m_llmClient->errorOccurred(u"API Rate limit"_s, u"Raw speech transcript"_s);
 
     QCOMPARE(warningSpy.count(), 1);
     QCOMPARE(finishSpy.count(), 1);
-    QCOMPARE(finishSpy.first().at(0).toString(), u"Raw whisper transcript"_s);
+    QCOMPARE(finishSpy.first().at(0).toString(), u"Raw speech transcript"_s);
     QCOMPARE(m_coordinator->dictationState(), DictationCoordinator::DictationState::Idle);
 }
 
@@ -495,7 +495,7 @@ void TestDictationCoordinator::testBackendChangeDuringEnhancingPreservesRawText(
     QCOMPARE(m_coordinator->dictationState(), DictationCoordinator::DictationState::Enhancing);
 
     // Backend switches while LLM is enhancing (e.g. network dropped causing fallback or user switched backend)
-    m_coordinator->setActiveBackend(DictationCoordinator::TranscriptionBackend::WhisperCpp);
+    m_coordinator->setActiveBackend(DictationCoordinator::TranscriptionBackend::TranscribeCpp);
 
     // Raw text should be preserved and emitted, and state returned to Idle
     QCOMPARE(finishSpy.count(), 1);
@@ -516,9 +516,9 @@ void TestDictationCoordinator::testCancelDictation() {
 }
 
 void TestDictationCoordinator::testRetryTranscription() {
-    m_coordinator->setActiveBackend(DictationCoordinator::TranscriptionBackend::WhisperCpp);
-    m_whisperClient->m_failNext = true;
-    m_whisperClient->m_simulatedError = u"Engine error"_s;
+    m_coordinator->setActiveBackend(DictationCoordinator::TranscriptionBackend::TranscribeCpp);
+    m_offlineClient->m_failNext = true;
+    m_offlineClient->m_simulatedError = u"Engine error"_s;
 
     QSignalSpy errorSpy(m_coordinator, &DictationCoordinator::errorOccurred);
 
@@ -529,8 +529,8 @@ void TestDictationCoordinator::testRetryTranscription() {
     QCOMPARE(m_coordinator->dictationState(), DictationCoordinator::DictationState::Error);
     QCOMPARE(m_coordinator->lastError(), u"Engine error"_s);
 
-    m_whisperClient->m_failNext = false;
-    m_whisperClient->m_simulatedText = u"Recovered text on retry"_s;
+    m_offlineClient->m_failNext = false;
+    m_offlineClient->m_simulatedText = u"Recovered text on retry"_s;
 
     m_coordinator->retryTranscription();
     QCOMPARE(m_coordinator->dictationState(), DictationCoordinator::DictationState::Idle);
@@ -624,7 +624,7 @@ void TestDictationCoordinator::testSystemHealthMonitorDirect() {
     QVERIFY(monitor.systemShortcutHasIssue());
 
     monitor.setAudioRecorder(m_recorder);
-    monitor.setActiveSttClient(m_whisperClient);
+    monitor.setActiveSttClient(m_offlineClient);
     QVERIFY(monitor.canRecord(true));
     QVERIFY(!monitor.canRecord(false));
 
@@ -637,7 +637,7 @@ void TestDictationCoordinator::testAutoSwitchOfflineWhenNetworkLost() {
     QCOMPARE(m_coordinator->activeBackend(), DictationCoordinator::TranscriptionBackend::Cloud);
 
     m_healthMonitor->setNetworkOnlineForTesting(false);
-    QCOMPARE(m_coordinator->activeBackend(), DictationCoordinator::TranscriptionBackend::WhisperCpp);
+    QCOMPARE(m_coordinator->activeBackend(), DictationCoordinator::TranscriptionBackend::TranscribeCpp);
 
     m_healthMonitor->setNetworkOnlineForTesting(true);
     QCOMPARE(m_coordinator->activeBackend(), DictationCoordinator::TranscriptionBackend::Cloud);
@@ -655,7 +655,7 @@ void TestDictationCoordinator::testAutoSwitchOfflineDeferredDuringRecording() {
     QCOMPARE(m_coordinator->activeBackend(), DictationCoordinator::TranscriptionBackend::Cloud);
 
     m_coordinator->stopRecording();
-    QCOMPARE(m_coordinator->activeBackend(), DictationCoordinator::TranscriptionBackend::WhisperCpp);
+    QCOMPARE(m_coordinator->activeBackend(), DictationCoordinator::TranscriptionBackend::TranscribeCpp);
 }
 
 void TestDictationCoordinator::testStartRecordingPreservesOfflineFallback() {
@@ -663,20 +663,20 @@ void TestDictationCoordinator::testStartRecordingPreservesOfflineFallback() {
     QCOMPARE(m_coordinator->activeBackend(), DictationCoordinator::TranscriptionBackend::Cloud);
 
     m_healthMonitor->setNetworkOnlineForTesting(false);
-    QCOMPARE(m_coordinator->activeBackend(), DictationCoordinator::TranscriptionBackend::WhisperCpp);
+    QCOMPARE(m_coordinator->activeBackend(), DictationCoordinator::TranscriptionBackend::TranscribeCpp);
     QVERIFY(m_sttEngine->isAutoSwitchedToOffline());
 
     m_coordinator->startRecording();
-    QCOMPARE(m_coordinator->activeBackend(), DictationCoordinator::TranscriptionBackend::WhisperCpp);
+    QCOMPARE(m_coordinator->activeBackend(), DictationCoordinator::TranscriptionBackend::TranscribeCpp);
     QVERIFY(m_sttEngine->isAutoSwitchedToOffline());
     m_coordinator->stopRecording();
 
     m_coordinator->loadSettings();
-    QCOMPARE(m_coordinator->activeBackend(), DictationCoordinator::TranscriptionBackend::WhisperCpp);
+    QCOMPARE(m_coordinator->activeBackend(), DictationCoordinator::TranscriptionBackend::TranscribeCpp);
     QVERIFY(m_sttEngine->isAutoSwitchedToOffline());
 
     m_coordinator->reloadSettings();
-    QCOMPARE(m_coordinator->activeBackend(), DictationCoordinator::TranscriptionBackend::WhisperCpp);
+    QCOMPARE(m_coordinator->activeBackend(), DictationCoordinator::TranscriptionBackend::TranscribeCpp);
     QVERIFY(m_sttEngine->isAutoSwitchedToOffline());
 
     m_healthMonitor->setNetworkOnlineForTesting(true);
@@ -725,9 +725,9 @@ void TestDictationCoordinator::testClearHistory() {
 }
 
 void TestDictationCoordinator::testNotificationIntegration() {
-    m_coordinator->setActiveBackend(DictationCoordinator::TranscriptionBackend::WhisperCpp);
-    m_whisperClient->m_failNext = true;
-    m_whisperClient->m_simulatedError = u"Mock engine failure"_s;
+    m_coordinator->setActiveBackend(DictationCoordinator::TranscriptionBackend::TranscribeCpp);
+    m_offlineClient->m_failNext = true;
+    m_offlineClient->m_simulatedError = u"Mock engine failure"_s;
     m_coordinator->startRecording();
     m_recorder->stopRecording();
 
@@ -736,7 +736,7 @@ void TestDictationCoordinator::testNotificationIntegration() {
     QCOMPARE(m_notificationService->m_lastBody, u"Mock engine failure"_s);
     QCOMPARE(m_notificationService->m_lastUrgency, LinuxNotificationService::Urgency::Critical);
 
-    m_whisperClient->m_failNext = false;
+    m_offlineClient->m_failNext = false;
     m_coordinator->startRecording();
     m_recorder->triggerMaxDuration();
     QCOMPARE(m_notificationService->m_lastTitle, u"Recording Limit Reached"_s);

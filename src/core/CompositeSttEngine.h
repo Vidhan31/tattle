@@ -10,7 +10,7 @@
 class AudioRecorder;
 class AbstractCloudSttClient;
 class AbstractOfflineSttClient;
-class WhisperModelManager;
+class TranscribeModelManager;
 class SystemHealthMonitor;
 class SettingsManager;
 
@@ -23,7 +23,7 @@ class CompositeSttEngine : public AbstractSttClient {
 
 public:
     // NOLINTNEXTLINE(performance-enum-size) QML-registered enums need int backing for qmlcachegen AOT
-    enum class TranscriptionBackend { Cloud, WhisperCpp };
+    enum class TranscriptionBackend { Cloud, TranscribeCpp };
     Q_ENUM(TranscriptionBackend)
 
     explicit CompositeSttEngine(QObject* parent = nullptr);
@@ -32,14 +32,14 @@ public:
     void setCloudClient(AbstractCloudSttClient* client);
     [[nodiscard]] AbstractCloudSttClient* cloudClient() const noexcept;
 
-    void setWhisperClient(AbstractOfflineSttClient* client);
-    [[nodiscard]] AbstractOfflineSttClient* whisperClient() const noexcept;
+    void setTranscribeClient(AbstractOfflineSttClient* client);
+    [[nodiscard]] AbstractOfflineSttClient* transcribeClient() const noexcept;
 
-    void setOfflineClient(AbstractOfflineSttClient* client) { setWhisperClient(client); }
-    [[nodiscard]] AbstractOfflineSttClient* offlineClient() const noexcept { return whisperClient(); }
+    void setOfflineClient(AbstractOfflineSttClient* client) { setTranscribeClient(client); }
+    [[nodiscard]] AbstractOfflineSttClient* offlineClient() const noexcept { return transcribeClient(); }
 
-    void setModelManager(WhisperModelManager* manager);
-    [[nodiscard]] WhisperModelManager* modelManager() const noexcept;
+    void setModelManager(TranscribeModelManager* manager);
+    [[nodiscard]] TranscribeModelManager* modelManager() const noexcept;
 
     void setHealthMonitor(SystemHealthMonitor* monitor);
     [[nodiscard]] SystemHealthMonitor* healthMonitor() const noexcept;
@@ -96,7 +96,7 @@ signals:
 private:
     void onActiveClientTranscriptionReady(const QString& text);
     void onActiveClientError(const QString& error);
-    void onWhisperModelLoadFailed(const QString& modelPath, const QString& error);
+    void onOfflineModelLoadFailed(const QString& modelPath, const QString& error);
 
     void applyOfflineSwitch();
     void restoreOnlineBackend();
@@ -104,13 +104,13 @@ private:
     void setLastError(const QString& error);
 
     QPointer<AbstractCloudSttClient> m_cloudClient;
-    QPointer<AbstractOfflineSttClient> m_whisperClient;
-    QPointer<WhisperModelManager> m_modelManager;
+    QPointer<AbstractOfflineSttClient> m_offlineClient;
+    QPointer<TranscribeModelManager> m_modelManager;
     QPointer<SystemHealthMonitor> m_healthMonitor;
     QPointer<AudioRecorder> m_recorder;
     SettingsManager* m_settingsManager = nullptr;
 
-    TranscriptionBackend m_activeBackend = TranscriptionBackend::WhisperCpp;
+    TranscriptionBackend m_activeBackend = TranscriptionBackend::TranscribeCpp;
     bool m_autoSwitchOffline = true;
     bool m_pendingOfflineSwitch = false;
     bool m_autoSwitchedToOffline = false;
