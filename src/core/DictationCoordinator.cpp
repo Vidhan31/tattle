@@ -505,8 +505,9 @@ void DictationCoordinator::loadSettings() {
     } else {
         const QSettings settings;
         const QString backendStr = settings.value(SettingsKeys::kSpeechBackend.toString(), u"Cloud"_s).toString();
-        backend =
-            (backendStr == u"TranscribeCpp"_s) ? TranscriptionBackend::TranscribeCpp : TranscriptionBackend::Cloud;
+        backend = (backendStr == u"TranscribeCpp"_s || backendStr == u"WhisperCpp"_s)
+                      ? TranscriptionBackend::TranscribeCpp
+                      : TranscriptionBackend::Cloud;
         autoSwitch = settings.value(SettingsKeys::kSpeechAutoSwitchOffline.toString(), true).toBool();
         const QString modeStr = settings.value(SettingsKeys::kSpeechRecordingMode.toString(), u"Toggle"_s).toString();
         mode = (modeStr == u"PushToTalk"_s) ? RecordingMode::PushToTalk : RecordingMode::Toggle;

@@ -111,7 +111,7 @@ void TranscribeWorker::loadModel(uint64_t loadRequestId, const QString& modelPat
         m_session,
         [](void* userData) -> bool {
             auto* self = static_cast<TranscribeWorker*>(userData);
-            return self && self->isAborted();
+            return self && self->isAborted(self->m_runningRequestId.load(std::memory_order_acquire));
         },
         this);
 
@@ -178,7 +178,9 @@ bool TranscribeWorker::isAborted(uint64_t requestId) const {
     if (QThread::currentThread() && QThread::currentThread()->isInterruptionRequested()) {
         return true;
     }
-    if (requestId > 0 && requestId <= m_cancelledRequestId.load(std::memory_order_acquire)) {
+    const uint64_t effectiveRequestId =
+        (requestId != 0) ? requestId : m_runningRequestId.load(std::memory_order_acquire);
+    if (effectiveRequestId > 0 && effectiveRequestId <= m_cancelledRequestId.load(std::memory_order_acquire)) {
         return true;
     }
     return false;
@@ -199,6 +201,12 @@ bool TranscribeWorker::isLoadAborted(uint64_t loadRequestId) const {
 
 void TranscribeWorker::transcribe(uint64_t requestId, const QByteArray& wavData, const QString& language,
                                   const QString& prompt) {
+    m_runningRequestId.store(requestId, std::memory_order_release);
+    struct RunningGuard {
+        std::atomic<uint64_t>& var;
+        ~RunningGuard() { var.store(0, std::memory_order_release); }
+    } guard {m_runningRequestId};
+
     if (requestId > 0 && requestId <= m_cancelledRequestId.load(std::memory_order_acquire)) {
         qCDebug(lcSpeech) << "TranscribeWorker: Transcription request" << requestId << "cancelled prior to processing";
         return;
@@ -273,7 +281,7 @@ void TranscribeWorker::transcribe(uint64_t requestId, const QByteArray& wavData,
         return;
     }
 
-    if (status != TRANSCRIBE_OK && status != TRANSCRIBE_ERR_OUTPUT_TRUNCATED) {
+    if (status != TRANSCRIBE_OK) {
         qCWarning(lcSpeech) << "TranscribeWorker: transcribe_run failed with return code:" << status;
         emit transcriptionFailed(
             requestId, tr("Speech inference failed (%1)").arg(QString::fromUtf8(transcribe_status_string(status))));

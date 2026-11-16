@@ -261,14 +261,18 @@ cmake --preset linux-qt6-debug -DENABLE_VULKAN=ON
 
 #### Offline or air-gapped builds
 
-CMake downloads transcribe.cpp during configure. For a machine without network access, clone the pinned commit first and pass its path to CMake:
+CMake downloads transcribe.cpp and miniaudio during configure. For a machine without network access, clone the pinned commits first and pass their paths to CMake:
 
 ```bash
 git clone https://github.com/handy-computer/transcribe.cpp.git /opt/transcribe-src
 git -C /opt/transcribe-src checkout 275cd50d2c4104c204009a197ac091b9687668e5
 
+git clone https://github.com/mackron/miniaudio.git /opt/miniaudio-src
+git -C /opt/miniaudio-src checkout 877ea4a7c2601c7b0f2a44e83dfac42e6470fea6
+
 cmake --preset linux-qt6-release \
   -DFETCHCONTENT_SOURCE_DIR_TRANSCRIBE=/opt/transcribe-src \
+  -DFETCHCONTENT_SOURCE_DIR_MINIAUDIO=/opt/miniaudio-src \
   -DFETCHCONTENT_FULLY_DISCONNECTED=ON
 ```
 

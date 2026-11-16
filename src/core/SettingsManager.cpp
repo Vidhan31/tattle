@@ -83,8 +83,15 @@ void SettingsManager::load() {
 
     SpeechConfig newSpeech;
     const QString backendStr = settings.value(SettingsKeys::kSpeechBackend.toString(), u"Cloud"_s).toString();
-    newSpeech.backend =
-        (backendStr == u"TranscribeCpp"_s) ? TranscriptionBackend::TranscribeCpp : TranscriptionBackend::Cloud;
+    const bool isOfflineBackend = (backendStr == u"TranscribeCpp"_s || backendStr == u"WhisperCpp"_s);
+    newSpeech.backend = isOfflineBackend ? TranscriptionBackend::TranscribeCpp : TranscriptionBackend::Cloud;
+    if (backendStr == u"WhisperCpp"_s) {
+        QSettings writeSettings;
+        writeSettings.setValue(SettingsKeys::kSpeechBackend.toString(), u"TranscribeCpp"_s);
+        writeSettings.setValue(SettingsKeys::kSpeechTranscriptionBackend.toString(),
+                               static_cast<int>(TranscriptionBackend::TranscribeCpp));
+        writeSettings.sync();
+    }
     const QString modeStr = settings.value(SettingsKeys::kSpeechRecordingMode.toString(), u"Toggle"_s).toString();
     newSpeech.recordingMode = (modeStr == u"PushToTalk"_s) ? RecordingMode::PushToTalk : RecordingMode::Toggle;
     newSpeech.autoSwitchOffline = settings.value(SettingsKeys::kSpeechAutoSwitchOffline.toString(), true).toBool();
@@ -623,8 +630,9 @@ void SettingsManager::setSetting(const QString& key, const QVariant& value) {
         if (value.metaType().id() == QMetaType::Int) {
             setBackend(value.toInt() == 1 ? TranscriptionBackend::TranscribeCpp : TranscriptionBackend::Cloud);
         } else {
-            setBackend(value.toString() == u"TranscribeCpp"_s ? TranscriptionBackend::TranscribeCpp
-                                                              : TranscriptionBackend::Cloud);
+            const QString str = value.toString();
+            setBackend((str == u"TranscribeCpp"_s || str == u"WhisperCpp"_s) ? TranscriptionBackend::TranscribeCpp
+                                                                             : TranscriptionBackend::Cloud);
         }
     } else if (key == SettingsKeys::kSpeechRecordingMode) {
         if (value.metaType().id() == QMetaType::Int) {

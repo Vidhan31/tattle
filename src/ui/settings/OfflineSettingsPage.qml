@@ -310,9 +310,11 @@ Item {
                             anchors.margins: Theme.spacingSm
                             spacing: Theme.spacingXs
 
-                            RowLayout {
+                            GridLayout {
                                 Layout.fillWidth: true
-                                spacing: Theme.spacingMd
+                                columns: root.width >= 540 ? 3 : 1
+                                columnSpacing: Theme.spacingSm
+                                rowSpacing: Theme.spacingXs
 
                                 ColumnLayout {
                                     Layout.fillWidth: true
@@ -326,6 +328,7 @@ Item {
                                             text: modelRow.name
                                             variant: "body"
                                             customWeight: Font.DemiBold
+                                            elide: Text.ElideRight
                                         }
 
                                         StyledText {
@@ -387,12 +390,12 @@ Item {
                                              || modelRow.isDownloading
                                     showDot: modelRow.isDownloading
                                     pulsing: modelRow.isDownloading
-                                    Layout.alignment: Qt.AlignVCenter
+                                    Layout.alignment: root.width >= 540 ? Qt.AlignVCenter : Qt.AlignLeft
                                 }
 
                                 RowLayout {
                                     spacing: Theme.spacingXs
-                                    Layout.alignment: Qt.AlignVCenter
+                                    Layout.alignment: root.width >= 540 ? Qt.AlignVCenter : Qt.AlignLeft
 
                                     StyledButton {
                                         text: qsTr("Cancel")

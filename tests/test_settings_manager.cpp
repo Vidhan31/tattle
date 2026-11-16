@@ -179,6 +179,26 @@ private slots:
         QDBusVariant val = service.getSetting(SettingsKeys::kGroqModel.toString());
         QCOMPARE(val.variant().toString(), u"whisper-large-v3"_s);
     }
+
+    void testLegacyWhisperCppBackendMigration() {
+        {
+            QSettings settings;
+            settings.setValue(SettingsKeys::kSpeechBackend.toString(), u"WhisperCpp"_s);
+            settings.sync();
+        }
+
+        SettingsManager manager;
+        QCOMPARE(manager.speechConfig().backend, SettingsManager::TranscriptionBackend::TranscribeCpp);
+
+        QSettings settings;
+        QCOMPARE(settings.value(SettingsKeys::kSpeechBackend.toString()).toString(), u"TranscribeCpp"_s);
+        QCOMPARE(settings.value(SettingsKeys::kSpeechTranscriptionBackend.toString()).toInt(),
+                 static_cast<int>(SettingsManager::TranscriptionBackend::TranscribeCpp));
+
+        manager.setSetting(SettingsKeys::kSpeechBackend.toString(), u"WhisperCpp"_s);
+        QCOMPARE(manager.speechConfig().backend, SettingsManager::TranscriptionBackend::TranscribeCpp);
+        QCOMPARE(settings.value(SettingsKeys::kSpeechBackend.toString()).toString(), u"TranscribeCpp"_s);
+    }
 };
 
 QTEST_MAIN(TestSettingsManager)

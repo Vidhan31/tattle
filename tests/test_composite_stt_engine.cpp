@@ -156,6 +156,7 @@ private slots:
     void testTranscriptionDelegation();
     void testAutoSwitchOfflineWhenNetworkLost();
     void testAutoSwitchOfflineDeferredDuringBusy();
+    void testAutoSwitchOfflineOnCancelDuringBusy();
     void testAutoSwitchOfflineRestoreWhenNetworkReturns();
     void testLoadSettingsPreservesOfflineFallback();
     void testRetryLast();
@@ -275,6 +276,23 @@ void TestCompositeSttEngine::testAutoSwitchOfflineDeferredDuringBusy() {
     QCOMPARE(m_engine->activeBackend(), CompositeSttEngine::TranscriptionBackend::TranscribeCpp);
 }
 
+void TestCompositeSttEngine::testAutoSwitchOfflineOnCancelDuringBusy() {
+    m_engine->setActiveBackend(CompositeSttEngine::TranscriptionBackend::Cloud);
+    m_cloudClient->m_manualCompletion = true;
+
+    QSignalSpy disconnectSpy(m_engine, &CompositeSttEngine::networkDisconnectedDuringSession);
+    m_engine->transcribe(QByteArray("in-flight audio"));
+
+    m_healthMonitor->setNetworkOnlineForTesting(false);
+    QCOMPARE(disconnectSpy.count(), 1);
+    QVERIFY(!m_engine->isAutoSwitchedToOffline());
+    QCOMPARE(m_engine->activeBackend(), CompositeSttEngine::TranscriptionBackend::Cloud);
+
+    m_engine->cancel();
+    QVERIFY(m_engine->isAutoSwitchedToOffline());
+    QCOMPARE(m_engine->activeBackend(), CompositeSttEngine::TranscriptionBackend::TranscribeCpp);
+}
+
 void TestCompositeSttEngine::testAutoSwitchOfflineRestoreWhenNetworkReturns() {
     m_engine->setActiveBackend(CompositeSttEngine::TranscriptionBackend::Cloud);
     m_healthMonitor->setNetworkOnlineForTesting(false);
@@ -385,6 +403,6 @@ int main(int argc, char* argv[]) {
     QCoreApplication app(argc, argv);
     TestCompositeSttEngine test;
     const int result = QTest::qExec(&test, argc, argv);
-    std::quick_exit(result);
+    return result;
 }
 #include "test_composite_stt_engine.moc"

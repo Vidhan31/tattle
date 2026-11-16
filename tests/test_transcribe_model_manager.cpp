@@ -2,7 +2,9 @@
 #include "TranscribeModelManager.h"
 
 #include <QFile>
+#include <QSettings>
 #include <QSignalSpy>
+#include <QStandardPaths>
 #include <QTemporaryDir>
 #include <QTest>
 
@@ -12,6 +14,23 @@ class TranscribeModelManagerTest : public QObject {
     Q_OBJECT
 
 private slots:
+    void initTestCase() {
+        QStandardPaths::setTestModeEnabled(true);
+        QCoreApplication::setOrganizationName(u"QTranscribeTestOrg"_s);
+        QCoreApplication::setApplicationName(u"QTranscribeTestApp_ModelManager"_s);
+        QSettings settings;
+        settings.clear();
+    }
+
+    void cleanupTestCase() {
+        QStandardPaths::setTestModeEnabled(false);
+    }
+
+    void init() {
+        QSettings settings;
+        settings.clear();
+    }
+
     void testPresetsCountAndMetadata() {
         TranscribeModelManager manager;
         QCOMPARE(manager.modelCount(), 9);
@@ -202,6 +221,33 @@ private slots:
         QCOMPARE(TranscribeModelManager::formatBytes(1024), u"1.0 KiB"_s);
         QCOMPARE(TranscribeModelManager::formatBytes(1024 * 1024), u"1.0 MiB"_s);
         QCOMPARE(TranscribeModelManager::formatBytes(1024LL * 1024LL * 1024LL), u"1.00 GiB"_s);
+    }
+
+    void testDownloadSelectsWhenCurrentNotInstalled() {
+        QTemporaryDir tempDir;
+        QVERIFY(tempDir.isValid());
+
+        auto downloader = std::make_unique<ModelDownloader>();
+        auto* downloaderPtr = downloader.get();
+
+        TranscribeModelManager manager(std::move(downloader));
+        manager.setModelsDirectory(tempDir.path());
+
+        QCOMPARE(manager.selectedModelId(), u"whisper-base.en"_s);
+        QVERIFY(!manager.isSelectedModelInstalled());
+
+        const QString tinyPath = tempDir.path() + u"/whisper-tiny.en-Q8_0.gguf"_s;
+        {
+            QFile file(tinyPath);
+            QVERIFY(file.open(QIODevice::WriteOnly));
+            file.write("dummy_data");
+            file.close();
+        }
+
+        emit downloaderPtr->downloadFinished(u"whisper-tiny.en"_s, true, QString());
+
+        QCOMPARE(manager.selectedModelId(), u"whisper-tiny.en"_s);
+        QVERIFY(manager.isSelectedModelInstalled());
     }
 };
 

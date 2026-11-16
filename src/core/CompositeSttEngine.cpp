@@ -71,7 +71,7 @@ void CompositeSttEngine::loadSettings() {
         backendInt = settings.value(SettingsKeys::kSpeechTranscriptionBackend.toString(), 0).toInt();
         const QString backendStr = settings.value(SettingsKeys::kSpeechBackend.toString(), QString()).toString();
         if (!backendStr.isEmpty()) {
-            backendInt = (backendStr == u"TranscribeCpp"_s) ? 1 : 0;
+            backendInt = (backendStr == u"TranscribeCpp"_s || backendStr == u"WhisperCpp"_s) ? 1 : 0;
         }
         autoSwitch = settings.value(SettingsKeys::kSpeechAutoSwitchOffline.toString(), true).toBool();
     }
@@ -364,6 +364,7 @@ void CompositeSttEngine::cancel() {
     }
     m_isBusy = false;
     emit busyChanged();
+    checkPendingOfflineOrOnlineSwitch();
 }
 
 void CompositeSttEngine::retryLast() {

@@ -245,7 +245,7 @@ void TranscribeModelManager::setupDownloaderConnections() {
                                      {IsInstalledRole, ProgressRole, BytesReceivedRole, TotalBytesRole,
                                       SpeedFormattedRole, InstalledSizeFormattedRole, CanDeleteRole});
 
-                    if (success && m_selectedModelId.isEmpty()) {
+                    if (success && !isSelectedModelInstalled()) {
                         setSelectedModelId(modelId);
                     }
                 }

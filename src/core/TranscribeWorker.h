@@ -43,6 +43,7 @@ private:
     std::atomic<bool> m_abortRequested {false};
     std::atomic<uint64_t> m_cancelledRequestId {0};
     std::atomic<uint64_t> m_cancelledLoadRequestId {0};
+    std::atomic<uint64_t> m_runningRequestId {0};
     QString m_activeDevice;
     int64_t m_maxAudioMs = 0;
 };
