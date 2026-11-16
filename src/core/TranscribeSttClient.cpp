@@ -110,13 +110,13 @@ QString TranscribeSttClient::resolveModelPath() const {
         return m_modelManager->selectedModelPath();
     }
 
-    const QString primary = modelsDirectory() + u"/whisper-base.en-Q8_0.gguf"_s;
+    QString primary = modelsDirectory() + u"/whisper-base.en-Q8_0.gguf"_s;
     if (QFile::exists(primary)) {
         return primary;
     }
 
     const QString appData = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-    const QString fallback = appData + u"/models/whisper-base.en-Q8_0.gguf"_s;
+    QString fallback = appData + u"/models/whisper-base.en-Q8_0.gguf"_s;
     if (QFile::exists(fallback)) {
         return fallback;
     }

@@ -389,7 +389,7 @@ QString TranscribeModelManager::selectedModelId() const {
 
 QString TranscribeModelManager::selectedModelPath() const {
     if (m_selectedModelId.isEmpty()) {
-        return QString();
+        return {};
     }
     return getModelPath(m_selectedModelId);
 }
@@ -413,7 +413,7 @@ QString TranscribeModelManager::firstInstalledModelId() const {
             return item.id;
         }
     }
-    return QString();
+    return {};
 }
 
 bool TranscribeModelManager::isDownloadingAny() const {
@@ -459,7 +459,7 @@ bool TranscribeModelManager::isModelInstalled(const QString& modelId) const {
 QString TranscribeModelManager::getModelPath(const QString& modelId) const {
     const auto item = model(modelId);
     if (!item) {
-        return QString();
+        return {};
     }
     return modelsDirectory() + u"/"_s + item->fileName;
 }
@@ -627,7 +627,7 @@ void TranscribeModelManager::loadSettings() {
     if (m_settingsManager) {
         savedId = m_settingsManager->transcribeConfig().selectedModel;
     } else {
-        QSettings settings;
+        const QSettings settings;
         savedId = settings.value(SettingsKeys::kTranscribeSelectedModel.toString(), QString()).toString();
     }
 
