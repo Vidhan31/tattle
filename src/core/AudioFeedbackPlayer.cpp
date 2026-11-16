@@ -86,11 +86,13 @@ void AudioFeedbackPlayer::setSoundEnabled(bool enabled) {
 void AudioFeedbackPlayer::playStartSound() {
     if (m_soundEnabled && m_startChime) {
         m_startChime->play();
+        emit startSoundPlayed();
     }
 }
 
 void AudioFeedbackPlayer::playStopSound() {
     if (m_soundEnabled && m_stopChime) {
         m_stopChime->play();
+        emit stopSoundPlayed();
     }
 }

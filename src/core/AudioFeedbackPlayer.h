@@ -27,6 +27,8 @@ public:
 
 signals:
     void soundEnabledChanged();
+    void startSoundPlayed();
+    void stopSoundPlayed();
 
 private:
     SettingsManager* m_settingsManager = nullptr;
