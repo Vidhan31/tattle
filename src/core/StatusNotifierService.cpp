@@ -378,7 +378,7 @@ static KDbusImageStruct imageToDbusPixmap(const QImage& img) {
     const QImage argb = img.convertToFormat(QImage::Format_ARGB32);
     item.width = argb.width();
     item.height = argb.height();
-    item.data.resize(item.width * item.height * 4);
+    item.data.resize(static_cast<qsizetype>(item.width) * item.height * 4);
     auto* dest = reinterpret_cast<uchar*>(item.data.data());
     for (int y = 0; y < item.height; ++y) {
         const auto* src = reinterpret_cast<const QRgb*>(argb.constScanLine(y));
