@@ -312,6 +312,8 @@ jobs:
             -DCMAKE_PREFIX_PATH="${QT_ROOT_DIR};/usr/lib/x86_64-linux-gnu" \
             -DCMAKE_C_COMPILER=clang-22 \
             -DCMAKE_CXX_COMPILER=clang++-22 \
+            -DCLANG_TIDY_EXE=clang-tidy-22 \
+            -DCMAKE_DISABLE_PRECOMPILE_HEADERS=ON \
             -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
             -DENABLE_CLANG_TIDY=ON \
             -DENABLE_QT_DEPLOYMENT=OFF \

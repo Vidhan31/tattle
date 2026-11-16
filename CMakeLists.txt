@@ -128,7 +128,7 @@ endforeach()
 
 option(ENABLE_CLANG_TIDY "Enable clang-tidy static analysis on first-party targets" OFF)
 if(ENABLE_CLANG_TIDY)
-    find_program(CLANG_TIDY_EXE NAMES clang-tidy clang-tidy-22 clang-tidy-21 clang-tidy-20 clang-tidy-19 clang-tidy-18)
+    find_program(CLANG_TIDY_EXE NAMES clang-tidy-22 clang-tidy-21 clang-tidy-20 clang-tidy-19 clang-tidy-18 clang-tidy)
     if(CLANG_TIDY_EXE)
         set(CMAKE_CXX_CLANG_TIDY "${CLANG_TIDY_EXE}")
         message(STATUS "clang-tidy static analysis enabled: ${CLANG_TIDY_EXE}")
