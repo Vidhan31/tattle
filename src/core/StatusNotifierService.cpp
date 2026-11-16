@@ -129,7 +129,7 @@ int StatusNotifierItemAdaptor::windowId() {
 }
 
 QString StatusNotifierItemAdaptor::iconThemePath() const {
-    const QString localShare = QDir::homePath() + u"/.local/share/icons"_s;
+    QString localShare = QDir::homePath() + u"/.local/share/icons"_s;
     if (QFile::exists(localShare + u"/hicolor/32x32/apps/io.github.tattle.png"_s)) {
         return localShare;
     }
