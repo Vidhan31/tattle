@@ -96,19 +96,19 @@ public:
     static QString category();
     static QString id();
     static QString title();
-    static QString status();
+    [[nodiscard]] QString status() const;
     static int windowId();
-    static QString iconThemePath();
+    [[nodiscard]] QString iconThemePath() const;
     static QDBusObjectPath menu();
     static bool itemIsMenu();
-    static QString iconName();
-    static KDbusImageVector iconPixmap();
+    [[nodiscard]] QString iconName() const;
+    [[nodiscard]] KDbusImageVector iconPixmap() const;
     static QString overlayIconName();
     static KDbusImageVector overlayIconPixmap();
-    static QString attentionIconName();
-    static KDbusImageVector attentionIconPixmap();
+    [[nodiscard]] QString attentionIconName() const;
+    [[nodiscard]] KDbusImageVector attentionIconPixmap() const;
     static QString attentionMovieName();
-    KDbusToolTipStruct toolTip() const;
+    [[nodiscard]] KDbusToolTipStruct toolTip() const;
 
 Q_SIGNALS:
     void NewTitle();
@@ -175,6 +175,9 @@ public:
     bool isRegistered() const { return m_registered; }
     uint revision() const { return m_revision; }
 
+    [[nodiscard]] const KDbusImageVector& iconPixmap() const { return m_iconPixmap; }
+    [[nodiscard]] const KDbusImageVector& recordingIconPixmap() const { return m_recordingIconPixmap; }
+
     Q_INVOKABLE void registerWithWatcher();
 
 signals:
@@ -183,6 +186,7 @@ signals:
 
 private:
     void onRecordingChanged();
+    void loadIcons();
 
     static void registerMetaTypes();
 
@@ -193,4 +197,6 @@ private:
     QString m_serviceName;
     bool m_registered = false;
     uint m_revision = 1;
+    KDbusImageVector m_iconPixmap;
+    KDbusImageVector m_recordingIconPixmap;
 };
