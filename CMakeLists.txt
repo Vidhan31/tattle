@@ -2,13 +2,14 @@ cmake_minimum_required(VERSION 3.28...4.4)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 
 # Configure-time security guards
 set(CMAKE_TLS_VERIFY ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# Prefix path resolution: strip empty entries and fall back to QT_DIR, CMAKE_PREFIX_PATH, or ~/Qt/6.11.1/gcc_64
+# Prefix path resolution: strip empty entries and fall back to QT_DIR, CMAKE_PREFIX_PATH, or ~/Qt/6.11.2/gcc_64
 if(DEFINED CMAKE_PREFIX_PATH)
     list(REMOVE_ITEM CMAKE_PREFIX_PATH "")
 endif()
@@ -17,6 +18,8 @@ if(NOT CMAKE_PREFIX_PATH)
         list(APPEND CMAKE_PREFIX_PATH "$ENV{QT_DIR}")
     elseif(DEFINED ENV{CMAKE_PREFIX_PATH} AND NOT "$ENV{CMAKE_PREFIX_PATH}" STREQUAL "")
         list(APPEND CMAKE_PREFIX_PATH "$ENV{CMAKE_PREFIX_PATH}")
+    elseif(EXISTS "$ENV{HOME}/Qt/6.11.2/gcc_64")
+        list(APPEND CMAKE_PREFIX_PATH "$ENV{HOME}/Qt/6.11.2/gcc_64")
     elseif(EXISTS "$ENV{HOME}/Qt/6.11.1/gcc_64")
         list(APPEND CMAKE_PREFIX_PATH "$ENV{HOME}/Qt/6.11.1/gcc_64")
     endif()
@@ -125,7 +128,7 @@ endforeach()
 
 option(ENABLE_CLANG_TIDY "Enable clang-tidy static analysis on first-party targets" OFF)
 if(ENABLE_CLANG_TIDY)
-    find_program(CLANG_TIDY_EXE NAMES clang-tidy clang-tidy-18 clang-tidy-19)
+    find_program(CLANG_TIDY_EXE NAMES clang-tidy-22 clang-tidy-21 clang-tidy-20 clang-tidy-19 clang-tidy-18 clang-tidy)
     if(CLANG_TIDY_EXE)
         set(CMAKE_CXX_CLANG_TIDY "${CLANG_TIDY_EXE}")
         message(STATUS "clang-tidy static analysis enabled: ${CLANG_TIDY_EXE}")

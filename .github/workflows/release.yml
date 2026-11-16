@@ -62,8 +62,8 @@ jobs:
           VERSION="${VERSION#V}"
           echo "Resolved Tag: ${TAG_NAME}"
           echo "Resolved Version: ${VERSION}"
-          echo "tag=${TAG_NAME}" >> $GITHUB_OUTPUT
-          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "tag=${TAG_NAME}" >> "$GITHUB_OUTPUT"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
 
   run-ci:
     name: Validate CI Suite
@@ -183,7 +183,7 @@ jobs:
           ls -lh dist/release-assets/
 
           cd dist/release-assets
-          sha256sum * > SHA256SUMS.txt
+          sha256sum -- * > SHA256SUMS.txt
 
           echo "============================================================"
           echo "SHA256 Checksums (SHA256SUMS.txt):"

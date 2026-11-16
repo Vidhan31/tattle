@@ -11,7 +11,7 @@ OUTPUT_DIR="${REPO_ROOT}/dist/deb"
 
 echo "======================================================================"
 echo " Building QtScribe Debian Package (Ubuntu ${UBUNTU_VERSION})"
-echo " Qt Version: 6.11.1 (Wayland Only)"
+echo " Qt Version: 6.11.2 (Wayland Only)"
 echo " Package Version: ${APP_VERSION}"
 echo " Output : ${OUTPUT_DIR}"
 echo "======================================================================"

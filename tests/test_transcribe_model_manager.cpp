@@ -1,4 +1,5 @@
 #include "ModelDownloader.h"
+#include "SettingsManager.h"
 #include "TranscribeModelManager.h"
 
 #include <QFile>
@@ -16,21 +17,43 @@ class TranscribeModelManagerTest : public QObject {
 private slots:
     void initTestCase() {
         QStandardPaths::setTestModeEnabled(true);
-        QCoreApplication::setOrganizationName(u"QTranscribeTestOrg"_s);
-        QCoreApplication::setApplicationName(u"QTranscribeTestApp_ModelManager"_s);
+        QCoreApplication::setOrganizationName(u"QtScribeTest"_s);
+        QCoreApplication::setApplicationName(u"QtScribeTest_ModelManager"_s);
+        if (auto* inst = SettingsManager::instance()) {
+            inst->setTranscribeSelectedModel(QString());
+        }
         QSettings settings;
         settings.clear();
+        settings.sync();
     }
 
     void cleanupTestCase() {
+        if (auto* inst = SettingsManager::instance()) {
+            inst->setTranscribeSelectedModel(QString());
+        }
+        QSettings settings;
+        settings.clear();
+        settings.sync();
         QStandardPaths::setTestModeEnabled(false);
     }
 
     void init() {
+        if (auto* inst = SettingsManager::instance()) {
+            inst->setTranscribeSelectedModel(u"whisper-base.en"_s);
+        }
         QSettings settings;
         settings.clear();
+        settings.sync();
     }
 
+    void cleanup() {
+        if (auto* inst = SettingsManager::instance()) {
+            inst->setTranscribeSelectedModel(QString());
+        }
+        QSettings settings;
+        settings.clear();
+        settings.sync();
+    }
     void testPresetsCountAndMetadata() {
         TranscribeModelManager manager;
         QCOMPARE(manager.modelCount(), 9);

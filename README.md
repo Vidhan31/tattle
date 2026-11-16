@@ -182,15 +182,15 @@ Open **Settings** in QtScribe:
 
 ## Building from source
 
-Qt 6.11.1 is required. Ubuntu 24.04 ships an older system Qt, so install Qt 6.11.1 from the Qt Online installer or with aqtinstall. CMake picks up `~/Qt/6.11.1/gcc_64` on its own. For a custom path, export `QT_DIR` or pass `-DCMAKE_PREFIX_PATH` when you configure.
+Qt 6.11.2 is required. Ubuntu 24.04 ships an older system Qt, so install Qt 6.11.2 from the Qt Online installer or with aqtinstall. CMake picks up `~/Qt/6.11.2/gcc_64` on its own. For a custom path, export `QT_DIR` or pass `-DCMAKE_PREFIX_PATH` when you configure.
 
-Pinned third party versions are transcribe.cpp v0.4.2 at commit `275cd50` and QtKeychain 0.17.0 at commit `875f77d`. CMake fetches transcribe.cpp for you. Packaging builds QtKeychain from source. Local builds can use the distro package instead.
+Pinned third party versions are transcribe.cpp v0.4.2 at commit `275cd50` and QtKeychain 0.18.0 at commit `e86bc3c`. CMake fetches transcribe.cpp for you. Packaging builds QtKeychain from source. Local builds can use the distro package instead.
 
 ### Prerequisites
 
 Core tools are CMake 3.28 to 4.4, Ninja, a C++20 compiler (GCC 13 or newer, or Clang 17 or newer), and pkg-config.
 
-Qt modules used are Gui, Qml, Quick, QuickControls2, Network, Multimedia, DBus, WaylandClient, and QuickEffects. The base Qt 6.11.1 install already contains them. You only need to add the Multimedia module when you install Qt with aqt.
+Qt modules used are Gui, Qml, Quick, QuickControls2, Network, Multimedia, DBus, WaylandClient, and QuickEffects. The base Qt 6.11.2 install already contains them. You only need to add the Multimedia module when you install Qt with aqt.
 
 System libraries cover Wayland protocols, secrets, input, audio, and clipboard fallback. Audio dev packages matter because QtMultimedia needs ALSA and Pulse headers at build time. `wl-clipboard` is a runtime dependency for clipboard fallback typing.
 

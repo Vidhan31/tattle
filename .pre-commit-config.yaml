@@ -18,6 +18,14 @@ repos:
         stages: [commit-msg]
         args: [build, chore, ci, docs, feat, fix, perf, refactor, revert, style, test, release]
 
+  - repo: https://github.com/Mateusz-Grzelinski/actionlint-py
+    rev: v1.7.12.25
+    hooks:
+      - id: actionlint
+        additional_dependencies:
+          - pyflakes>=3.4.0
+          - shellcheck-py>=0.11.0.1
+
   - repo: local
     hooks:
       - id: clang-format
@@ -31,7 +39,7 @@ repos:
       - id: qmlformat
         name: QML Formatting (qmlformat)
         description: Format QML files with Qt qmlformat. Prefers $QT_ROOT_DIR/bin to match the pinned Qt version used in CI.
-        entry: bash -c 'QMLFORMAT=""; if [ -n "${QT_ROOT_DIR}" ] && [ -x "${QT_ROOT_DIR}/bin/qmlformat" ]; then QMLFORMAT="${QT_ROOT_DIR}/bin/qmlformat"; elif [ -x "$HOME/Qt/6.11.1/gcc_64/bin/qmlformat" ]; then QMLFORMAT="$HOME/Qt/6.11.1/gcc_64/bin/qmlformat"; elif command -v qmlformat >/dev/null 2>&1; then QMLFORMAT="qmlformat"; elif command -v qmlformat-qt6 >/dev/null 2>&1; then QMLFORMAT="qmlformat-qt6"; else exit 0; fi; exec "${QMLFORMAT}" --inplace "$@"' --
+        entry: bash -c 'QMLFORMAT=""; if [ -n "${QT_ROOT_DIR}" ] && [ -x "${QT_ROOT_DIR}/bin/qmlformat" ]; then QMLFORMAT="${QT_ROOT_DIR}/bin/qmlformat"; elif [ -x "$HOME/Qt/6.11.2/gcc_64/bin/qmlformat" ]; then QMLFORMAT="$HOME/Qt/6.11.2/gcc_64/bin/qmlformat"; elif [ -x "$HOME/Qt/6.11.1/gcc_64/bin/qmlformat" ]; then QMLFORMAT="$HOME/Qt/6.11.1/gcc_64/bin/qmlformat"; elif command -v qmlformat >/dev/null 2>&1; then QMLFORMAT="qmlformat"; elif command -v qmlformat-qt6 >/dev/null 2>&1; then QMLFORMAT="qmlformat-qt6"; else exit 0; fi; exec "${QMLFORMAT}" --inplace "$@"' --
         language: system
         files: ^src/.*\.qml$
         types: [file]
@@ -39,7 +47,7 @@ repos:
       - id: qmllint
         name: QML Linting (qmllint)
         description: Verify QML files against qmllint rules. Prefers $QT_ROOT_DIR/bin to match the pinned Qt version.
-        entry: bash -c 'if [ ! -d build ] && [ ! -d build-release ] && [ ! -d build-relwithdebinfo ]; then exit 0; fi; QMLLINT=""; if [ -n "${QT_ROOT_DIR}" ] && [ -x "${QT_ROOT_DIR}/bin/qmllint" ]; then QMLLINT="${QT_ROOT_DIR}/bin/qmllint"; elif [ -x "$HOME/Qt/6.11.1/gcc_64/bin/qmllint" ]; then QMLLINT="$HOME/Qt/6.11.1/gcc_64/bin/qmllint"; elif command -v qmllint >/dev/null 2>&1; then QMLLINT="qmllint"; else QMLLINT="qmllint-qt6"; fi; exec "${QMLLINT}" -I build -I build-release -I build-relwithdebinfo "$@"' --
+        entry: bash -c 'if [ ! -d build ] && [ ! -d build-release ] && [ ! -d build-relwithdebinfo ]; then exit 0; fi; QMLLINT=""; if [ -n "${QT_ROOT_DIR}" ] && [ -x "${QT_ROOT_DIR}/bin/qmllint" ]; then QMLLINT="${QT_ROOT_DIR}/bin/qmllint"; elif [ -x "$HOME/Qt/6.11.2/gcc_64/bin/qmllint" ]; then QMLLINT="$HOME/Qt/6.11.2/gcc_64/bin/qmllint"; elif [ -x "$HOME/Qt/6.11.1/gcc_64/bin/qmllint" ]; then QMLLINT="$HOME/Qt/6.11.1/gcc_64/bin/qmllint"; elif command -v qmllint >/dev/null 2>&1; then QMLLINT="qmllint"; else QMLLINT="qmllint-qt6"; fi; exec "${QMLLINT}" -I build -I build-release -I build-relwithdebinfo "$@"' --
         language: system
         files: ^src/ui/.*\.qml$
         types: [file]

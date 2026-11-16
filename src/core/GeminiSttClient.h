@@ -26,7 +26,7 @@ public:
     QString customVocabulary() const;
     void setCustomVocabulary(const QString& vocab);
 
-    void setSettingsManager(SettingsManager* settings);
+    void setSettingsManager(SettingsManager* settings) override;
     void loadSettings() override;
 
 signals:

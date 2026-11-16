@@ -95,7 +95,7 @@ jobs:
 
       - name: Check CMake latest release
         run: |
-          PINNED="4.4.3"
+          PINNED="4.3.0"
           LATEST=$(curl -fsSL https://api.github.com/repos/Kitware/CMake/releases/latest | python3 -c "import sys,json; print(json.load(sys.stdin)['tag_name'].lstrip('v'))")
           echo "Pinned : ${PINNED}"
           echo "Latest : ${LATEST}"
@@ -119,7 +119,7 @@ jobs:
 
       - name: Check qtkeychain latest tag
         run: |
-          PINNED="0.17.0"
+          PINNED="0.18.0"
           LATEST=$(curl -fsSL https://api.github.com/repos/frankosterfeld/qtkeychain/releases/latest | python3 -c "import sys,json; print(json.load(sys.stdin)['tag_name'])")
           echo "Pinned : ${PINNED}"
           echo "Latest : ${LATEST}"

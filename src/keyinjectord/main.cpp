@@ -59,10 +59,10 @@ int main(int argc, char* argv[]) {
     int i = 1;
     while (i < argc) {
         if (std::strcmp(argv[i], "--socket-fd") == 0 && i + 1 < argc) {
-            socketFd = std::atoi(argv[i + 1]);
+            socketFd = static_cast<int>(std::strtol(argv[i + 1], nullptr, 10));
             i += 2;
         } else if (std::strcmp(argv[i], "--delay-ms") == 0 && i + 1 < argc) {
-            delayMs = std::atoi(argv[i + 1]);
+            delayMs = static_cast<int>(std::strtol(argv[i + 1], nullptr, 10));
             if (delayMs < 1) {
                 delayMs = 1;
             }
