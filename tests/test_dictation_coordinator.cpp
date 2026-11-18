@@ -831,15 +831,15 @@ void TestDictationCoordinator::testNotificationIntegration() {
 
     m_recorder->setMockHasAudioInputDevice(false);
     QCOMPARE(m_notificationService->m_lastTitle, u"No Microphone Detected"_s);
-    QCOMPARE(m_notificationService->m_lastActions, QStringList({u"settings"_s, u"Audio Settings"_s}));
+    QCOMPARE(m_notificationService->m_lastActions, QStringList({u"audio"_s, u"Audio Settings"_s}));
 
     m_recorder->setMockHasAudioInputDevice(true);
     QVERIFY(m_coordinator->lastError().isEmpty());
 
     QSignalSpy navSpy(m_presenter, &NotificationPresenter::requestNavigate);
-    m_notificationService->onActionInvoked(100, u"settings"_s);
+    m_notificationService->onActionInvoked(100, u"audio"_s);
     QCOMPARE(navSpy.count(), 1);
-    QCOMPARE(navSpy.first().at(0).toString(), u"system"_s);
+    QCOMPARE(navSpy.first().at(0).toString(), u"audio"_s);
 }
 
 void TestDictationCoordinator::testModelControlMethods() {
