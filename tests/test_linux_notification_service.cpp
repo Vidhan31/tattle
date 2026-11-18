@@ -4,6 +4,7 @@
 #include <QTest>
 
 #include "LinuxNotificationService.h"
+#include "SettingsManager.h"
 
 using namespace Qt::StringLiterals;
 
@@ -57,6 +58,7 @@ private slots:
     void testShowCategoryNotificationReplacement();
     void testNotificationClosedClearsCategory();
     void testActionInvokedSignal();
+    void testGranularCategorySuppression();
 };
 
 void TestLinuxNotificationService::initTestCase() {
@@ -64,9 +66,13 @@ void TestLinuxNotificationService::initTestCase() {
     QCoreApplication::setApplicationName(u"QTranscribeTestApp_LinuxNotificationService"_s);
     QSettings settings;
     settings.clear();
+    delete SettingsManager::instance();
+    SettingsManager::setInstance(nullptr);
 }
 
 void TestLinuxNotificationService::cleanupTestCase() {
+    delete SettingsManager::instance();
+    SettingsManager::setInstance(nullptr);
     QSettings settings;
     settings.clear();
 }
@@ -153,6 +159,28 @@ void TestLinuxNotificationService::testActionInvokedSignal() {
     service.onNotificationClosed(id, 1);
     service.onActionInvoked(id, u"settings"_s);
     QCOMPARE(actionSpy.count(), 1);
+}
+
+void TestLinuxNotificationService::testGranularCategorySuppression() {
+    SettingsManager* sm = SettingsManager::instance();
+    auto cfg = sm->notificationConfig();
+    cfg.transcriptionNotificationsEnabled = false;
+    cfg.modelNotificationsEnabled = true;
+    sm->setNotificationConfig(cfg);
+
+    FakeNotificationService service;
+    service.setEnabled(true);
+
+    const uint transId = service.showCategoryNotification(u"transcription"_s, u"Error"_s, u"Msg"_s);
+    QCOMPARE(transId, 0u);
+
+    const uint modelId = service.showCategoryNotification(u"model_download"_s, u"Ready"_s, u"Msg"_s);
+    QCOMPARE(modelId, 101u);
+
+    cfg.transcriptionNotificationsEnabled = true;
+    sm->setNotificationConfig(cfg);
+    const uint transId2 = service.showCategoryNotification(u"transcription"_s, u"Error"_s, u"Msg"_s);
+    QCOMPARE(transId2, 102u);
 }
 
 QTEST_GUILESS_MAIN(TestLinuxNotificationService)

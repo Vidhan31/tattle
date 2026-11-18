@@ -82,7 +82,7 @@ ColumnLayout {
         title: qsTr("No Microphone Detected")
         message: qsTr("Please connect a microphone or check your audio permissions in system settings.")
         actionText: qsTr("Audio Settings")
-        onActionClicked: root.navigateRequested("system")
+        onActionClicked: root.navigateRequested("audio")
     }
 
     StatusBanner {

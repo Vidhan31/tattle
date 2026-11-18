@@ -33,6 +33,11 @@ inline constexpr QStringView kGroqLlmTemperature = u"Groq/LlmTemperature";
 inline constexpr QStringView kAudioSoundEnabled = u"Audio/SoundEnabled";
 
 inline constexpr QStringView kNotificationsEnabled = u"notifications/enabled";
+inline constexpr QStringView kNotificationsTranscription = u"notifications/transcription";
+inline constexpr QStringView kNotificationsModel = u"notifications/model";
+inline constexpr QStringView kNotificationsAudio = u"notifications/audio";
+inline constexpr QStringView kNotificationsFailover = u"notifications/failover";
+inline constexpr QStringView kNotificationsSystem = u"notifications/system";
 
 inline constexpr QStringView kClipboardPreventHistory = u"Clipboard/PreventHistory";
 inline constexpr QStringView kTypingPreInjectionDelayMs = u"Typing/PreInjectionDelayMs";

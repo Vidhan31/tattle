@@ -89,6 +89,55 @@ void LinuxNotificationService::loadSettings() {
     }
 }
 
+bool LinuxNotificationService::isCategoryEnabled(const QString& categoryKey) const {
+    if (!m_enabled) {
+        return false;
+    }
+    if (categoryKey.isEmpty()) {
+        return true;
+    }
+
+    if (m_settingsManager) {
+        const auto& cfg = m_settingsManager->notificationConfig();
+        if (categoryKey == u"transcription"_s || categoryKey == u"recording_limit"_s ||
+            categoryKey == u"llm_fallback"_s) {
+            return cfg.transcriptionNotificationsEnabled;
+        }
+        if (categoryKey == u"model_download"_s || categoryKey == u"model"_s) {
+            return cfg.modelNotificationsEnabled;
+        }
+        if (categoryKey == u"microphone"_s || categoryKey == u"audio"_s) {
+            return cfg.audioNotificationsEnabled;
+        }
+        if (categoryKey == u"failover"_s || categoryKey == u"network"_s) {
+            return cfg.failoverNotificationsEnabled;
+        }
+        if (categoryKey == u"daemon_error"_s || categoryKey == u"system"_s) {
+            return cfg.systemNotificationsEnabled;
+        }
+    } else {
+        const QSettings settings;
+        if (categoryKey == u"transcription"_s || categoryKey == u"recording_limit"_s ||
+            categoryKey == u"llm_fallback"_s) {
+            return settings.value(SettingsKeys::kNotificationsTranscription.toString(), true).toBool();
+        }
+        if (categoryKey == u"model_download"_s || categoryKey == u"model"_s) {
+            return settings.value(SettingsKeys::kNotificationsModel.toString(), true).toBool();
+        }
+        if (categoryKey == u"microphone"_s || categoryKey == u"audio"_s) {
+            return settings.value(SettingsKeys::kNotificationsAudio.toString(), true).toBool();
+        }
+        if (categoryKey == u"failover"_s || categoryKey == u"network"_s) {
+            return settings.value(SettingsKeys::kNotificationsFailover.toString(), true).toBool();
+        }
+        if (categoryKey == u"daemon_error"_s || categoryKey == u"system"_s) {
+            return settings.value(SettingsKeys::kNotificationsSystem.toString(), true).toBool();
+        }
+    }
+
+    return true;
+}
+
 uint LinuxNotificationService::showNotification(const QString& title, const QString& body, Urgency urgency,
                                                 const QString& icon, int timeoutMs, const QStringList& actions,
                                                 uint replacesId) {
@@ -138,6 +187,11 @@ uint LinuxNotificationService::showNotification(const QString& title, const QStr
 uint LinuxNotificationService::showCategoryNotification(const QString& categoryKey, const QString& title,
                                                         const QString& body, Urgency urgency, const QString& icon,
                                                         int timeoutMs, const QStringList& actions) {
+    if (!isCategoryEnabled(categoryKey)) {
+        qCDebug(lcSpeech) << "LinuxNotificationService: Category notification suppressed by user setting for category:"
+                          << categoryKey << "Title:" << title;
+        return 0;
+    }
     const uint replacesId = m_categoryIds.value(categoryKey, 0U);
     const uint newId = showNotification(title, body, urgency, icon, timeoutMs, actions, replacesId);
     if (newId > 0) {

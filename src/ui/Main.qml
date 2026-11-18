@@ -28,17 +28,30 @@ T.ApplicationWindow {
             return 0;
         case "history":
             return 1;
+        case "engine":
+            return 2;
         case "cloud":
         case "online":
-            return 2;
-        case "offline":
             return 3;
-        case "system":
+        case "offline":
             return 4;
-        case "about":
+        case "audio":
+        case "recording":
+        case "mic":
             return 5;
-        case "license":
+        case "shortcuts":
+        case "shortcut":
+        case "hotkey":
             return 6;
+        case "notifications":
+        case "notification":
+            return 7;
+        case "system":
+        case "advanced":
+        case "general":
+            return 8;
+        case "about":
+            return 9;
         default:
             return 0;
         }
@@ -46,11 +59,36 @@ T.ApplicationWindow {
 
     function normalizeSectionId(target: string): string {
         switch (target) {
+        case "engine":
+        case "dictation":
+            return "engine";
         case "apiKey":
         case "enhancement":
+        case "cloud":
             return "cloud";
-        case "dictation":
-            return DaemonClient.activeBackend === DaemonClient.Cloud ? "cloud" : "offline";
+        case "offline":
+            return "offline";
+        case "audio":
+        case "recording":
+        case "mic":
+            return "audio";
+        case "shortcuts":
+        case "shortcut":
+        case "hotkey":
+            return "shortcuts";
+        case "notifications":
+        case "notification":
+            return "notifications";
+        case "system":
+        case "advanced":
+        case "general":
+            return "system";
+        case "dictate":
+            return "dictate";
+        case "history":
+            return "history";
+        case "about":
+            return "about";
         default:
             return target;
         }
@@ -102,7 +140,7 @@ T.ApplicationWindow {
                     root.currentSectionId = "cloud";
                 }
             } else {
-                if (root.currentSectionId === "cloud" || root.currentSectionId === "online") {
+                if (root.currentSectionId === "cloud") {
                     root.currentSectionId = "offline";
                 }
             }
@@ -270,6 +308,20 @@ T.ApplicationWindow {
                 }
 
                 ScrollView {
+                    id: engineScrollView
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    clip: true
+
+                    EngineSettingsPage {
+                        width: engineScrollView.availableWidth
+                        onNavigateRequested: target => {
+                            root.navigateToSection(target);
+                        }
+                    }
+                }
+
+                ScrollView {
                     id: cloudScrollView
                     Layout.fillWidth: true
                     Layout.fillHeight: true
@@ -292,6 +344,39 @@ T.ApplicationWindow {
                 }
 
                 ScrollView {
+                    id: audioScrollView
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    clip: true
+
+                    AudioSettingsPage {
+                        width: audioScrollView.availableWidth
+                    }
+                }
+
+                ScrollView {
+                    id: shortcutsScrollView
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    clip: true
+
+                    ShortcutsSettingsPage {
+                        width: shortcutsScrollView.availableWidth
+                    }
+                }
+
+                ScrollView {
+                    id: notificationsScrollView
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    clip: true
+
+                    NotificationSettingsPage {
+                        width: notificationsScrollView.availableWidth
+                    }
+                }
+
+                ScrollView {
                     id: systemScrollView
                     Layout.fillWidth: true
                     Layout.fillHeight: true
@@ -303,11 +388,6 @@ T.ApplicationWindow {
                 }
 
                 CreditsView {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                }
-
-                LicenseView {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                 }

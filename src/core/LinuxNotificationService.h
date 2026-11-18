@@ -31,6 +31,8 @@ public:
 
     void loadSettings();
 
+    bool isCategoryEnabled(const QString& categoryKey) const;
+
     Q_INVOKABLE virtual uint showNotification(const QString& title, const QString& body,
                                               Urgency urgency = Urgency::Normal,
                                               const QString& icon = QStringLiteral("dialog-information"),

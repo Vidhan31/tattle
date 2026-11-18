@@ -24,7 +24,7 @@ Item {
             spacing: 4
 
             StyledText {
-                text: qsTr("Cloud Dictation")
+                text: qsTr("Cloud Transcription")
                 variant: "heading"
             }
 
@@ -33,10 +33,6 @@ Item {
                 variant: "caption"
                 colorRole: "secondary"
             }
-        }
-
-        EngineModeSwitcherCard {
-            Layout.fillWidth: true
         }
 
         StyledCard {

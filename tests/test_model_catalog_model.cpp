@@ -53,6 +53,8 @@ private slots:
     void testSelectionUpdatesInPlace();
     void testStructuralChangeResetsModel();
     void testIdenticalSnapshotIsSilent();
+    void testPrefixCountsAndMatching();
+    void testRevisionIncrementsOnUpdate();
 };
 
 void TestModelCatalogModel::initTestCase() {
@@ -153,6 +155,60 @@ void TestModelCatalogModel::testIdenticalSnapshotIsSilent() {
     QCOMPARE(resetSpy.count(), 0);
     QCOMPARE(dataSpy.count(), 0);
     QCOMPARE(progressSpy.count(), 0);
+}
+
+void TestModelCatalogModel::testPrefixCountsAndMatching() {
+    ModelCatalogModel model;
+    QJsonArray models = {
+        catalogEntry(u"whisper-tiny"_s, u"Whisper Tiny (Multilingual)"_s, true, true, false, 0.0, 0),
+        catalogEntry(u"whisper-base"_s, u"Whisper Base (Multilingual)"_s, false, false, false, 0.0, 0),
+        catalogEntry(u"whisper-small"_s, u"Whisper Small (Multilingual)"_s, false, false, false, 0.0, 0),
+        catalogEntry(u"moonshine-tiny"_s, u"Moonshine Tiny (English)"_s, false, false, false, 0.0, 0),
+        catalogEntry(u"moonshine-base"_s, u"Moonshine Base (English)"_s, true, false, false, 0.0, 0),
+        catalogEntry(u"parakeet-tdt"_s, u"Parakeet TDT (Multilingual)"_s, false, false, false, 0.0, 0),
+    };
+    model.applyCatalogJson(catalogJson(models));
+
+    // Whisper counts
+    QCOMPARE(model.totalCountForPrefix(u"whisper-"_s), 3);
+    QCOMPARE(model.installedCountForPrefix(u"whisper-"_s), 1);
+    QCOMPARE(model.availableCountForPrefix(u"whisper-"_s), 2);
+
+    // Moonshine counts
+    QCOMPARE(model.totalCountForPrefix(u"moonshine-"_s), 2);
+    QCOMPARE(model.installedCountForPrefix(u"moonshine-"_s), 1);
+    QCOMPARE(model.availableCountForPrefix(u"moonshine-"_s), 1);
+
+    // Parakeet counts
+    QCOMPARE(model.totalCountForPrefix(u"parakeet-"_s), 1);
+    QCOMPARE(model.installedCountForPrefix(u"parakeet-"_s), 0);
+    QCOMPARE(model.availableCountForPrefix(u"parakeet-"_s), 1);
+
+    // Matching with status filter
+    QCOMPARE(model.matchingCount(u"whisper-"_s, u"all"_s, QString()), 3);
+    QCOMPARE(model.matchingCount(u"whisper-"_s, u"installed"_s, QString()), 1);
+    QCOMPARE(model.matchingCount(u"whisper-"_s, u"available"_s, QString()), 2);
+
+    // Matching with search filter
+    QCOMPARE(model.matchingCount(u"whisper-"_s, u"all"_s, u"tiny"_s), 1);
+    QCOMPARE(model.matchingCount(u"moonshine-"_s, u"all"_s, u"tiny"_s), 1);
+    QCOMPARE(model.matchingCount(u"parakeet-"_s, u"all"_s, u"tiny"_s), 0);
+}
+
+void TestModelCatalogModel::testRevisionIncrementsOnUpdate() {
+    ModelCatalogModel model;
+    QSignalSpy revisionSpy(&model, &ModelCatalogModel::revisionChanged);
+    const int initialRev = model.revision();
+
+    model.applyCatalogJson(catalogJson(initialCatalog()));
+    QCOMPARE(model.revision(), initialRev + 1);
+    QCOMPARE(revisionSpy.count(), 1);
+
+    QJsonArray updated = initialCatalog();
+    updated[0] = catalogEntry(u"tiny.en"_s, u"Tiny"_s, false, true, true, 0.5, 500);
+    model.applyCatalogJson(catalogJson(updated));
+    QCOMPARE(model.revision(), initialRev + 2);
+    QCOMPARE(revisionSpy.count(), 2);
 }
 
 QTEST_MAIN(TestModelCatalogModel)

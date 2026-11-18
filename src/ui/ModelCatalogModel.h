@@ -27,6 +27,7 @@ class ModelCatalogModel : public QAbstractListModel {
     Q_PROPERTY(QString downloadBytesFormatted READ downloadBytesFormatted NOTIFY downloadProgressChanged FINAL)
     Q_PROPERTY(QString lastError READ lastError NOTIFY lastErrorChanged FINAL)
     Q_PROPERTY(QString availableDiskSpaceFormatted READ availableDiskSpaceFormatted NOTIFY diskSpaceChanged FINAL)
+    Q_PROPERTY(int revision READ revision NOTIFY revisionChanged FINAL)
 
 public:
     // NOLINTNEXTLINE(performance-enum-size) QML-registered enums need int backing for qmlcachegen AOT
@@ -78,6 +79,13 @@ public:
     [[nodiscard]] static QString downloadBytesFormatted();
     [[nodiscard]] static QString lastError();
     [[nodiscard]] static QString availableDiskSpaceFormatted();
+    [[nodiscard]] int revision() const noexcept { return m_revision; }
+
+    [[nodiscard]] Q_INVOKABLE int totalCountForPrefix(const QString& prefix) const;
+    [[nodiscard]] Q_INVOKABLE int installedCountForPrefix(const QString& prefix) const;
+    [[nodiscard]] Q_INVOKABLE int availableCountForPrefix(const QString& prefix) const;
+    [[nodiscard]] Q_INVOKABLE int matchingCount(const QString& prefix, const QString& statusFilter,
+                                                const QString& searchFilter) const;
 
     Q_INVOKABLE static void setSelectedModelId(const QString& id);
     Q_INVOKABLE static void startDownload(const QString& modelId);
@@ -95,6 +103,7 @@ signals:
     void downloadProgressChanged();
     void lastErrorChanged();
     void diskSpaceChanged();
+    void revisionChanged();
 
 private:
     struct CatalogItem {
@@ -126,6 +135,7 @@ private:
 
     static inline ModelCatalogModel* s_instance = nullptr;
     QList<CatalogItem> m_items;
+    int m_revision = 0;
 
     QString m_emittedModelsDirectory;
     QString m_emittedDownloadBytes;

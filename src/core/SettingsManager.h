@@ -68,6 +68,11 @@ public:
 
     struct NotificationConfig {
         bool notificationsEnabled = true;
+        bool transcriptionNotificationsEnabled = true;
+        bool modelNotificationsEnabled = true;
+        bool audioNotificationsEnabled = true;
+        bool failoverNotificationsEnabled = true;
+        bool systemNotificationsEnabled = true;
         bool operator==(const NotificationConfig&) const = default;
     };
 

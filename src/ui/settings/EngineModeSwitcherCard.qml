@@ -83,13 +83,6 @@ StyledCard {
                             colorRole: "secondary"
                         }
                     }
-
-                    StateBadge {
-                        text: qsTr("Active")
-                        statusType: "accent"
-                        visible: cloudOptionCard.isSelected
-                        showDot: true
-                    }
                 }
 
                 StyledDivider {
@@ -199,13 +192,6 @@ StyledCard {
                             variant: "caption"
                             colorRole: "secondary"
                         }
-                    }
-
-                    StateBadge {
-                        text: qsTr("Active")
-                        statusType: "accent"
-                        visible: offlineOptionCard.isSelected
-                        showDot: true
                     }
                 }
 
