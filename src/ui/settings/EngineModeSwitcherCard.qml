@@ -7,9 +7,6 @@ import "../controls"
 StyledCard {
     id: root
 
-    title: qsTr("Transcription Mode")
-    description: qsTr("Choose between fast cloud transcription and private on-device processing")
-
     GridLayout {
         Layout.fillWidth: true
         columns: root.width >= 560 ? 2 : 1
@@ -61,7 +58,7 @@ StyledCard {
 
                         StyledIcon {
                             anchors.centerIn: parent
-                            source: "qrc:/qt/qml/Tattle/assets/icons/sparkles.svg"
+                            source: "qrc:/qt/qml/Tattle/assets/icons/cloud.svg"
                             size: 16
                             color: cloudOptionCard.isSelected ? Theme.accentColor : Theme.textSecondary
                         }
@@ -78,7 +75,7 @@ StyledCard {
                         }
 
                         StyledText {
-                            text: qsTr("%1 Transcription").arg(CloudProviderModel.activeProviderName)
+                            text: qsTr("Cloud Speech Service")
                             variant: "caption"
                             colorRole: "secondary"
                         }
@@ -94,7 +91,7 @@ StyledCard {
                     spacing: 4
 
                     StyledText {
-                        text: qsTr("• Ultra-fast cloud speech recognition (<1s)")
+                        text: qsTr("• Fast cloud speech recognition")
                         variant: "caption"
                         colorRole: "secondary"
                     }
@@ -106,7 +103,7 @@ StyledCard {
                     }
 
                     StyledText {
-                        text: qsTr("• Multiple provider options (Groq & Gemini)")
+                        text: qsTr("• Multiple provider options")
                         variant: "caption"
                         colorRole: "secondary"
                     }
@@ -246,7 +243,8 @@ StyledCard {
         Layout.fillWidth: true
         title: qsTr("Automatic Offline Switching")
         description: qsTr("Automatically switch to offline speech model when internet connection is lost")
-        checked: DaemonClient.autoSwitchOffline
+        enabled: ModelCatalog.hasDownloadedModels
+        checked: DaemonClient.autoSwitchOffline && ModelCatalog.hasDownloadedModels
         onToggled: DaemonClient.autoSwitchOffline = checked
     }
 }

@@ -15,20 +15,34 @@ Item {
 
     Layout.fillWidth: true
     implicitHeight: Math.max(Theme.switchTrackHeight + Theme.spacingSm, switchRow.implicitHeight + Theme.spacingSm)
+    opacity: root.enabled ? 1.0 : 0.55
 
-    activeFocusOnTab: true
+    Behavior on opacity {
+        NumberAnimation {
+            duration: Theme.animFast
+            easing.type: Easing.OutCubic
+        }
+    }
+
+    activeFocusOnTab: root.enabled
     Accessible.role: Accessible.CheckBox
     Accessible.name: root.title
     Accessible.description: root.description
     Accessible.checked: root.checked
 
     Keys.onSpacePressed: event => {
+        if (!root.enabled) {
+            return;
+        }
         root.checked = !root.checked;
         root.toggled();
         event.accepted = true;
     }
 
     Keys.onReturnPressed: event => {
+        if (!root.enabled) {
+            return;
+        }
         root.checked = !root.checked;
         root.toggled();
         event.accepted = true;
@@ -104,10 +118,14 @@ Item {
     MouseArea {
         id: switchArea
         anchors.fill: parent
-        cursorShape: Qt.PointingHandCursor
-        hoverEnabled: true
+        enabled: root.enabled
+        cursorShape: root.enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+        hoverEnabled: root.enabled
 
         onClicked: {
+            if (!root.enabled) {
+                return;
+            }
             root.forceActiveFocus();
             root.checked = !root.checked;
             root.toggled();
