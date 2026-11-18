@@ -217,7 +217,7 @@ void DictationCoordinator::setSttEngine(AbstractSttClient* engine) {
                     m_pendingRawText.clear();
                     if (!rawText.isEmpty()) {
                         completeTranscription(rawText);
-                        setStatusMessage(tr("Ready (Used raw text)"));
+                        setStatusMessage(tr("Ready (Used original text)"));
                     } else {
                         cancelDictation();
                     }
@@ -387,7 +387,7 @@ void DictationCoordinator::setActiveBackend(TranscriptionBackend backend, bool p
                 m_pendingRawText.clear();
                 if (!rawText.isEmpty()) {
                     completeTranscription(rawText);
-                    setStatusMessage(tr("Ready (Used raw text)"));
+                    setStatusMessage(tr("Ready (Used original text)"));
                 } else {
                     cancelDictation();
                 }
@@ -808,7 +808,7 @@ void DictationCoordinator::onSttTranscriptionReady(const QString& text) {
         qCDebug(lcSpeech) << "DictationCoordinator: Passing transcription to LLM post-processing...";
         m_pendingRawText = text;
         setState(DictationState::Enhancing);
-        setStatusMessage(tr("Enhancing text with AI…"));
+        setStatusMessage(tr("Cleaning up text…"));
         m_llmClient->processText(text);
         updateCoordinatorHealth();
         return;
@@ -831,7 +831,7 @@ void DictationCoordinator::onLlmError(const QString& error, const QString& fallb
     m_pendingRawText.clear();
     if (!rawToUse.isEmpty()) {
         completeTranscription(rawToUse);
-        setStatusMessage(tr("Ready (Used raw speech text)"));
+        setStatusMessage(tr("Ready (Used original text)"));
     } else {
         setState(DictationState::Idle);
         setStatusMessage(tr("Ready"));

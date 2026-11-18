@@ -35,7 +35,6 @@ qt_add_qml_module(tattle_ui
         CloudProviderModel.cpp
         NavigationModel.h
         NavigationModel.cpp
-        LicenseHelper.h
         ColorUtils.h
         ColorUtils.cpp
     QML_FILES
@@ -43,10 +42,10 @@ qt_add_qml_module(tattle_ui
         SpeechPanel.qml
         SystemDiagnosticsColumn.qml
         RecordingControl.qml
+        AudioWaveformVisualizer.qml
         SystemStatusFooter.qml
         HistoryView.qml
         CreditsView.qml
-        LicenseView.qml
         Theme.qml
         StateBadge.qml
         StatusBanner.qml
@@ -65,19 +64,16 @@ qt_add_qml_module(tattle_ui
         settings/EngineModeSwitcherCard.qml
         settings/ApiKeyConfigCard.qml
         settings/CustomVocabularyCard.qml
+        settings/EngineSettingsPage.qml
         settings/CloudSettingsPage.qml
         settings/providers/GroqProviderSettings.qml
         settings/providers/GeminiProviderSettings.qml
         settings/providers/MetaMusaProviderSettings.qml
         settings/OfflineSettingsPage.qml
+        settings/AudioSettingsPage.qml
+        settings/ShortcutsSettingsPage.qml
+        settings/NotificationSettingsPage.qml
         settings/SystemSettingsPage.qml
-)
-
-qt_add_resources(tattle_ui "tattle_license"
-    PREFIX "/qt/qml/Tattle/license"
-    BASE "${CMAKE_SOURCE_DIR}"
-    FILES
-        ${CMAKE_SOURCE_DIR}/LICENSE
 )
 
 qt_add_resources(tattle_ui "tattle_assets"
@@ -96,6 +92,7 @@ qt_add_resources(tattle_ui "tattle_assets"
         ${CMAKE_SOURCE_DIR}/assets/icons/spinner.svg
         ${CMAKE_SOURCE_DIR}/assets/icons/keyboard.svg
         ${CMAKE_SOURCE_DIR}/assets/icons/bolt.svg
+        ${CMAKE_SOURCE_DIR}/assets/icons/bell.svg
         ${CMAKE_SOURCE_DIR}/assets/icons/copy.svg
         ${CMAKE_SOURCE_DIR}/assets/icons/trash.svg
         ${CMAKE_SOURCE_DIR}/assets/icons/check.svg
@@ -103,8 +100,10 @@ qt_add_resources(tattle_ui "tattle_assets"
         ${CMAKE_SOURCE_DIR}/assets/icons/key.svg
         ${CMAKE_SOURCE_DIR}/assets/icons/speech.svg
         ${CMAKE_SOURCE_DIR}/assets/icons/sparkles.svg
+        ${CMAKE_SOURCE_DIR}/assets/icons/cloud.svg
+        ${CMAKE_SOURCE_DIR}/assets/icons/cpu.svg
+        ${CMAKE_SOURCE_DIR}/assets/icons/sliders.svg
         ${CMAKE_SOURCE_DIR}/assets/icons/info.svg
-        ${CMAKE_SOURCE_DIR}/assets/icons/license.svg
         ${CMAKE_SOURCE_DIR}/assets/icons/save.svg
         ${CMAKE_SOURCE_DIR}/assets/icons/refresh.svg
 )

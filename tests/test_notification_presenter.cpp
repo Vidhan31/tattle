@@ -18,7 +18,7 @@ class FakeNotificationBackend : public LinuxNotificationService {
 public:
     explicit FakeNotificationBackend(QObject* parent = nullptr)
         : LinuxNotificationService(parent) {
-        m_activeNotificationIds = {101, 102, 103, 104, 105};
+        m_activeNotificationIds = {101, 102, 103, 104, 105, 106};
     }
 
     uint showNotification(const QString& title, const QString& body, Urgency urgency, const QString& icon,
@@ -161,7 +161,7 @@ void TestNotificationPresenter::testLlmFallbackNotification() {
 
     QCOMPARE(m_service->m_callCount, 1);
     QCOMPARE(m_service->m_lastCategory, u"llm_fallback"_s);
-    QCOMPARE(m_service->m_lastTitle, u"AI Formatting Unavailable"_s);
+    QCOMPARE(m_service->m_lastTitle, u"Text Cleanup Unavailable"_s);
     QVERIFY(m_service->m_lastBody.contains(u"Timeout error"_s));
     QCOMPARE(m_service->m_lastUrgency, LinuxNotificationService::Urgency::Low);
 }
@@ -179,6 +179,7 @@ void TestNotificationPresenter::testMicrophoneDisconnectedNotification() {
     QCOMPARE(m_service->m_lastTitle, u"Microphone Disconnected"_s);
     QVERIFY(m_service->m_lastBody.contains(u"JBL Headset"_s));
     QVERIFY(m_service->m_lastBody.contains(u"Webcam Mic"_s));
+    QCOMPARE(m_service->m_lastActions, (QStringList{u"audio"_s, u"Audio Settings"_s}));
 }
 
 void TestNotificationPresenter::testNoMicrophoneNotificationAndClear() {
@@ -187,6 +188,7 @@ void TestNotificationPresenter::testNoMicrophoneNotificationAndClear() {
     QCOMPARE(m_service->m_callCount, 1);
     QCOMPARE(m_service->m_lastCategory, u"microphone"_s);
     QCOMPARE(m_service->m_lastTitle, u"No Microphone Detected"_s);
+    QCOMPARE(m_service->m_lastActions, (QStringList{u"audio"_s, u"Audio Settings"_s}));
 
     m_recorder->setMockHasAudioInputDevice(true);
     QVERIFY(m_service->m_clearedCategories.contains(u"microphone"_s));
@@ -226,7 +228,11 @@ void TestNotificationPresenter::testActionInvokedRouting() {
     QCOMPARE(navSpy.count(), 3);
     QCOMPARE(navSpy.last().at(0).toString(), u"offline"_s);
 
-    m_service->onActionInvoked(105, u"quit"_s);
+    m_service->onActionInvoked(105, u"audio"_s);
+    QCOMPARE(navSpy.count(), 4);
+    QCOMPARE(navSpy.last().at(0).toString(), u"audio"_s);
+
+    m_service->onActionInvoked(106, u"quit"_s);
     QCOMPARE(quitSpy.count(), 1);
 }
 

@@ -92,7 +92,7 @@ T.Dialog {
 
                     StyledText {
                         text: qsTr(
-                                  "Tattle uses clipboard paste injection simulating Ctrl+Shift+V to insert transcribed speech directly into your active applications on Wayland.")
+                                  "Tattle pastes transcribed speech directly into your active applications using Ctrl+Shift+V on Wayland.")
                         variant: "body"
                         wrapMode: Text.WordWrap
                         Layout.fillWidth: true
@@ -141,7 +141,7 @@ T.Dialog {
 
                                     StyledText {
                                         text: qsTr(
-                                                  "Copied plain text is automatically backed up and restored immediately after dictation paste completes.")
+                                                  "Copied plain text is automatically saved and restored immediately after dictation completes.")
                                         variant: "caption"
                                         colorRole: "secondary"
                                         wrapMode: Text.WordWrap
@@ -185,7 +185,7 @@ T.Dialog {
 
                                     StyledText {
                                         text: qsTr(
-                                                  "Non-text clipboard formats (such as images, screenshots, or copied files) cannot be restored and will be overwritten.")
+                                                  "Images, screenshots, and copied files on your clipboard cannot be restored and will be overwritten.")
                                         variant: "caption"
                                         colorRole: "secondary"
                                         wrapMode: Text.WordWrap
@@ -220,7 +220,7 @@ T.Dialog {
                                     spacing: 2
 
                                     StyledText {
-                                        text: qsTr("Ctrl+Shift+V Application Compatibility")
+                                        text: qsTr("Ctrl+Shift+V App Compatibility")
                                         customWeight: Font.DemiBold
                                         variant: "body"
                                         customColor: Theme.accentColor
@@ -229,7 +229,7 @@ T.Dialog {
 
                                     StyledText {
                                         text: qsTr(
-                                                  "Text is injected by simulating the Ctrl+Shift+V shortcut (standard for terminals, code editors, and plain-text pasting). Please ensure your active application supports Ctrl+Shift+V for pasting.")
+                                                  "Text is pasted by simulating the Ctrl+Shift+V shortcut (standard for terminals, code editors, and plain-text pasting). Please ensure your active application supports Ctrl+Shift+V for pasting.")
                                         variant: "caption"
                                         colorRole: "secondary"
                                         wrapMode: Text.WordWrap
@@ -287,7 +287,7 @@ T.Dialog {
 
                     StyledText {
                         text: qsTr(
-                                  "Before transcribing, please paste and save any important copied media files, or install a desktop clipboard manager extension.")
+                                  "Before dictating, please paste and save any important copied media files, or install a desktop clipboard manager extension.")
                         variant: "caption"
                         colorRole: "secondary"
                         wrapMode: Text.WordWrap

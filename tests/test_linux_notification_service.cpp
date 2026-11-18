@@ -4,6 +4,7 @@
 #include <QTest>
 
 #include "LinuxNotificationService.h"
+#include "SettingsManager.h"
 
 using namespace Qt::StringLiterals;
 
@@ -57,6 +58,7 @@ private slots:
     void testShowCategoryNotificationReplacement();
     void testNotificationClosedClearsCategory();
     void testActionInvokedSignal();
+    void testGranularCategorySuppression();
 };
 
 void TestLinuxNotificationService::initTestCase() {
@@ -64,9 +66,13 @@ void TestLinuxNotificationService::initTestCase() {
     QCoreApplication::setApplicationName(u"QTranscribeTestApp_LinuxNotificationService"_s);
     QSettings settings;
     settings.clear();
+    delete SettingsManager::instance();
+    SettingsManager::setInstance(nullptr);
 }
 
 void TestLinuxNotificationService::cleanupTestCase() {
+    delete SettingsManager::instance();
+    SettingsManager::setInstance(nullptr);
     QSettings settings;
     settings.clear();
 }
@@ -153,6 +159,40 @@ void TestLinuxNotificationService::testActionInvokedSignal() {
     service.onNotificationClosed(id, 1);
     service.onActionInvoked(id, u"settings"_s);
     QCOMPARE(actionSpy.count(), 1);
+}
+
+void TestLinuxNotificationService::testGranularCategorySuppression() {
+    SettingsManager* sm = SettingsManager::instance();
+    FakeNotificationService service;
+    service.setEnabled(true);
+
+    sm->setSetting(SettingsKeys::kNotificationsTranscription.toString(), false);
+    sm->setSetting(SettingsKeys::kNotificationsModel.toString(), true);
+
+    const uint transId = service.showCategoryNotification(u"transcription"_s, u"Error"_s, u"Msg"_s);
+    QCOMPARE(transId, 0u);
+
+    const uint modelId = service.showCategoryNotification(u"model_download"_s, u"Ready"_s, u"Msg"_s);
+    QCOMPARE(modelId, 101u);
+
+    sm->setSetting(SettingsKeys::kNotificationsTranscription.toString(), true);
+    const uint transId2 = service.showCategoryNotification(u"transcription"_s, u"Error"_s, u"Msg"_s);
+    QCOMPARE(transId2, 102u);
+
+    sm->setSetting(SettingsKeys::kNotificationsAudio.toString(), false);
+    QCOMPARE(service.showCategoryNotification(u"audio"_s, u"Mic"_s, u"Msg"_s), 0u);
+    sm->setSetting(SettingsKeys::kNotificationsAudio.toString(), true);
+    QCOMPARE(service.showCategoryNotification(u"audio"_s, u"Mic"_s, u"Msg"_s), 103u);
+
+    sm->setSetting(SettingsKeys::kNotificationsFailover.toString(), false);
+    QCOMPARE(service.showCategoryNotification(u"failover"_s, u"Net"_s, u"Msg"_s), 0u);
+    sm->setSetting(SettingsKeys::kNotificationsFailover.toString(), true);
+    QCOMPARE(service.showCategoryNotification(u"failover"_s, u"Net"_s, u"Msg"_s), 104u);
+
+    sm->setSetting(SettingsKeys::kNotificationsSystem.toString(), false);
+    QCOMPARE(service.showCategoryNotification(u"system"_s, u"Sys"_s, u"Msg"_s), 0u);
+    sm->setSetting(SettingsKeys::kNotificationsSystem.toString(), true);
+    QCOMPARE(service.showCategoryNotification(u"system"_s, u"Sys"_s, u"Msg"_s), 105u);
 }
 
 QTEST_GUILESS_MAIN(TestLinuxNotificationService)

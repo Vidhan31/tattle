@@ -189,6 +189,62 @@ QString ModelCatalogModel::availableDiskSpaceFormatted() {
     return {};
 }
 
+int ModelCatalogModel::totalCountForPrefix(const QString& prefix) const {
+    int count = 0;
+    for (const auto& item : m_items) {
+        if (item.id.startsWith(prefix)) {
+            ++count;
+        }
+    }
+    return count;
+}
+
+int ModelCatalogModel::installedCountForPrefix(const QString& prefix) const {
+    int count = 0;
+    for (const auto& item : m_items) {
+        if (item.id.startsWith(prefix) && item.isInstalled) {
+            ++count;
+        }
+    }
+    return count;
+}
+
+int ModelCatalogModel::availableCountForPrefix(const QString& prefix) const {
+    int count = 0;
+    for (const auto& item : m_items) {
+        if (item.id.startsWith(prefix) && !item.isInstalled) {
+            ++count;
+        }
+    }
+    return count;
+}
+
+int ModelCatalogModel::matchingCount(const QString& prefix, const QString& statusFilter,
+                                     const QString& searchFilter) const {
+    const QString query = searchFilter.trimmed().toLower();
+    int count = 0;
+    for (const auto& item : m_items) {
+        if (!item.id.startsWith(prefix)) {
+            continue;
+        }
+        if (statusFilter == u"installed"_s && !item.isInstalled) {
+            continue;
+        }
+        if (statusFilter == u"available"_s && item.isInstalled) {
+            continue;
+        }
+        if (!query.isEmpty()) {
+            const bool matches = item.name.toLower().contains(query) || item.fileName.toLower().contains(query) ||
+                                 item.description.toLower().contains(query) || item.id.toLower().contains(query);
+            if (!matches) {
+                continue;
+            }
+        }
+        ++count;
+    }
+    return count;
+}
+
 void ModelCatalogModel::setSelectedModelId(const QString& id) {
     if (auto* client = DaemonClient::instance()) {
         client->selectModel(id);
@@ -327,6 +383,9 @@ void ModelCatalogModel::applyCatalogJson(const QString& json) {
         m_emittedDiskSpace = diskSpace;
         emit diskSpaceChanged();
     }
+
+    ++m_revision;
+    emit revisionChanged();
 }
 
 void ModelCatalogModel::applyItems(const QList<CatalogItem>& items) {

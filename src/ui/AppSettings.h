@@ -40,6 +40,11 @@ class AppSettings : public QObject {
 
     Q_PROPERTY(bool soundEnabled READ soundEnabled WRITE setSoundEnabled NOTIFY soundEnabledChanged FINAL)
     Q_PROPERTY(bool notificationsEnabled READ notificationsEnabled WRITE setNotificationsEnabled NOTIFY notificationsEnabledChanged FINAL)
+    Q_PROPERTY(bool notificationsTranscriptionEnabled READ notificationsTranscriptionEnabled WRITE setNotificationsTranscriptionEnabled NOTIFY notificationsTranscriptionEnabledChanged FINAL)
+    Q_PROPERTY(bool notificationsModelEnabled READ notificationsModelEnabled WRITE setNotificationsModelEnabled NOTIFY notificationsModelEnabledChanged FINAL)
+    Q_PROPERTY(bool notificationsAudioEnabled READ notificationsAudioEnabled WRITE setNotificationsAudioEnabled NOTIFY notificationsAudioEnabledChanged FINAL)
+    Q_PROPERTY(bool notificationsFailoverEnabled READ notificationsFailoverEnabled WRITE setNotificationsFailoverEnabled NOTIFY notificationsFailoverEnabledChanged FINAL)
+    Q_PROPERTY(bool notificationsSystemEnabled READ notificationsSystemEnabled WRITE setNotificationsSystemEnabled NOTIFY notificationsSystemEnabledChanged FINAL)
 
 public:
     explicit AppSettings(QObject* parent = nullptr);
@@ -86,6 +91,16 @@ public:
     void setSoundEnabled(bool enabled);
     [[nodiscard]] bool notificationsEnabled() const;
     void setNotificationsEnabled(bool enabled);
+    [[nodiscard]] bool notificationsTranscriptionEnabled() const;
+    void setNotificationsTranscriptionEnabled(bool enabled);
+    [[nodiscard]] bool notificationsModelEnabled() const;
+    void setNotificationsModelEnabled(bool enabled);
+    [[nodiscard]] bool notificationsAudioEnabled() const;
+    void setNotificationsAudioEnabled(bool enabled);
+    [[nodiscard]] bool notificationsFailoverEnabled() const;
+    void setNotificationsFailoverEnabled(bool enabled);
+    [[nodiscard]] bool notificationsSystemEnabled() const;
+    void setNotificationsSystemEnabled(bool enabled);
 
     Q_INVOKABLE [[nodiscard]] QString systemPromptForPreset(const QString& preset) const;
 
@@ -108,6 +123,11 @@ signals:
     void llmTemperatureChanged();
     void soundEnabledChanged();
     void notificationsEnabledChanged();
+    void notificationsTranscriptionEnabledChanged();
+    void notificationsModelEnabledChanged();
+    void notificationsAudioEnabledChanged();
+    void notificationsFailoverEnabledChanged();
+    void notificationsSystemEnabledChanged();
 
 private:
     // NOLINTNEXTLINE(performance-enum-size) small private enum, no QML exposure
@@ -142,4 +162,9 @@ private:
     bool m_llmEnabled = false;
     bool m_soundEnabled = true;
     bool m_notificationsEnabled = true;
+    bool m_notificationsTranscriptionEnabled = true;
+    bool m_notificationsModelEnabled = true;
+    bool m_notificationsAudioEnabled = true;
+    bool m_notificationsFailoverEnabled = true;
+    bool m_notificationsSystemEnabled = true;
 };

@@ -131,6 +131,36 @@ AppSettings::AppSettings(QObject* parent)
                     m_notificationsEnabled = val;
                     emit notificationsEnabledChanged();
                 }
+            } else if (key == SettingsKeys::kNotificationsTranscription) {
+                const bool val = value.toBool();
+                if (m_notificationsTranscriptionEnabled != val) {
+                    m_notificationsTranscriptionEnabled = val;
+                    emit notificationsTranscriptionEnabledChanged();
+                }
+            } else if (key == SettingsKeys::kNotificationsModel) {
+                const bool val = value.toBool();
+                if (m_notificationsModelEnabled != val) {
+                    m_notificationsModelEnabled = val;
+                    emit notificationsModelEnabledChanged();
+                }
+            } else if (key == SettingsKeys::kNotificationsAudio) {
+                const bool val = value.toBool();
+                if (m_notificationsAudioEnabled != val) {
+                    m_notificationsAudioEnabled = val;
+                    emit notificationsAudioEnabledChanged();
+                }
+            } else if (key == SettingsKeys::kNotificationsFailover) {
+                const bool val = value.toBool();
+                if (m_notificationsFailoverEnabled != val) {
+                    m_notificationsFailoverEnabled = val;
+                    emit notificationsFailoverEnabledChanged();
+                }
+            } else if (key == SettingsKeys::kNotificationsSystem) {
+                const bool val = value.toBool();
+                if (m_notificationsSystemEnabled != val) {
+                    m_notificationsSystemEnabled = val;
+                    emit notificationsSystemEnabledChanged();
+                }
             }
         });
     }
@@ -179,6 +209,11 @@ void AppSettings::loadPersistedValues() {
 
     m_soundEnabled = getVal(SettingsKeys::kAudioSoundEnabled, true).toBool();
     m_notificationsEnabled = getVal(SettingsKeys::kNotificationsEnabled, true).toBool();
+    m_notificationsTranscriptionEnabled = getVal(SettingsKeys::kNotificationsTranscription, true).toBool();
+    m_notificationsModelEnabled = getVal(SettingsKeys::kNotificationsModel, true).toBool();
+    m_notificationsAudioEnabled = getVal(SettingsKeys::kNotificationsAudio, true).toBool();
+    m_notificationsFailoverEnabled = getVal(SettingsKeys::kNotificationsFailover, true).toBool();
+    m_notificationsSystemEnabled = getVal(SettingsKeys::kNotificationsSystem, true).toBool();
 }
 
 QString AppSettings::groqApiKey() const {
@@ -420,6 +455,71 @@ void AppSettings::setNotificationsEnabled(bool enabled) {
     m_notificationsEnabled = enabled;
     persistValue(u"notifications/enabled"_s, enabled);
     emit notificationsEnabledChanged();
+}
+
+bool AppSettings::notificationsTranscriptionEnabled() const {
+    return m_notificationsTranscriptionEnabled;
+}
+
+void AppSettings::setNotificationsTranscriptionEnabled(bool enabled) {
+    if (m_notificationsTranscriptionEnabled == enabled) {
+        return;
+    }
+    m_notificationsTranscriptionEnabled = enabled;
+    persistValue(u"notifications/transcription"_s, enabled);
+    emit notificationsTranscriptionEnabledChanged();
+}
+
+bool AppSettings::notificationsModelEnabled() const {
+    return m_notificationsModelEnabled;
+}
+
+void AppSettings::setNotificationsModelEnabled(bool enabled) {
+    if (m_notificationsModelEnabled == enabled) {
+        return;
+    }
+    m_notificationsModelEnabled = enabled;
+    persistValue(u"notifications/model"_s, enabled);
+    emit notificationsModelEnabledChanged();
+}
+
+bool AppSettings::notificationsAudioEnabled() const {
+    return m_notificationsAudioEnabled;
+}
+
+void AppSettings::setNotificationsAudioEnabled(bool enabled) {
+    if (m_notificationsAudioEnabled == enabled) {
+        return;
+    }
+    m_notificationsAudioEnabled = enabled;
+    persistValue(u"notifications/audio"_s, enabled);
+    emit notificationsAudioEnabledChanged();
+}
+
+bool AppSettings::notificationsFailoverEnabled() const {
+    return m_notificationsFailoverEnabled;
+}
+
+void AppSettings::setNotificationsFailoverEnabled(bool enabled) {
+    if (m_notificationsFailoverEnabled == enabled) {
+        return;
+    }
+    m_notificationsFailoverEnabled = enabled;
+    persistValue(u"notifications/failover"_s, enabled);
+    emit notificationsFailoverEnabledChanged();
+}
+
+bool AppSettings::notificationsSystemEnabled() const {
+    return m_notificationsSystemEnabled;
+}
+
+void AppSettings::setNotificationsSystemEnabled(bool enabled) {
+    if (m_notificationsSystemEnabled == enabled) {
+        return;
+    }
+    m_notificationsSystemEnabled = enabled;
+    persistValue(u"notifications/system"_s, enabled);
+    emit notificationsSystemEnabledChanged();
 }
 
 QString AppSettings::systemPromptForPreset(const QString& preset) const {

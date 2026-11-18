@@ -78,15 +78,30 @@ void NavigationModel::rebuildItems() {
 
     m_items.append({u"MAIN"_s, tr("History"), u"qrc:/qt/qml/Tattle/assets/icons/history.svg"_s, u"history"_s, false});
 
-    m_items.append({u"PREFERENCES"_s, tr("Dictation"), u"qrc:/qt/qml/Tattle/assets/icons/speech.svg"_s,
-                    m_isCloud ? u"cloud"_s : u"offline"_s, true});
+    m_items.append({u"PREFERENCES"_s, tr("Transcription Mode"), u"qrc:/qt/qml/Tattle/assets/icons/sparkles.svg"_s,
+                    u"engine"_s, true});
 
-    m_items.append({u"PREFERENCES"_s, tr("System & Audio"), u"qrc:/qt/qml/Tattle/assets/icons/keyboard.svg"_s,
+    if (m_isCloud) {
+        m_items.append({u"PREFERENCES"_s, tr("Cloud Transcription"), u"qrc:/qt/qml/Tattle/assets/icons/cloud.svg"_s,
+                        u"cloud"_s, false});
+    } else {
+        m_items.append({u"PREFERENCES"_s, tr("Offline Transcription"), u"qrc:/qt/qml/Tattle/assets/icons/cpu.svg"_s,
+                        u"offline"_s, false});
+    }
+
+    m_items.append({u"PREFERENCES"_s, tr("Audio & Recording"), u"qrc:/qt/qml/Tattle/assets/icons/speech.svg"_s,
+                    u"audio"_s, false});
+
+    m_items.append(
+        {u"PREFERENCES"_s, tr("Shortcuts"), u"qrc:/qt/qml/Tattle/assets/icons/keyboard.svg"_s, u"shortcuts"_s, false});
+
+    m_items.append({u"PREFERENCES"_s, tr("Notifications"), u"qrc:/qt/qml/Tattle/assets/icons/bell.svg"_s,
+                    u"notifications"_s, false});
+
+    m_items.append({u"PREFERENCES"_s, tr("System & Privacy"), u"qrc:/qt/qml/Tattle/assets/icons/sliders.svg"_s,
                     u"system"_s, false});
 
     m_items.append({u"INFO"_s, tr("About"), u"qrc:/qt/qml/Tattle/assets/icons/info.svg"_s, u"about"_s, true});
-
-    m_items.append({u"INFO"_s, tr("License"), u"qrc:/qt/qml/Tattle/assets/icons/license.svg"_s, u"license"_s, false});
 
     endResetModel();
     emit countChanged();

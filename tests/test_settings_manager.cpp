@@ -138,6 +138,11 @@ private slots:
         manager.setSetting(SettingsKeys::kCloudActiveProvider.toString(), u"gemini"_s);
         manager.setSetting(SettingsKeys::kAudioSoundEnabled.toString(), false);
         manager.setSetting(SettingsKeys::kNotificationsEnabled.toString(), false);
+        manager.setSetting(SettingsKeys::kNotificationsTranscription.toString(), false);
+        manager.setSetting(SettingsKeys::kNotificationsModel.toString(), false);
+        manager.setSetting(SettingsKeys::kNotificationsAudio.toString(), false);
+        manager.setSetting(SettingsKeys::kNotificationsFailover.toString(), false);
+        manager.setSetting(SettingsKeys::kNotificationsSystem.toString(), false);
 
         QCOMPARE(manager.speechConfig().backend, SettingsManager::TranscriptionBackend::TranscribeCpp);
         QCOMPARE(manager.speechConfig().recordingMode, SettingsManager::RecordingMode::PushToTalk);
@@ -145,6 +150,11 @@ private slots:
         QCOMPARE(manager.cloudRouterConfig().activeProvider, u"gemini"_s);
         QCOMPARE(manager.audioFeedbackConfig().soundEnabled, false);
         QCOMPARE(manager.notificationConfig().notificationsEnabled, false);
+        QCOMPARE(manager.notificationConfig().transcriptionNotificationsEnabled, false);
+        QCOMPARE(manager.notificationConfig().modelNotificationsEnabled, false);
+        QCOMPARE(manager.notificationConfig().audioNotificationsEnabled, false);
+        QCOMPARE(manager.notificationConfig().failoverNotificationsEnabled, false);
+        QCOMPARE(manager.notificationConfig().systemNotificationsEnabled, false);
 
         // Verify stored in QSettings
         QSettings settings;
@@ -154,6 +164,11 @@ private slots:
         QCOMPARE(settings.value(SettingsKeys::kCloudActiveProvider.toString()).toString(), u"gemini"_s);
         QCOMPARE(settings.value(SettingsKeys::kAudioSoundEnabled.toString()).toBool(), false);
         QCOMPARE(settings.value(SettingsKeys::kNotificationsEnabled.toString()).toBool(), false);
+        QCOMPARE(settings.value(SettingsKeys::kNotificationsTranscription.toString()).toBool(), false);
+        QCOMPARE(settings.value(SettingsKeys::kNotificationsModel.toString()).toBool(), false);
+        QCOMPARE(settings.value(SettingsKeys::kNotificationsAudio.toString()).toBool(), false);
+        QCOMPARE(settings.value(SettingsKeys::kNotificationsFailover.toString()).toBool(), false);
+        QCOMPARE(settings.value(SettingsKeys::kNotificationsSystem.toString()).toBool(), false);
 
         // Create a new manager instance and verify load() restores the settings
         SettingsManager secondManager;

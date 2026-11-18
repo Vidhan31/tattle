@@ -134,7 +134,11 @@ void NotificationPresenter::onNotificationActionInvoked(uint id, const QString& 
     qCDebug(lcSpeech) << "NotificationPresenter: action invoked:" << actionKey;
     if (actionKey == u"default"_s || actionKey == u"open"_s) {
         emit requestShowWindow();
-    } else if (actionKey == u"settings"_s || actionKey == u"audio"_s || actionKey == u"system"_s) {
+    } else if (actionKey == u"audio"_s) {
+        emit requestNavigate(u"audio"_s);
+    } else if (actionKey == u"shortcuts"_s) {
+        emit requestNavigate(u"shortcuts"_s);
+    } else if (actionKey == u"settings"_s || actionKey == u"system"_s) {
         emit requestNavigate(u"system"_s);
     } else if (actionKey == u"cloud"_s) {
         emit requestNavigate(u"cloud"_s);
@@ -167,8 +171,8 @@ void NotificationPresenter::onCoordinatorMaxDurationWarning() {
 }
 
 void NotificationPresenter::onCoordinatorLlmFallbackWarning(const QString& warning) {
-    sendCategoryNotification(u"llm_fallback"_s, tr("AI Formatting Unavailable"),
-                             tr("Enhancement failed (%1). Injected raw speech transcript instead.").arg(warning),
+    sendCategoryNotification(u"llm_fallback"_s, tr("Text Cleanup Unavailable"),
+                             tr("Text cleanup failed (%1). Original speech dictation used instead.").arg(warning),
                              static_cast<int>(LinuxNotificationService::Urgency::Low), u"dialog-warning"_s,
                              {u"default"_s, tr("Open Tattle")});
 }
@@ -181,7 +185,7 @@ void NotificationPresenter::onAudioDeviceDisconnected(const QString& deviceName,
     sendCategoryNotification(u"microphone"_s, tr("Microphone Disconnected"),
                              tr("'%1' was disconnected. Switched to '%2'.").arg(deviceName, fallbackDeviceName),
                              static_cast<int>(LinuxNotificationService::Urgency::Normal), u"audio-input-microphone"_s,
-                             {u"settings"_s, tr("Audio Settings")});
+                             {u"audio"_s, tr("Audio Settings")});
 }
 
 void NotificationPresenter::onAudioDeviceAvailabilityChanged() {
@@ -193,7 +197,7 @@ void NotificationPresenter::onAudioDeviceAvailabilityChanged() {
         sendCategoryNotification(u"microphone"_s, tr("No Microphone Detected"),
                                  tr("Microphone disconnected. Please reconnect your microphone to dictate."),
                                  static_cast<int>(LinuxNotificationService::Urgency::Normal),
-                                 u"audio-input-microphone"_s, {u"settings"_s, tr("Audio Settings")});
+                                 u"audio-input-microphone"_s, {u"audio"_s, tr("Audio Settings")});
     } else {
         if (m_notificationService) {
             m_notificationService->clearCategory(u"microphone"_s);
@@ -202,34 +206,36 @@ void NotificationPresenter::onAudioDeviceAvailabilityChanged() {
 }
 
 void NotificationPresenter::onFailoverTriggered() {
-    sendNotification(tr("Tattle: Switched to Offline Dictation"),
-                     tr("Internet connection offline. Automatically switched to local transcribe.cpp model."),
-                     static_cast<int>(LinuxNotificationService::Urgency::Normal), u"network-offline"_s);
+    sendCategoryNotification(u"failover"_s, tr("Tattle: Switched to Offline Dictation"),
+                             tr("Internet connection offline. Automatically switched to local speech model."),
+                             static_cast<int>(LinuxNotificationService::Urgency::Normal), u"network-offline"_s);
 }
 
 void NotificationPresenter::onOnlineRestored() {
-    sendNotification(tr("Tattle: Internet Connection Restored"), tr("Switched back to Cloud transcription engine."),
-                     static_cast<int>(LinuxNotificationService::Urgency::Normal), u"network-wireless"_s);
+    sendCategoryNotification(u"failover"_s, tr("Tattle: Internet Connection Restored"),
+                             tr("Switched back to Cloud speech recognition."),
+                             static_cast<int>(LinuxNotificationService::Urgency::Normal), u"network-wireless"_s);
 }
 
 void NotificationPresenter::onOfflineModelRequired() {
-    sendNotification(tr("Tattle: Offline Model Required"),
-                     tr("No internet connection available. Please open Tattle and download a speech model to "
-                        "use offline dictation."),
-                     static_cast<int>(LinuxNotificationService::Urgency::Critical), u"dialog-warning"_s);
+    sendCategoryNotification(u"failover"_s, tr("Tattle: Offline Model Required"),
+                             tr("No internet connection available. Please open Tattle and download a speech model to "
+                                "use offline dictation."),
+                             static_cast<int>(LinuxNotificationService::Urgency::Critical), u"dialog-warning"_s);
 }
 
 void NotificationPresenter::onNetworkDisconnectedDuringSession() {
-    sendNotification(tr("Tattle: Network Disconnected"),
-                     tr("Internet connection lost while recording. Model will not be changed during active session."),
-                     static_cast<int>(LinuxNotificationService::Urgency::Normal), u"network-offline"_s);
+    sendCategoryNotification(
+        u"failover"_s, tr("Tattle: Network Disconnected"),
+        tr("Internet connection lost while recording. The current mode will continue until this recording finishes."),
+        static_cast<int>(LinuxNotificationService::Urgency::Normal), u"network-offline"_s);
 }
 
 void NotificationPresenter::onModelLoadFailed(const QString& modelPath, const QString& error) {
     Q_UNUSED(error);
-    sendNotification(
-        tr("Tattle: Model Load Failed"),
-        tr("Could not load offline speech model (%1). Please verify model integrity in Settings.").arg(modelPath),
+    sendCategoryNotification(
+        u"model"_s, tr("Tattle: Model Load Failed"),
+        tr("Could not load offline speech model (%1). Please verify the model in Settings.").arg(modelPath),
         static_cast<int>(LinuxNotificationService::Urgency::Normal), u"dialog-error"_s);
 }
 

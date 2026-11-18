@@ -9,14 +9,46 @@ ColumnLayout {
     signal navigateRequested(string target)
     signal clipboardWarningRequested
 
+    readonly property bool showClipboardWarning: DaemonDiagnosticModel.clipboardWarningRequired &&
+                                                 !DaemonDiagnosticModel.clipboardBannerDismissed
+    readonly property bool showApiKeyWarning: DaemonClient.activeBackend === DaemonClient.Cloud &&
+                                              !DaemonClient.cloudApiKeySet
+    readonly property bool showInvalidApiKeyWarning: DaemonClient.activeBackend === DaemonClient.Cloud
+                                                     && DaemonClient.cloudApiKeyInvalid
+    readonly property bool showRateLimitedWarning: DaemonClient.activeBackend === DaemonClient.Cloud
+                                                   && DaemonClient.cloudRateLimited
+    readonly property bool showMissingModelWarning: DaemonClient.activeBackend === DaemonClient.TranscribeCpp &&
+                                                    !DaemonClient.isModelInstalled
+    readonly property bool showLoadingModelWarning: DaemonClient.activeBackend === DaemonClient.TranscribeCpp
+                                                    && DaemonClient.isModelInstalled && !DaemonClient.isModelLoaded
+    readonly property bool showNoMicWarning: !DaemonClient.microphoneAvailable
+    readonly property bool showFatalErrorWarning: DaemonDiagnosticModel.hasFatalError
+    readonly property bool showDictationErrorWarning: DaemonClient.dictationState === DaemonClient.Error && (
+                                                          DaemonClient.activeBackend !== DaemonClient.Cloud || (
+                                                              !DaemonClient.cloudApiKeyInvalid &&
+                                                              !DaemonClient.cloudRateLimited))
+
+    readonly property bool hasVisibleBanners: (showClipboardWarning || showApiKeyWarning || showInvalidApiKeyWarning
+                                               || showRateLimitedWarning || showMissingModelWarning
+                                               || showLoadingModelWarning || showNoMicWarning || showFatalErrorWarning
+                                               || showDictationErrorWarning)
+
+    visible: hasVisibleBanners
+    Layout.fillWidth: true
+    Layout.preferredHeight: hasVisibleBanners ? -1 : 0
+    implicitHeight: hasVisibleBanners ? -1 : 0
+
     spacing: Theme.spacingMd
 
     StatusBanner {
-        visible: DaemonDiagnosticModel.clipboardWarningRequired && !DaemonDiagnosticModel.clipboardBannerDismissed
+        id: clipboardBanner
+        visible: root.showClipboardWarning
+        Layout.fillWidth: true
+        Layout.preferredHeight: visible ? implicitHeight : 0
         bannerType: "warning"
-        title: qsTr("Paste Shortcut & Clipboard Notice")
+        title: qsTr("Clipboard & Paste Notice")
         message: qsTr(
-                     "Transcribing injects text via Ctrl+Shift+V. Text is restored, but images/media are overwritten unless saved or using a clipboard manager (e.g., Klipper, GPaste, Clipboard Indicator).")
+                     "Dictation pastes text via Ctrl+Shift+V. Text is restored, but images/media are overwritten unless saved or using a clipboard manager (e.g., Klipper, GPaste, Clipboard Indicator).")
         actionText: qsTr("Learn More")
         onActionClicked: root.clipboardWarningRequested()
         secondaryActionText: qsTr("Dismiss")
@@ -26,7 +58,10 @@ ColumnLayout {
     }
 
     StatusBanner {
-        visible: DaemonClient.activeBackend === DaemonClient.Cloud && !DaemonClient.cloudApiKeySet
+        id: apiKeyBanner
+        visible: root.showApiKeyWarning
+        Layout.fillWidth: true
+        Layout.preferredHeight: visible ? implicitHeight : 0
         bannerType: "warning"
         title: qsTr("%1 API Key Required").arg(CloudProviderModel.activeProviderName)
         message: qsTr("Configure your %1 API key in Settings to begin cloud speech transcription.").arg(
@@ -36,11 +71,14 @@ ColumnLayout {
     }
 
     StatusBanner {
-        visible: DaemonClient.activeBackend === DaemonClient.Cloud && DaemonClient.cloudApiKeyInvalid
+        id: invalidApiKeyBanner
+        visible: root.showInvalidApiKeyWarning
+        Layout.fillWidth: true
+        Layout.preferredHeight: visible ? implicitHeight : 0
         bannerType: "warning"
         title: qsTr("Invalid %1 API Key").arg(CloudProviderModel.activeProviderName)
         message: DaemonClient.cloudLastError.length > 0 ? DaemonClient.cloudLastError : qsTr(
-                                                              "Authentication failed. Please verify your %1 API key.").arg(
+                                                              "Authentication failed. Please check your %1 API key.").arg(
                                                               CloudProviderModel.activeProviderName)
         actionText: qsTr("Configure API Key")
         onActionClicked: root.navigateRequested("cloud")
@@ -49,16 +87,22 @@ ColumnLayout {
     }
 
     StatusBanner {
-        visible: DaemonClient.activeBackend === DaemonClient.Cloud && DaemonClient.cloudRateLimited
+        id: rateLimitedBanner
+        visible: root.showRateLimitedWarning
+        Layout.fillWidth: true
+        Layout.preferredHeight: visible ? implicitHeight : 0
         bannerType: "warning"
-        title: qsTr("%1 Rate Limit Exceeded").arg(CloudProviderModel.activeProviderName)
+        title: qsTr("%1 Rate Limit Reached").arg(CloudProviderModel.activeProviderName)
         message: qsTr("Auto-retrying in %1s…").arg(DaemonClient.cloudRetrySecondsRemaining)
         actionText: qsTr("Dismiss")
         onActionClicked: DaemonClient.clearError()
     }
 
     StatusBanner {
-        visible: DaemonClient.activeBackend === DaemonClient.TranscribeCpp && !DaemonClient.isModelInstalled
+        id: missingModelBanner
+        visible: root.showMissingModelWarning
+        Layout.fillWidth: true
+        Layout.preferredHeight: visible ? implicitHeight : 0
         bannerType: "warning"
         title: qsTr("Offline Speech Model Missing")
         message: qsTr("Download %1 to start offline transcription.").arg(DaemonClient.modelFileName)
@@ -67,30 +111,38 @@ ColumnLayout {
     }
 
     StatusBanner {
-        visible: DaemonClient.activeBackend === DaemonClient.TranscribeCpp && DaemonClient.isModelInstalled &&
-                 !DaemonClient.isModelLoaded
+        id: loadingModelBanner
+        visible: root.showLoadingModelWarning
+        Layout.fillWidth: true
+        Layout.preferredHeight: visible ? implicitHeight : 0
         bannerType: "info"
         title: qsTr("Loading Speech Model")
-        message: qsTr("Loading offline speech recognition model into memory…")
+        message: qsTr("Loading offline speech recognition model…")
         actionText: qsTr("Offline Settings")
         onActionClicked: root.navigateRequested("offline")
     }
 
     StatusBanner {
-        visible: !DaemonClient.microphoneAvailable
+        id: noMicBanner
+        visible: root.showNoMicWarning
+        Layout.fillWidth: true
+        Layout.preferredHeight: visible ? implicitHeight : 0
         bannerType: "warning"
         title: qsTr("No Microphone Detected")
         message: qsTr("Please connect a microphone or check your audio permissions in system settings.")
         actionText: qsTr("Audio Settings")
-        onActionClicked: root.navigateRequested("system")
+        onActionClicked: root.navigateRequested("audio")
     }
 
     StatusBanner {
-        visible: DaemonDiagnosticModel.hasFatalError
+        id: fatalErrorBanner
+        visible: root.showFatalErrorWarning
+        Layout.fillWidth: true
+        Layout.preferredHeight: visible ? implicitHeight : 0
         bannerType: "danger"
-        title: qsTr("Text Injection Service Stopped")
+        title: qsTr("Text Paste Service Stopped")
         message: DaemonDiagnosticModel.fatalErrorMessage.length > 0 ? DaemonDiagnosticModel.fatalErrorMessage : qsTr(
-                                                                          "The background key injection daemon encountered an error. Text will fallback to clipboard paste until restarted.")
+                                                                          "The background text paste service encountered an error. Automatic paste is unavailable until restarted.")
         actionText: qsTr("Restart Service")
         onActionClicked: DaemonDiagnosticModel.restartService()
         secondaryActionText: qsTr("Settings")
@@ -98,10 +150,10 @@ ColumnLayout {
     }
 
     StatusBanner {
-        visible: DaemonClient.dictationState === DaemonClient.Error && (DaemonClient.activeBackend
-                                                                        !== DaemonClient.Cloud || (
-                                                                            !DaemonClient.cloudApiKeyInvalid &&
-                                                                            !DaemonClient.cloudRateLimited))
+        id: dictationErrorBanner
+        visible: root.showDictationErrorWarning
+        Layout.fillWidth: true
+        Layout.preferredHeight: visible ? implicitHeight : 0
         bannerType: "danger"
         title: DaemonClient.activeBackend === DaemonClient.TranscribeCpp ? qsTr("Offline Transcription Failed") : qsTr(
                                                                                "Transcription Failed")

@@ -133,29 +133,30 @@ void TestCloudProviderModel::testNavigationModelIsCloud() {
     QCOMPARE(navModel.isOnline(), true);
 
     const int count = navModel.rowCount();
-    QVERIFY(count > 0);
+    QCOMPARE(count, 9);
 
-    bool foundDictationSection = false;
+    QStringList cloudSectionIds;
     for (int i = 0; i < count; ++i) {
         const QModelIndex idx = navModel.index(i, 0);
-        const QString sectionId = navModel.data(idx, NavigationModel::SectionIdRole).toString();
-        const QString title = navModel.data(idx, NavigationModel::TitleRole).toString();
-        if (title == tr("Dictation")) {
-            foundDictationSection = true;
-            QCOMPARE(sectionId, u"cloud"_s);
-        }
+        cloudSectionIds.append(navModel.data(idx, NavigationModel::SectionIdRole).toString());
     }
-    QVERIFY(foundDictationSection);
+
+    const QStringList expectedCloud = {u"dictate"_s,   u"history"_s,       u"engine"_s,
+                                       u"cloud"_s,     u"audio"_s,         u"shortcuts"_s,
+                                       u"notifications"_s, u"system"_s,    u"about"_s};
+    QCOMPARE(cloudSectionIds, expectedCloud);
 
     navModel.setIsCloud(false);
-    for (int i = 0; i < count; ++i) {
+    QStringList offlineSectionIds;
+    for (int i = 0; i < navModel.rowCount(); ++i) {
         const QModelIndex idx = navModel.index(i, 0);
-        const QString sectionId = navModel.data(idx, NavigationModel::SectionIdRole).toString();
-        const QString title = navModel.data(idx, NavigationModel::TitleRole).toString();
-        if (title == tr("Dictation")) {
-            QCOMPARE(sectionId, u"offline"_s);
-        }
+        offlineSectionIds.append(navModel.data(idx, NavigationModel::SectionIdRole).toString());
     }
+
+    const QStringList expectedOffline = {u"dictate"_s,   u"history"_s,       u"engine"_s,
+                                         u"offline"_s,   u"audio"_s,         u"shortcuts"_s,
+                                         u"notifications"_s, u"system"_s,    u"about"_s};
+    QCOMPARE(offlineSectionIds, expectedOffline);
 }
 
 void TestCloudProviderModel::testSaveSettingsSyncsToDisk() {

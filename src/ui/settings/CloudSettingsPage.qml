@@ -24,24 +24,20 @@ Item {
             spacing: 4
 
             StyledText {
-                text: qsTr("Cloud Dictation")
+                text: qsTr("Cloud Transcription")
                 variant: "heading"
             }
 
             StyledText {
-                text: qsTr("Configure cloud speech recognition providers, API credentials, and LLM text enhancement")
+                text: qsTr("Configure cloud speech recognition providers, API keys, and text cleanup")
                 variant: "caption"
                 colorRole: "secondary"
             }
         }
 
-        EngineModeSwitcherCard {
-            Layout.fillWidth: true
-        }
-
         StyledCard {
             title: qsTr("Cloud Provider")
-            description: qsTr("Choose the cloud backend provider for speech transcription and text enhancement")
+            description: qsTr("Choose the cloud provider for speech transcription and text cleanup")
 
             PreferenceRow {
                 title: qsTr("Active Provider")

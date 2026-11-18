@@ -7,8 +7,8 @@ import "../controls"
 StyledCard {
     id: root
 
-    title: qsTr("Transcription Engine")
-    description: qsTr("Select between fast Cloud-based AI transcription and private On-Device inference")
+    title: qsTr("Transcription Mode")
+    description: qsTr("Choose between fast cloud transcription and private on-device processing")
 
     GridLayout {
         Layout.fillWidth: true
@@ -83,13 +83,6 @@ StyledCard {
                             colorRole: "secondary"
                         }
                     }
-
-                    StateBadge {
-                        text: qsTr("Active")
-                        statusType: "accent"
-                        visible: cloudOptionCard.isSelected
-                        showDot: true
-                    }
                 }
 
                 StyledDivider {
@@ -107,7 +100,7 @@ StyledCard {
                     }
 
                     StyledText {
-                        text: qsTr("• Text enhancement & smart formatting")
+                        text: qsTr("• Text cleanup & smart formatting")
                         variant: "caption"
                         colorRole: "secondary"
                     }
@@ -195,17 +188,10 @@ StyledCard {
                         }
 
                         StyledText {
-                            text: qsTr("transcribe.cpp Local Engine")
+                            text: qsTr("Local Speech Model")
                             variant: "caption"
                             colorRole: "secondary"
                         }
-                    }
-
-                    StateBadge {
-                        text: qsTr("Active")
-                        statusType: "accent"
-                        visible: offlineOptionCard.isSelected
-                        showDot: true
                     }
                 }
 
@@ -218,7 +204,7 @@ StyledCard {
                     spacing: 4
 
                     StyledText {
-                        text: qsTr("• 100% private on-device inference")
+                        text: qsTr("• 100% private on-device transcription")
                         variant: "caption"
                         colorRole: "secondary"
                     }
@@ -258,8 +244,8 @@ StyledCard {
 
     PreferenceSwitch {
         Layout.fillWidth: true
-        title: qsTr("Automatic Offline Fallback")
-        description: qsTr("Automatically switch to local transcribe.cpp model when internet connectivity is lost")
+        title: qsTr("Automatic Offline Switching")
+        description: qsTr("Automatically switch to offline speech model when internet connection is lost")
         checked: DaemonClient.autoSwitchOffline
         onToggled: DaemonClient.autoSwitchOffline = checked
     }

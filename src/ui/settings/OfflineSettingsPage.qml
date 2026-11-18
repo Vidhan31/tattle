@@ -11,224 +11,64 @@ Item {
 
     implicitWidth: 500
     implicitHeight: contentColumn.implicitHeight
+    height: contentColumn.implicitHeight
 
     ColumnLayout {
         id: contentColumn
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        spacing: Theme.spacingLg
+        spacing: Theme.spacingMd
 
         ColumnLayout {
             Layout.fillWidth: true
             Layout.topMargin: Theme.spacingXs
-            Layout.bottomMargin: Theme.spacingSm
-            spacing: 4
+            Layout.bottomMargin: Theme.spacingXs
+            spacing: 2
 
             StyledText {
-                text: qsTr("Offline Dictation")
+                text: qsTr("Offline Transcription")
                 variant: "heading"
             }
 
             StyledText {
-                text: qsTr("Configure on-device transcribe.cpp speech recognition models and hardware acceleration")
+                text: qsTr("Configure on-device speech recognition models and hardware acceleration")
                 variant: "caption"
                 colorRole: "secondary"
-            }
-        }
-
-        EngineModeSwitcherCard {
-            Layout.fillWidth: true
-        }
-
-        StyledCard {
-            title: qsTr("Active Speech Model")
-            description: qsTr("Current model selected for offline transcription inference")
-
-            RowLayout {
+                wrapMode: Text.WordWrap
                 Layout.fillWidth: true
-                spacing: Theme.spacingMd
-
-                ColumnLayout {
-                    Layout.fillWidth: true
-                    spacing: 2
-
-                    RowLayout {
-                        spacing: Theme.spacingSm
-
-                        StyledText {
-                            text: ModelCatalog.isSelectedModelInstalled ? ModelCatalog.selectedModelName : qsTr(
-                                                                              "None Selected")
-                            variant: "body"
-                            customWeight: Font.DemiBold
-                        }
-
-                        StyledText {
-                            text: "(" + DaemonClient.modelFileName + ")"
-                            variant: "caption"
-                            colorRole: "secondary"
-                            visible: ModelCatalog.isSelectedModelInstalled
-                        }
-                    }
-
-                    StyledText {
-                        text: {
-                            if (DaemonClient.isModelLoaded && DaemonClient.loadedModelPath === DaemonClient.modelPath) {
-                                return qsTr("Loaded into memory and ready for dictation");
-                            }
-                            if (ModelCatalog.isSelectedModelInstalled) {
-                                return qsTr("Installed on disk (click Load to activate in memory)");
-                            }
-                            return qsTr("No active model installed. Download a model below to begin.");
-                        }
-                        variant: "caption"
-                        colorRole: "secondary"
-                    }
-                }
-
-                StateBadge {
-                    text: {
-                        if (DaemonClient.isModelLoaded && DaemonClient.loadedModelPath === DaemonClient.modelPath) {
-                            return qsTr("Ready");
-                        }
-                        if (ModelCatalog.isSelectedModelInstalled) {
-                            return qsTr("Installed");
-                        }
-                        return qsTr("No Model");
-                    }
-                    statusType: {
-                        if (DaemonClient.isModelLoaded && DaemonClient.loadedModelPath === DaemonClient.modelPath) {
-                            return "success";
-                        }
-                        if (ModelCatalog.isSelectedModelInstalled) {
-                            return "neutral";
-                        }
-                        return "neutral";
-                    }
-                    showDot: ModelCatalog.isSelectedModelInstalled
-                    pulsing: DaemonClient.isModelBusy
-                }
-            }
-
-            StyledDivider {}
-
-            RowLayout {
-                Layout.fillWidth: true
-                spacing: Theme.spacingSm
-
-                StyledButton {
-                    text: (DaemonClient.isModelLoaded && DaemonClient.loadedModelPath === DaemonClient.modelPath) ? qsTr(
-                                                                                                                        "Reload Model") :
-                                                                                                                    qsTr("Load Model")
-                    size: "small"
-                    variant: (DaemonClient.isModelLoaded && DaemonClient.loadedModelPath === DaemonClient.modelPath)
-                             ? "secondary" : "primary"
-                    enabled: ModelCatalog.isSelectedModelInstalled && !DaemonClient.isModelBusy && !DaemonClient.isBusy
-                    onClicked: {
-                        DaemonClient.loadModel();
-                    }
-                }
-
-                StyledButton {
-                    text: qsTr("Unload Model")
-                    size: "small"
-                    variant: "secondary"
-                    visible: DaemonClient.isModelLoaded
-                    enabled: !DaemonClient.isModelBusy && !DaemonClient.isBusy
-                    onClicked: {
-                        DaemonClient.unloadModel();
-                    }
-                }
-
-                StyledButton {
-                    text: qsTr("Check Status")
-                    size: "small"
-                    variant: "flat"
-                    onClicked: {
-                        ModelCatalog.refreshModelList();
-                        DaemonClient.checkModelStatus();
-                    }
-                }
-
-                Item {
-                    Layout.fillWidth: true
-                }
             }
         }
 
         StyledCard {
+            id: libraryCard
             title: qsTr("Speech Model Library")
-            description: qsTr("Download and manage GGUF speech recognition models from HuggingFace (handy-computer)")
+            description: qsTr("Download and manage speech recognition models")
 
-            Rectangle {
-                Layout.fillWidth: true
-                implicitHeight: storageHeaderRow.implicitHeight + Theme.spacingSm * 2
-                radius: Theme.radiusSm
-                color: Theme.controlBg
-                border.color: Theme.controlBorder
-                border.width: 1
+            readonly property int whisperTotal: (ModelCatalog.revision >= 0) ? ModelCatalog.totalCountForPrefix(
+                                                                                   "whisper-") : 0
+            readonly property int moonshineTotal: (ModelCatalog.revision >= 0) ? ModelCatalog.totalCountForPrefix(
+                                                                                     "moonshine-") : 0
+            readonly property int parakeetTotal: (ModelCatalog.revision >= 0) ? ModelCatalog.totalCountForPrefix(
+                                                                                    "parakeet-") : 0
+            readonly property int allTotal: (ModelCatalog.revision >= 0) ? ModelCatalog.totalCountForPrefix("") : 0
 
-                RowLayout {
-                    id: storageHeaderRow
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.margins: Theme.spacingSm
-                    spacing: Theme.spacingSm
-
-                    StyledIcon {
-                        source: "qrc:/qt/qml/Tattle/assets/icons/info.svg"
-                        size: 14
-                        color: Theme.textSecondary
-                        Layout.alignment: Qt.AlignVCenter
-                    }
-
-                    StyledText {
-                        text: qsTr("Storage:")
-                        variant: "caption"
-                        customWeight: Font.Medium
-                    }
-
-                    StyledText {
-                        text: ModelCatalog.modelsDirectory
-                        variant: "caption"
-                        colorRole: "secondary"
-                        elide: Text.ElideMiddle
-                        Layout.fillWidth: true
-                    }
-
-                    Rectangle {
-                        implicitWidth: 1
-                        implicitHeight: 12
-                        color: Theme.controlBorder
-                    }
-
-                    StyledText {
-                        text: qsTr("Free: %1").arg(ModelCatalog.availableDiskSpaceFormatted)
-                        variant: "caption"
-                        customWeight: Font.Medium
-                        colorRole: "secondary"
-                    }
-
-                    StyledButton {
-                        text: qsTr("Open")
-                        size: "small"
-                        variant: "ghost"
-                        onClicked: {
-                            Qt.openUrlExternally("file://" + ModelCatalog.modelsDirectory);
-                        }
-                    }
-
-                    StyledButton {
-                        text: qsTr("Refresh")
-                        iconSource: "qrc:/qt/qml/Tattle/assets/icons/refresh.svg"
-                        size: "small"
-                        variant: "flat"
-                        onClicked: {
-                            ModelCatalog.refreshModelList();
-                        }
-                    }
+            property string selectedFamily: {
+                const downloading = ModelCatalog.downloadingModelId;
+                if (downloading.length > 0) {
+                    if (downloading.startsWith("whisper-"))
+                    return "whisper";
+                    if (downloading.startsWith("moonshine-"))
+                    return "moonshine";
+                    if (downloading.startsWith("parakeet-"))
+                    return "parakeet";
                 }
+                const active = DaemonClient.modelFileName;
+                if (active.includes("moonshine"))
+                return "moonshine";
+                if (active.includes("parakeet"))
+                return "parakeet";
+                return "whisper";
             }
 
             Rectangle {
@@ -267,22 +107,73 @@ Item {
                 }
             }
 
-            StyledDivider {}
-
-            ColumnLayout {
+            RowLayout {
                 Layout.fillWidth: true
                 spacing: Theme.spacingSm
+
+                StyledButton {
+                    text: qsTr("Whisper (%1)").arg(libraryCard.whisperTotal)
+                    size: "small"
+                    variant: libraryCard.selectedFamily === "whisper" ? "primary" : "secondary"
+                    onClicked: {
+                        libraryCard.selectedFamily = "whisper";
+                    }
+                }
+
+                StyledButton {
+                    text: qsTr("Moonshine (%1)").arg(libraryCard.moonshineTotal)
+                    size: "small"
+                    variant: libraryCard.selectedFamily === "moonshine" ? "primary" : "secondary"
+                    onClicked: {
+                        libraryCard.selectedFamily = "moonshine";
+                    }
+                }
+
+                StyledButton {
+                    text: qsTr("Parakeet (%1)").arg(libraryCard.parakeetTotal)
+                    size: "small"
+                    variant: libraryCard.selectedFamily === "parakeet" ? "primary" : "secondary"
+                    onClicked: {
+                        libraryCard.selectedFamily = "parakeet";
+                    }
+                }
+
+                StyledButton {
+                    text: qsTr("All (%1)").arg(libraryCard.allTotal)
+                    size: "small"
+                    variant: libraryCard.selectedFamily === "all" ? "primary" : "secondary"
+                    onClicked: {
+                        libraryCard.selectedFamily = "all";
+                    }
+                }
+
+                Item {
+                    Layout.fillWidth: true
+                }
+            }
+
+            Flow {
+                id: cardsFlow
+                Layout.fillWidth: true
+                spacing: Theme.spacingSm
+
+                readonly property int responsiveColumns: {
+                    if (cardsFlow.width >= 860)
+                    return 3;
+                    if (cardsFlow.width >= 540)
+                    return 2;
+                    return 1;
+                }
 
                 Repeater {
                     model: ModelCatalog
 
                     delegate: Rectangle {
-                        id: modelRow
+                        id: modelCard
                         required property int index
                         required property string modelId
                         required property string name
                         required property string fileName
-                        required property string downloadUrl
                         required property string sizeFormatted
                         required property string memoryFormatted
                         required property string description
@@ -294,215 +185,249 @@ Item {
                         required property string installedSizeFormatted
                         required property bool canDelete
 
-                        Layout.fillWidth: true
-                        implicitHeight: rowContent.implicitHeight + Theme.spacingSm * 2 + (modelRow.isDownloading
-                                                                                           ? Theme.spacingXs : 0)
+                        readonly property bool inFamily: {
+                            if (libraryCard.selectedFamily === "all") {
+                                return true;
+                            }
+                            return modelId.startsWith(libraryCard.selectedFamily + "-");
+                        }
+
+                        visible: inFamily
+                        width: Math.floor((cardsFlow.width - (cardsFlow.responsiveColumns - 1) * cardsFlow.spacing)
+                                          / cardsFlow.responsiveColumns)
+                        implicitHeight: Math.max(148, cardInnerLayout.implicitHeight + Theme.spacingMd * 2)
                         radius: Theme.radiusSm
-                        color: modelRow.isSelected ? Theme.selectedBg : Theme.cardBgSubtle
-                        border.color: modelRow.isSelected ? Theme.accentColor : Theme.cardBorder
-                        border.width: 1
+                        color: modelCard.isSelected ? Theme.selectedBg : (cardHover.containsMouse
+                                                                          ? Theme.cardBgElevated : Theme.controlBg)
+                        border.color: modelCard.isSelected ? Theme.accentColor : (cardHover.containsMouse
+                                                                                  ? Theme.cardBorderHover :
+                                                                                    Theme.controlBorder)
+                        border.width: modelCard.isSelected ? 1.5 : 1
+
+                        Behavior on color {
+                            ColorAnimation {
+                                duration: Theme.animFast
+                            }
+                        }
+                        Behavior on border.color {
+                            ColorAnimation {
+                                duration: Theme.animFast
+                            }
+                        }
+
+                        MouseArea {
+                            id: cardHover
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            acceptedButtons: Qt.NoButton
+                        }
 
                         ColumnLayout {
-                            id: rowContent
-                            anchors.left: parent.left
-                            anchors.right: parent.right
-                            anchors.top: parent.top
-                            anchors.margins: Theme.spacingSm
+                            id: cardInnerLayout
+                            anchors.fill: parent
+                            anchors.margins: Theme.spacingMd
                             spacing: Theme.spacingXs
 
-                            GridLayout {
+                            RowLayout {
                                 Layout.fillWidth: true
-                                columns: root.width >= 540 ? 3 : 1
-                                columnSpacing: Theme.spacingSm
-                                rowSpacing: Theme.spacingXs
+                                spacing: Theme.spacingSm
+
+                                StyledText {
+                                    text: modelCard.name.replace(" (English)", "").replace(" (Multilingual)", "")
+                                    variant: "body"
+                                    customWeight: Font.DemiBold
+                                    wrapMode: Text.WordWrap
+                                    Layout.fillWidth: true
+                                }
+
+                                Rectangle {
+                                    implicitHeight: 18
+                                    implicitWidth: langLabel.implicitWidth + 8
+                                    radius: Theme.radiusXs
+                                    color: Theme.cardBgSubtle
+                                    border.color: Theme.controlBorder
+                                    border.width: 1
+                                    Layout.alignment: Qt.AlignTop
+
+                                    StyledText {
+                                        id: langLabel
+                                        anchors.centerIn: parent
+                                        text: modelCard.name.toLowerCase().includes("english") ? qsTr("English") : qsTr(
+                                                                                                     "Multilingual")
+                                        variant: "caption"
+                                        colorRole: "secondary"
+                                    }
+                                }
+                            }
+
+                            StyledText {
+                                text: (modelCard.isInstalled && modelCard.installedSizeFormatted.length > 0
+                                       ? modelCard.installedSizeFormatted : modelCard.sizeFormatted) + " • "
+                                      + modelCard.memoryFormatted
+                                variant: "caption"
+                                colorRole: "secondary"
+                            }
+
+                            StyledText {
+                                text: modelCard.description
+                                variant: "caption"
+                                colorRole: "secondary"
+                                wrapMode: Text.WordWrap
+                                Layout.fillWidth: true
+                            }
+
+                            Item {
+                                Layout.fillHeight: true
+                            }
+
+                            Item {
+                                Layout.fillWidth: true
+                                implicitHeight: 28
 
                                 ColumnLayout {
-                                    Layout.fillWidth: true
-                                    spacing: 1
+                                    anchors.fill: parent
+                                    spacing: 3
+                                    visible: modelCard.isDownloading
 
                                     RowLayout {
                                         Layout.fillWidth: true
-                                        spacing: Theme.spacingSm
 
                                         StyledText {
-                                            text: modelRow.name
-                                            variant: "body"
+                                            text: qsTr("%1%").arg(Math.round(modelCard.progress * 100))
+                                            variant: "caption"
                                             customWeight: Font.DemiBold
-                                            elide: Text.ElideRight
-                                        }
-
-                                        StyledText {
-                                            text: modelRow.isInstalled && modelRow.installedSizeFormatted.length > 0
-                                                  ? modelRow.installedSizeFormatted : modelRow.sizeFormatted
-                                            variant: "caption"
-                                            colorRole: "secondary"
-                                        }
-
-                                        Rectangle {
-                                            implicitHeight: 18
-                                            implicitWidth: memText.implicitWidth + 8
-                                            radius: Theme.radiusXs
-                                            color: Theme.controlBg
-                                            border.color: Theme.controlBorder
-                                            border.width: 1
-
-                                            StyledText {
-                                                id: memText
-                                                anchors.centerIn: parent
-                                                text: modelRow.memoryFormatted
-                                                variant: "caption"
-                                                customWeight: Font.Medium
-                                                colorRole: "secondary"
-                                            }
-                                        }
-
-                                        StyledText {
-                                            text: "(" + modelRow.fileName + ")"
-                                            variant: "caption"
-                                            colorRole: "secondary"
-                                            elide: Text.ElideRight
-                                            Layout.maximumWidth: 260
-                                            visible: root.width >= 480
                                         }
 
                                         Item {
                                             Layout.fillWidth: true
                                         }
+
+                                        StyledText {
+                                            text: modelCard.speedFormatted
+                                            variant: "caption"
+                                            colorRole: "secondary"
+                                        }
+
+                                        StyledButton {
+                                            text: qsTr("Cancel")
+                                            size: "small"
+                                            variant: "danger"
+                                            onClicked: {
+                                                ModelCatalog.cancelDownload(modelCard.modelId);
+                                            }
+                                        }
                                     }
 
-                                    StyledText {
-                                        text: modelRow.description
-                                        variant: "caption"
-                                        colorRole: "secondary"
-                                        wrapMode: Text.WordWrap
+                                    T.ProgressBar {
                                         Layout.fillWidth: true
-                                        maximumLineCount: 2
-                                        elide: Text.ElideRight
+                                        implicitHeight: 4
+                                        from: 0.0
+                                        to: 1.0
+                                        value: Math.min(Math.max(modelCard.progress, 0.0), 1.0)
+                                        background: Rectangle {
+                                            implicitHeight: 4
+                                            radius: Theme.radiusCircle
+                                            color: Theme.controlBg
+                                        }
+                                        contentItem: Item {
+                                            implicitHeight: 4
+                                            Rectangle {
+                                                anchors.left: parent.left
+                                                anchors.top: parent.top
+                                                anchors.bottom: parent.bottom
+                                                width: parent.width * Math.min(Math.max(modelCard.progress, 0.0), 1.0)
+                                                radius: Theme.radiusCircle
+                                                color: Theme.accentColor
+                                            }
+                                        }
                                     }
-                                }
-
-                                StateBadge {
-                                    text: modelRow.isSelected ? qsTr("Active") : (modelRow.isDownloading ? qsTr(
-                                                                                                               "Downloading") :
-                                                                                                           qsTr("Installed"))
-                                    statusType: modelRow.isSelected || modelRow.isDownloading ? "accent" : "neutral"
-                                    visible: modelRow.isSelected || (modelRow.isInstalled && !modelRow.isDownloading)
-                                             || modelRow.isDownloading
-                                    showDot: modelRow.isDownloading
-                                    pulsing: modelRow.isDownloading
-                                    Layout.alignment: root.width >= 540 ? Qt.AlignVCenter : Qt.AlignLeft
                                 }
 
                                 RowLayout {
-                                    spacing: Theme.spacingXs
-                                    Layout.alignment: root.width >= 540 ? Qt.AlignVCenter : Qt.AlignLeft
-
-                                    StyledButton {
-                                        text: qsTr("Cancel")
-                                        size: "small"
-                                        variant: "danger"
-                                        visible: modelRow.isDownloading
-                                        onClicked: {
-                                            ModelCatalog.cancelDownload(modelRow.modelId);
-                                        }
-                                    }
-
-                                    StyledButton {
-                                        text: qsTr("Download")
-                                        size: "small"
-                                        variant: "primary"
-                                        visible: !modelRow.isInstalled && !modelRow.isDownloading
-                                        enabled: !ModelCatalog.isDownloadingAny
-                                        onClicked: {
-                                            ModelCatalog.startDownload(modelRow.modelId);
-                                        }
-                                    }
-
-                                    StyledButton {
-                                        text: qsTr("Set Active")
-                                        size: "small"
-                                        variant: "secondary"
-                                        visible: modelRow.isInstalled && !modelRow.isSelected && !modelRow.isDownloading
-                                        enabled: !DaemonClient.isModelBusy && !DaemonClient.isBusy
-                                        onClicked: {
-                                            ModelCatalog.setSelectedModelId(modelRow.modelId);
-                                        }
-                                    }
-
-                                    StyledButton {
-                                        text: qsTr("Delete")
-                                        size: "small"
-                                        variant: "ghost"
-                                        visible: modelRow.canDelete && !modelRow.isDownloading
-                                        enabled: !DaemonClient.isModelBusy && !DaemonClient.isBusy
-                                        onClicked: {
-                                            ModelCatalog.deleteModel(modelRow.modelId);
-                                        }
-                                    }
-                                }
-                            }
-
-                            ColumnLayout {
-                                Layout.fillWidth: true
-                                spacing: 2
-                                visible: modelRow.isDownloading
-                                Layout.topMargin: 2
-
-                                RowLayout {
-                                    Layout.fillWidth: true
+                                    anchors.fill: parent
+                                    spacing: Theme.spacingSm
+                                    visible: !modelCard.isDownloading && modelCard.isSelected
+                                             && DaemonClient.isModelLoaded
 
                                     StyledText {
-                                        text: qsTr("%1%").arg(Math.round(modelRow.progress * 100))
+                                        text: qsTr("Active")
                                         variant: "caption"
                                         customWeight: Font.DemiBold
+                                        customColor: Theme.accentColor
                                     }
 
                                     Item {
                                         Layout.fillWidth: true
                                     }
 
-                                    StyledText {
-                                        text: {
-                                            const bytes = ModelCatalog.downloadBytesFormatted;
-                                            const speed = modelRow.speedFormatted;
-                                            if (bytes.length > 0 && speed.length > 0) {
-                                                return bytes + " (" + speed + ")";
-                                            }
-                                            if (bytes.length > 0) {
-                                                return bytes;
-                                            }
-                                            if (speed.length > 0) {
-                                                return speed;
-                                            }
-                                            return "";
+                                    StyledButton {
+                                        text: qsTr("Unload")
+                                        size: "small"
+                                        variant: "ghost"
+                                        visible: DaemonClient.isModelLoaded
+                                        enabled: !DaemonClient.isModelBusy && !DaemonClient.isBusy
+                                        onClicked: {
+                                            DaemonClient.unloadModel();
                                         }
-                                        variant: "caption"
-                                        colorRole: "secondary"
+                                    }
+
+                                    StyledButton {
+                                        iconSource: "qrc:/qt/qml/Tattle/assets/icons/trash.svg"
+                                        size: "small"
+                                        variant: "danger"
+                                        visible: modelCard.canDelete
+                                        enabled: !DaemonClient.isModelBusy && !DaemonClient.isBusy
+                                        onClicked: {
+                                            ModelCatalog.deleteModel(modelCard.modelId);
+                                        }
                                     }
                                 }
 
-                                T.ProgressBar {
-                                    Layout.fillWidth: true
-                                    implicitHeight: 4
-                                    from: 0.0
-                                    to: 1.0
-                                    value: Math.min(Math.max(modelRow.progress, 0.0), 1.0)
+                                RowLayout {
+                                    anchors.fill: parent
+                                    spacing: Theme.spacingSm
+                                    visible: !modelCard.isDownloading && modelCard.isInstalled && (
+                                                 !modelCard.isSelected || !DaemonClient.isModelLoaded)
 
-                                    background: Rectangle {
-                                        implicitHeight: 4
-                                        radius: Theme.radiusCircle
-                                        color: Theme.controlBg
+                                    StyledButton {
+                                        text: modelCard.isSelected ? qsTr("Load") : qsTr("Activate")
+                                        size: "small"
+                                        variant: modelCard.isSelected ? "primary" : "secondary"
+                                        Layout.fillWidth: true
+                                        enabled: !DaemonClient.isModelBusy && !DaemonClient.isBusy
+                                        onClicked: {
+                                            if (!modelCard.isSelected) {
+                                                ModelCatalog.setSelectedModelId(modelCard.modelId);
+                                            }
+                                            DaemonClient.loadModel();
+                                        }
                                     }
 
-                                    contentItem: Item {
-                                        implicitHeight: 4
-                                        Rectangle {
-                                            anchors.left: parent.left
-                                            anchors.top: parent.top
-                                            anchors.bottom: parent.bottom
-                                            width: parent.width * Math.min(Math.max(modelRow.progress, 0.0), 1.0)
-                                            radius: Theme.radiusCircle
-                                            color: Theme.accentColor
+                                    StyledButton {
+                                        iconSource: "qrc:/qt/qml/Tattle/assets/icons/trash.svg"
+                                        size: "small"
+                                        variant: "danger"
+                                        visible: modelCard.canDelete
+                                        enabled: !DaemonClient.isModelBusy && !DaemonClient.isBusy
+                                        onClicked: {
+                                            ModelCatalog.deleteModel(modelCard.modelId);
+                                        }
+                                    }
+                                }
+
+                                RowLayout {
+                                    anchors.fill: parent
+                                    spacing: Theme.spacingSm
+                                    visible: !modelCard.isDownloading && !modelCard.isInstalled
+
+                                    StyledButton {
+                                        text: qsTr("Download")
+                                        size: "small"
+                                        variant: "primary"
+                                        Layout.fillWidth: true
+                                        enabled: !ModelCatalog.isDownloadingAny
+                                        onClicked: {
+                                            ModelCatalog.startDownload(modelCard.modelId);
                                         }
                                     }
                                 }
@@ -536,6 +461,8 @@ Item {
                                                                qsTr("Running via optimized CPU SIMD intrinsics (AVX2/AVX)")
                         variant: "caption"
                         colorRole: "secondary"
+                        wrapMode: Text.WordWrap
+                        Layout.fillWidth: true
                     }
                 }
 

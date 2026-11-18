@@ -136,7 +136,7 @@ Item {
                         }
 
                         StyledText {
-                            text: qsTr("Fast and modern speech-to-text dictation client for Wayland.")
+                            text: qsTr("Fast and modern voice dictation app for Wayland.")
                             variant: "body"
                             colorRole: "secondary"
                             wrapMode: Text.WordWrap
@@ -166,7 +166,7 @@ Item {
                 Layout.fillWidth: true
 
                 StyledText {
-                    text: qsTr("Speech & Machine Learning")
+                    text: qsTr("Core Frameworks & Libraries")
                     variant: "subheading"
                     Layout.bottomMargin: Theme.spacingXs
                 }
@@ -181,25 +181,6 @@ Item {
                 }
 
                 StyledDivider {}
-
-                ComponentItem {
-                    title: qsTr("Groq Cloud API")
-                    badgeText: qsTr("Cloud AI")
-                    url: "https://github.com/groq"
-                    urlLabel: "github.com/groq"
-                    description: qsTr(
-                                     "Ultra-fast cloud LPU inference service powering real-time Whisper speech-to-text recognition and LLaMA text enhancement.")
-                }
-            }
-
-            StyledCard {
-                Layout.fillWidth: true
-
-                StyledText {
-                    text: qsTr("Core Framework & Platform")
-                    variant: "subheading"
-                    Layout.bottomMargin: Theme.spacingXs
-                }
 
                 ComponentItem {
                     title: qsTr("Qt 6 Framework")
@@ -219,58 +200,6 @@ Item {
                     urlLabel: "frankosterfeld/qtkeychain"
                     description: qsTr(
                                      "Platform-independent Qt library providing secure credential storage using Linux Secret Service (freedesktop.org) and KWallet.")
-                }
-
-                StyledDivider {}
-
-                ComponentItem {
-                    title: qsTr("Vulkan Headers & SDK")
-                    badgeText: qsTr("Apache-2.0")
-                    url: "https://github.com/KhronosGroup/Vulkan-Headers"
-                    urlLabel: "KhronosGroup/Vulkan-Headers"
-                    description: qsTr(
-                                     "Khronos cross-platform low-overhead GPU compute and graphics headers enabling Vulkan tensor acceleration for transcribe.cpp.")
-                }
-            }
-
-            StyledCard {
-                Layout.fillWidth: true
-
-                StyledText {
-                    text: qsTr("Linux & Desktop Integration")
-                    variant: "subheading"
-                    Layout.bottomMargin: Theme.spacingXs
-                }
-
-                ComponentItem {
-                    title: qsTr("wl-clipboard")
-                    badgeText: qsTr("GPL-3.0-or-later")
-                    url: "https://github.com/bugaevc/wl-clipboard"
-                    urlLabel: "bugaevc/wl-clipboard"
-                    description: qsTr(
-                                     "Wayland clipboard copy/paste utilities and data-control protocol client enabling clipboard synchronization.")
-                }
-
-                StyledDivider {}
-
-                ComponentItem {
-                    title: qsTr("libevdev")
-                    badgeText: qsTr("MIT")
-                    url: "https://gitlab.freedesktop.org/libevdev/libevdev"
-                    urlLabel: "freedesktop/libevdev"
-                    description: qsTr(
-                                     "Linux kernel event device library used by keyinjectord for virtual uinput device management and simulated keypress injection.")
-                }
-
-                StyledDivider {}
-
-                ComponentItem {
-                    title: qsTr("libcap")
-                    badgeText: qsTr("BSD-3-Clause / GPL-2.0")
-                    url: "https://git.kernel.org/pub/scm/libs/libcap/libcap.git"
-                    urlLabel: "kernel.org/libcap"
-                    description: qsTr(
-                                     "Linux POSIX capability library enabling keyinjectord to drop root privileges while retaining CAP_SETUID and CAP_SETGID for sandboxed operation.")
                 }
             }
 

@@ -158,8 +158,7 @@ void CloudProviderModel::initializeProviders() {
     m_providers.append({
         .id = u"groq"_s,
         .name = tr("Groq Cloud"),
-        .description =
-            tr("Ultra-fast cloud Whisper speech recognition and LLM text enhancement powered by Groq LPU compute."),
+        .description = tr("Ultra-fast cloud Whisper speech recognition and text cleanup powered by Groq."),
         .iconSource = u"qrc:/qt/qml/Tattle/assets/icons/sparkles.svg"_s,
         .componentSource = u"providers/GroqProviderSettings.qml"_s,
         .websiteUrl = u"https://console.groq.com/keys"_s,

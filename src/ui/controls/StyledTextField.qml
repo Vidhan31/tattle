@@ -23,6 +23,21 @@ T.TextField {
     bottomPadding: topPadding
     verticalAlignment: TextInput.AlignVCenter
 
+    Text {
+        id: placeholderLabel
+        x: root.leftPadding
+        y: root.topPadding
+        width: root.width - (root.leftPadding + root.rightPadding)
+        height: root.height - (root.topPadding + root.bottomPadding)
+        text: root.placeholderText
+        font: root.font
+        color: root.placeholderTextColor
+        verticalAlignment: root.verticalAlignment
+        elide: Text.ElideRight
+        visible: !root.length && !root.preeditText && (!root.activeFocus || root.horizontalAlignment
+                                                       !== Qt.AlignHCenter)
+    }
+
     background: Rectangle {
         color: Theme.inputBg
         border.color: root.activeFocus ? Theme.focusRingColor : Theme.inputBorder

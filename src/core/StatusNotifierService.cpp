@@ -189,7 +189,7 @@ KDbusToolTipStruct StatusNotifierItemAdaptor::toolTip() const {
     tip.icon = rec ? u"media-record"_s : u"audio-input-microphone"_s;
     tip.image = m_service ? m_service->iconPixmap() : KDbusImageVector {};
     tip.title = u"Tattle"_s;
-    tip.subTitle = rec ? u"Recording speech..."_s : u"Ready"_s;
+    tip.subTitle = rec ? u"Recording…"_s : u"Ready"_s;
     return tip;
 }
 

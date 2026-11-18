@@ -40,12 +40,12 @@ Item {
 
         ApiKeyConfigCard {
             title: qsTr("Gemini API Key")
-            description: qsTr("Required for Gemini speech recognition (Free tier available at Google AI Studio)")
+            description: qsTr("Required for Gemini speech recognition (Free API available at Google AI Studio)")
             rowDescription: qsTr("Enter your Google Gemini API key")
             apiKey: AppSettings.geminiApiKey
             placeholderText: qsTr("AIzaSy...")
             helpText: qsTr(
-                          "API keys available from Google AI Studio at aistudio.google.com. Stored securely in system keychain (with configuration fallback).")
+                          "API keys available from Google AI Studio at aistudio.google.com. Stored securely on your device.")
             linkButtonText: qsTr("Get API Key")
             linkUrl: "https://aistudio.google.com/app/apikey"
             onSaveRequested: key => {
@@ -84,7 +84,7 @@ Item {
             PreferenceRow {
                 title: qsTr("Transcription Mode")
                 description: qsTr(
-                                 "Smart mode removes filler words and structures output. Verbatim provides word-for-word accuracy.")
+                                 "Smart mode removes filler words and formats output. Verbatim provides word-for-word accuracy.")
                 layoutVertical: true
 
                 StyledComboBox {
@@ -107,7 +107,7 @@ Item {
 
         CustomVocabularyCard {
             title: qsTr("Custom Vocabulary")
-            description: qsTr("Provide specialized terminology to bias recognition")
+            description: qsTr("Help the speech recognizer with specialized terms and names")
             fieldLabel: qsTr("Custom Vocabulary")
             placeholderText: qsTr(
                                  "Comma-separated or newline-separated terms, e.g. Tattle, Wayland, Qt6, CMake, Kubernetes, Gemini...")

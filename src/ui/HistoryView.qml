@@ -29,7 +29,7 @@ Item {
                 }
 
                 StyledText {
-                    text: qsTr("Recent speech transcriptions")
+                    text: qsTr("Recent voice dictations")
                     variant: "caption"
                     colorRole: "secondary"
                 }
