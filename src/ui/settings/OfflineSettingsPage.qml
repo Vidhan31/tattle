@@ -45,6 +45,14 @@ Item {
             title: qsTr("Speech Model Library")
             description: qsTr("Download and manage speech recognition models")
 
+            readonly property int whisperTotal: (ModelCatalog.revision >= 0) ? ModelCatalog.totalCountForPrefix(
+                                                                                   "whisper-") : 0
+            readonly property int moonshineTotal: (ModelCatalog.revision >= 0) ? ModelCatalog.totalCountForPrefix(
+                                                                                     "moonshine-") : 0
+            readonly property int parakeetTotal: (ModelCatalog.revision >= 0) ? ModelCatalog.totalCountForPrefix(
+                                                                                    "parakeet-") : 0
+            readonly property int allTotal: (ModelCatalog.revision >= 0) ? ModelCatalog.totalCountForPrefix("") : 0
+
             property string selectedFamily: {
                 const downloading = ModelCatalog.downloadingModelId;
                 if (downloading.length > 0) {
@@ -104,7 +112,7 @@ Item {
                 spacing: Theme.spacingSm
 
                 StyledButton {
-                    text: qsTr("Whisper (6)")
+                    text: qsTr("Whisper (%1)").arg(libraryCard.whisperTotal)
                     size: "small"
                     variant: libraryCard.selectedFamily === "whisper" ? "primary" : "secondary"
                     onClicked: {
@@ -113,7 +121,7 @@ Item {
                 }
 
                 StyledButton {
-                    text: qsTr("Moonshine (2)")
+                    text: qsTr("Moonshine (%1)").arg(libraryCard.moonshineTotal)
                     size: "small"
                     variant: libraryCard.selectedFamily === "moonshine" ? "primary" : "secondary"
                     onClicked: {
@@ -122,7 +130,7 @@ Item {
                 }
 
                 StyledButton {
-                    text: qsTr("Parakeet (1)")
+                    text: qsTr("Parakeet (%1)").arg(libraryCard.parakeetTotal)
                     size: "small"
                     variant: libraryCard.selectedFamily === "parakeet" ? "primary" : "secondary"
                     onClicked: {
@@ -131,7 +139,7 @@ Item {
                 }
 
                 StyledButton {
-                    text: qsTr("All (9)")
+                    text: qsTr("All (%1)").arg(libraryCard.allTotal)
                     size: "small"
                     variant: libraryCard.selectedFamily === "all" ? "primary" : "secondary"
                     onClicked: {
@@ -339,6 +347,7 @@ Item {
                                     anchors.fill: parent
                                     spacing: Theme.spacingSm
                                     visible: !modelCard.isDownloading && modelCard.isSelected
+                                             && DaemonClient.isModelLoaded
 
                                     StyledText {
                                         text: qsTr("Active")
@@ -377,16 +386,19 @@ Item {
                                 RowLayout {
                                     anchors.fill: parent
                                     spacing: Theme.spacingSm
-                                    visible: !modelCard.isDownloading && modelCard.isInstalled && !modelCard.isSelected
+                                    visible: !modelCard.isDownloading && modelCard.isInstalled && (
+                                                 !modelCard.isSelected || !DaemonClient.isModelLoaded)
 
                                     StyledButton {
-                                        text: qsTr("Activate")
+                                        text: modelCard.isSelected ? qsTr("Load") : qsTr("Activate")
                                         size: "small"
-                                        variant: "secondary"
+                                        variant: modelCard.isSelected ? "primary" : "secondary"
                                         Layout.fillWidth: true
                                         enabled: !DaemonClient.isModelBusy && !DaemonClient.isBusy
                                         onClicked: {
-                                            ModelCatalog.setSelectedModelId(modelCard.modelId);
+                                            if (!modelCard.isSelected) {
+                                                ModelCatalog.setSelectedModelId(modelCard.modelId);
+                                            }
                                             DaemonClient.loadModel();
                                         }
                                     }

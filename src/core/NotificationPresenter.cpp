@@ -185,7 +185,7 @@ void NotificationPresenter::onAudioDeviceDisconnected(const QString& deviceName,
     sendCategoryNotification(u"microphone"_s, tr("Microphone Disconnected"),
                              tr("'%1' was disconnected. Switched to '%2'.").arg(deviceName, fallbackDeviceName),
                              static_cast<int>(LinuxNotificationService::Urgency::Normal), u"audio-input-microphone"_s,
-                             {u"settings"_s, tr("Audio Settings")});
+                             {u"audio"_s, tr("Audio Settings")});
 }
 
 void NotificationPresenter::onAudioDeviceAvailabilityChanged() {
@@ -197,7 +197,7 @@ void NotificationPresenter::onAudioDeviceAvailabilityChanged() {
         sendCategoryNotification(u"microphone"_s, tr("No Microphone Detected"),
                                  tr("Microphone disconnected. Please reconnect your microphone to dictate."),
                                  static_cast<int>(LinuxNotificationService::Urgency::Normal),
-                                 u"audio-input-microphone"_s, {u"settings"_s, tr("Audio Settings")});
+                                 u"audio-input-microphone"_s, {u"audio"_s, tr("Audio Settings")});
     } else {
         if (m_notificationService) {
             m_notificationService->clearCategory(u"microphone"_s);

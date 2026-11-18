@@ -9,11 +9,29 @@ ColumnLayout {
     signal navigateRequested(string target)
     signal clipboardWarningRequested
 
-    readonly property bool hasVisibleBanners: (clipboardBanner.visible || apiKeyBanner.visible
-                                               || invalidApiKeyBanner.visible || rateLimitedBanner.visible
-                                               || missingModelBanner.visible || loadingModelBanner.visible
-                                               || noMicBanner.visible || fatalErrorBanner.visible
-                                               || dictationErrorBanner.visible)
+    readonly property bool showClipboardWarning: DaemonDiagnosticModel.clipboardWarningRequired &&
+                                                 !DaemonDiagnosticModel.clipboardBannerDismissed
+    readonly property bool showApiKeyWarning: DaemonClient.activeBackend === DaemonClient.Cloud &&
+                                              !DaemonClient.cloudApiKeySet
+    readonly property bool showInvalidApiKeyWarning: DaemonClient.activeBackend === DaemonClient.Cloud
+                                                     && DaemonClient.cloudApiKeyInvalid
+    readonly property bool showRateLimitedWarning: DaemonClient.activeBackend === DaemonClient.Cloud
+                                                   && DaemonClient.cloudRateLimited
+    readonly property bool showMissingModelWarning: DaemonClient.activeBackend === DaemonClient.TranscribeCpp &&
+                                                    !DaemonClient.isModelInstalled
+    readonly property bool showLoadingModelWarning: DaemonClient.activeBackend === DaemonClient.TranscribeCpp
+                                                    && DaemonClient.isModelInstalled && !DaemonClient.isModelLoaded
+    readonly property bool showNoMicWarning: !DaemonClient.microphoneAvailable
+    readonly property bool showFatalErrorWarning: DaemonDiagnosticModel.hasFatalError
+    readonly property bool showDictationErrorWarning: DaemonClient.dictationState === DaemonClient.Error && (
+                                                          DaemonClient.activeBackend !== DaemonClient.Cloud || (
+                                                              !DaemonClient.cloudApiKeyInvalid &&
+                                                              !DaemonClient.cloudRateLimited))
+
+    readonly property bool hasVisibleBanners: (showClipboardWarning || showApiKeyWarning || showInvalidApiKeyWarning
+                                               || showRateLimitedWarning || showMissingModelWarning
+                                               || showLoadingModelWarning || showNoMicWarning || showFatalErrorWarning
+                                               || showDictationErrorWarning)
 
     visible: hasVisibleBanners
     Layout.fillWidth: true
@@ -24,7 +42,7 @@ ColumnLayout {
 
     StatusBanner {
         id: clipboardBanner
-        visible: DaemonDiagnosticModel.clipboardWarningRequired && !DaemonDiagnosticModel.clipboardBannerDismissed
+        visible: root.showClipboardWarning
         Layout.fillWidth: true
         Layout.preferredHeight: visible ? implicitHeight : 0
         bannerType: "warning"
@@ -41,7 +59,7 @@ ColumnLayout {
 
     StatusBanner {
         id: apiKeyBanner
-        visible: DaemonClient.activeBackend === DaemonClient.Cloud && !DaemonClient.cloudApiKeySet
+        visible: root.showApiKeyWarning
         Layout.fillWidth: true
         Layout.preferredHeight: visible ? implicitHeight : 0
         bannerType: "warning"
@@ -54,7 +72,7 @@ ColumnLayout {
 
     StatusBanner {
         id: invalidApiKeyBanner
-        visible: DaemonClient.activeBackend === DaemonClient.Cloud && DaemonClient.cloudApiKeyInvalid
+        visible: root.showInvalidApiKeyWarning
         Layout.fillWidth: true
         Layout.preferredHeight: visible ? implicitHeight : 0
         bannerType: "warning"
@@ -70,7 +88,7 @@ ColumnLayout {
 
     StatusBanner {
         id: rateLimitedBanner
-        visible: DaemonClient.activeBackend === DaemonClient.Cloud && DaemonClient.cloudRateLimited
+        visible: root.showRateLimitedWarning
         Layout.fillWidth: true
         Layout.preferredHeight: visible ? implicitHeight : 0
         bannerType: "warning"
@@ -82,7 +100,7 @@ ColumnLayout {
 
     StatusBanner {
         id: missingModelBanner
-        visible: DaemonClient.activeBackend === DaemonClient.TranscribeCpp && !DaemonClient.isModelInstalled
+        visible: root.showMissingModelWarning
         Layout.fillWidth: true
         Layout.preferredHeight: visible ? implicitHeight : 0
         bannerType: "warning"
@@ -94,8 +112,7 @@ ColumnLayout {
 
     StatusBanner {
         id: loadingModelBanner
-        visible: DaemonClient.activeBackend === DaemonClient.TranscribeCpp && DaemonClient.isModelInstalled &&
-                 !DaemonClient.isModelLoaded
+        visible: root.showLoadingModelWarning
         Layout.fillWidth: true
         Layout.preferredHeight: visible ? implicitHeight : 0
         bannerType: "info"
@@ -107,7 +124,7 @@ ColumnLayout {
 
     StatusBanner {
         id: noMicBanner
-        visible: !DaemonClient.microphoneAvailable
+        visible: root.showNoMicWarning
         Layout.fillWidth: true
         Layout.preferredHeight: visible ? implicitHeight : 0
         bannerType: "warning"
@@ -119,7 +136,7 @@ ColumnLayout {
 
     StatusBanner {
         id: fatalErrorBanner
-        visible: DaemonDiagnosticModel.hasFatalError
+        visible: root.showFatalErrorWarning
         Layout.fillWidth: true
         Layout.preferredHeight: visible ? implicitHeight : 0
         bannerType: "danger"
@@ -134,10 +151,7 @@ ColumnLayout {
 
     StatusBanner {
         id: dictationErrorBanner
-        visible: DaemonClient.dictationState === DaemonClient.Error && (DaemonClient.activeBackend
-                                                                        !== DaemonClient.Cloud || (
-                                                                            !DaemonClient.cloudApiKeyInvalid &&
-                                                                            !DaemonClient.cloudRateLimited))
+        visible: root.showDictationErrorWarning
         Layout.fillWidth: true
         Layout.preferredHeight: visible ? implicitHeight : 0
         bannerType: "danger"

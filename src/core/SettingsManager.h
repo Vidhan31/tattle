@@ -143,6 +143,11 @@ public:
 
     void setSoundEnabled(bool enabled);
     void setNotificationsEnabled(bool enabled);
+    void setNotificationsTranscriptionEnabled(bool enabled);
+    void setNotificationsModelEnabled(bool enabled);
+    void setNotificationsAudioEnabled(bool enabled);
+    void setNotificationsFailoverEnabled(bool enabled);
+    void setNotificationsSystemEnabled(bool enabled);
     void setActiveProvider(const QString& providerId);
     void setTranscribeSelectedModel(const QString& modelId);
 

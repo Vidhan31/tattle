@@ -184,6 +184,10 @@ void TestModelCatalogModel::testPrefixCountsAndMatching() {
     QCOMPARE(model.installedCountForPrefix(u"parakeet-"_s), 0);
     QCOMPARE(model.availableCountForPrefix(u"parakeet-"_s), 1);
 
+    // Total counts across all families
+    QCOMPARE(model.totalCountForPrefix(QString()), 6);
+    QCOMPARE(model.totalCountForPrefix(u""_s), 6);
+
     // Matching with status filter
     QCOMPARE(model.matchingCount(u"whisper-"_s, u"all"_s, QString()), 3);
     QCOMPARE(model.matchingCount(u"whisper-"_s, u"installed"_s, QString()), 1);

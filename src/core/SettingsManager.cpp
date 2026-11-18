@@ -602,6 +602,61 @@ void SettingsManager::setNotificationsEnabled(bool enabled) {
     }
 }
 
+void SettingsManager::setNotificationsTranscriptionEnabled(bool enabled) {
+    if (m_notificationConfig.transcriptionNotificationsEnabled != enabled) {
+        m_notificationConfig.transcriptionNotificationsEnabled = enabled;
+        QSettings settings;
+        settings.setValue(SettingsKeys::kNotificationsTranscription.toString(), enabled);
+        settings.sync();
+        emit notificationConfigChanged(m_notificationConfig);
+        emit settingChanged(SettingsKeys::kNotificationsTranscription.toString(), enabled);
+    }
+}
+
+void SettingsManager::setNotificationsModelEnabled(bool enabled) {
+    if (m_notificationConfig.modelNotificationsEnabled != enabled) {
+        m_notificationConfig.modelNotificationsEnabled = enabled;
+        QSettings settings;
+        settings.setValue(SettingsKeys::kNotificationsModel.toString(), enabled);
+        settings.sync();
+        emit notificationConfigChanged(m_notificationConfig);
+        emit settingChanged(SettingsKeys::kNotificationsModel.toString(), enabled);
+    }
+}
+
+void SettingsManager::setNotificationsAudioEnabled(bool enabled) {
+    if (m_notificationConfig.audioNotificationsEnabled != enabled) {
+        m_notificationConfig.audioNotificationsEnabled = enabled;
+        QSettings settings;
+        settings.setValue(SettingsKeys::kNotificationsAudio.toString(), enabled);
+        settings.sync();
+        emit notificationConfigChanged(m_notificationConfig);
+        emit settingChanged(SettingsKeys::kNotificationsAudio.toString(), enabled);
+    }
+}
+
+void SettingsManager::setNotificationsFailoverEnabled(bool enabled) {
+    if (m_notificationConfig.failoverNotificationsEnabled != enabled) {
+        m_notificationConfig.failoverNotificationsEnabled = enabled;
+        QSettings settings;
+        settings.setValue(SettingsKeys::kNotificationsFailover.toString(), enabled);
+        settings.sync();
+        emit notificationConfigChanged(m_notificationConfig);
+        emit settingChanged(SettingsKeys::kNotificationsFailover.toString(), enabled);
+    }
+}
+
+void SettingsManager::setNotificationsSystemEnabled(bool enabled) {
+    if (m_notificationConfig.systemNotificationsEnabled != enabled) {
+        m_notificationConfig.systemNotificationsEnabled = enabled;
+        QSettings settings;
+        settings.setValue(SettingsKeys::kNotificationsSystem.toString(), enabled);
+        settings.sync();
+        emit notificationConfigChanged(m_notificationConfig);
+        emit settingChanged(SettingsKeys::kNotificationsSystem.toString(), enabled);
+    }
+}
+
 void SettingsManager::setCloudRouterConfig(const CloudRouterConfig& config) {
     if (m_cloudRouterConfig == config) {
         return;
@@ -697,6 +752,16 @@ void SettingsManager::setSetting(const QString& key, const QVariant& value) {
         setSoundEnabled(value.toBool());
     } else if (key == SettingsKeys::kNotificationsEnabled) {
         setNotificationsEnabled(value.toBool());
+    } else if (key == SettingsKeys::kNotificationsTranscription) {
+        setNotificationsTranscriptionEnabled(value.toBool());
+    } else if (key == SettingsKeys::kNotificationsModel) {
+        setNotificationsModelEnabled(value.toBool());
+    } else if (key == SettingsKeys::kNotificationsAudio) {
+        setNotificationsAudioEnabled(value.toBool());
+    } else if (key == SettingsKeys::kNotificationsFailover) {
+        setNotificationsFailoverEnabled(value.toBool());
+    } else if (key == SettingsKeys::kNotificationsSystem) {
+        setNotificationsSystemEnabled(value.toBool());
     } else if (key == SettingsKeys::kCloudActiveProvider) {
         setActiveProvider(value.toString());
     } else if (key == SettingsKeys::kTranscribeSelectedModel) {
