@@ -107,6 +107,10 @@ void NotificationPresenter::setCompositeSttEngine(CompositeSttEngine* engine) {
         disconnect(m_sttEngine, &CompositeSttEngine::onlineRestored, this, &NotificationPresenter::onOnlineRestored);
         disconnect(m_sttEngine, &CompositeSttEngine::offlineModelRequired, this,
                    &NotificationPresenter::onOfflineModelRequired);
+        disconnect(m_sttEngine, &CompositeSttEngine::offlineSwitchSuggested, this,
+                   &NotificationPresenter::onOfflineSwitchSuggested);
+        disconnect(m_sttEngine, &CompositeSttEngine::onlineSwitchSuggested, this,
+                   &NotificationPresenter::onOnlineSwitchSuggested);
         disconnect(m_sttEngine, &CompositeSttEngine::networkDisconnectedDuringSession, this,
                    &NotificationPresenter::onNetworkDisconnectedDuringSession);
         disconnect(m_sttEngine, &CompositeSttEngine::modelLoadFailed, this, &NotificationPresenter::onModelLoadFailed);
@@ -119,6 +123,10 @@ void NotificationPresenter::setCompositeSttEngine(CompositeSttEngine* engine) {
         connect(m_sttEngine, &CompositeSttEngine::onlineRestored, this, &NotificationPresenter::onOnlineRestored);
         connect(m_sttEngine, &CompositeSttEngine::offlineModelRequired, this,
                 &NotificationPresenter::onOfflineModelRequired);
+        connect(m_sttEngine, &CompositeSttEngine::offlineSwitchSuggested, this,
+                &NotificationPresenter::onOfflineSwitchSuggested);
+        connect(m_sttEngine, &CompositeSttEngine::onlineSwitchSuggested, this,
+                &NotificationPresenter::onOnlineSwitchSuggested);
         connect(m_sttEngine, &CompositeSttEngine::networkDisconnectedDuringSession, this,
                 &NotificationPresenter::onNetworkDisconnectedDuringSession);
         connect(m_sttEngine, &CompositeSttEngine::modelLoadFailed, this, &NotificationPresenter::onModelLoadFailed);
@@ -144,6 +152,14 @@ void NotificationPresenter::onNotificationActionInvoked(uint id, const QString& 
         emit requestNavigate(u"cloud"_s);
     } else if (actionKey == u"offline"_s) {
         emit requestNavigate(u"offline"_s);
+    } else if (actionKey == u"switch_offline"_s) {
+        if (m_dictationCoordinator) {
+            m_dictationCoordinator->applyOfflineSwitch();
+        }
+    } else if (actionKey == u"switch_cloud"_s) {
+        if (m_dictationCoordinator) {
+            m_dictationCoordinator->restoreOnlineBackend();
+        }
     } else if (actionKey == u"quit"_s) {
         emit requestQuitApp();
     }
@@ -218,10 +234,27 @@ void NotificationPresenter::onOnlineRestored() {
 }
 
 void NotificationPresenter::onOfflineModelRequired() {
-    sendCategoryNotification(u"failover"_s, tr("Tattle: Offline Model Required"),
-                             tr("No internet connection available. Please open Tattle and download a speech model to "
+    sendCategoryNotification(u"failover"_s, tr("Offline Model Required"),
+                             tr("No internet connection available. Open Tattle and download a speech model to "
                                 "use offline dictation."),
-                             static_cast<int>(LinuxNotificationService::Urgency::Critical), u"dialog-warning"_s);
+                             static_cast<int>(LinuxNotificationService::Urgency::Critical), u"dialog-warning"_s,
+                             {u"offline"_s, tr("Download Model")});
+}
+
+void NotificationPresenter::onOfflineSwitchSuggested(const QString& modelName) {
+    const QString body = modelName.isEmpty()
+                             ? tr("Cloud dictation unavailable. Switch to offline speech recognition?")
+                             : tr("Cloud dictation unavailable. Switch to offline model (%1)?").arg(modelName);
+    sendCategoryNotification(u"failover"_s, tr("Internet Connection Offline"), body,
+                             static_cast<int>(LinuxNotificationService::Urgency::Normal), u"network-offline"_s,
+                             {u"switch_offline"_s, tr("Switch to Offline"), u"offline"_s, tr("Offline Settings")});
+}
+
+void NotificationPresenter::onOnlineSwitchSuggested() {
+    sendCategoryNotification(u"failover"_s, tr("Internet Connection Restored"),
+                             tr("Connection restored. Switch back to Cloud transcription?"),
+                             static_cast<int>(LinuxNotificationService::Urgency::Normal), u"network-wireless"_s,
+                             {u"switch_cloud"_s, tr("Switch to Cloud")});
 }
 
 void NotificationPresenter::onNetworkDisconnectedDuringSession() {

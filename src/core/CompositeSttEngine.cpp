@@ -45,8 +45,9 @@ void CompositeSttEngine::setSettingsManager(SettingsManager* settings) {
                     if (m_autoSwitchOffline != config.autoSwitchOffline) {
                         m_autoSwitchOffline = config.autoSwitchOffline;
                         emit autoSwitchOfflineChanged();
-                        if (!m_autoSwitchOffline && m_autoSwitchedToOffline && !isBusy()) {
-                            restoreOnlineBackend();
+                        if (!m_autoSwitchOffline) {
+                            m_pendingOfflineSwitch = false;
+                            m_pendingOnlineSwitch = false;
                         }
                     }
                 });
@@ -88,8 +89,9 @@ void CompositeSttEngine::loadSettings() {
     if (m_autoSwitchOffline != autoSwitch) {
         m_autoSwitchOffline = autoSwitch;
         emit autoSwitchOfflineChanged();
-        if (!m_autoSwitchOffline && m_autoSwitchedToOffline && !isBusy()) {
-            restoreOnlineBackend();
+        if (!m_autoSwitchOffline) {
+            m_pendingOfflineSwitch = false;
+            m_pendingOnlineSwitch = false;
         }
     }
 
@@ -251,9 +253,10 @@ void CompositeSttEngine::setActiveBackend(TranscriptionBackend backend, bool per
                                   m_activeBackend == TranscriptionBackend::TranscribeCpp ? u"TranscribeCpp"_s
                                                                                          : u"Cloud"_s);
             }
-            if (m_autoSwitchedToOffline || m_pendingOfflineSwitch) {
+            if (m_autoSwitchedToOffline || m_pendingOfflineSwitch || m_pendingOnlineSwitch) {
                 m_autoSwitchedToOffline = false;
                 m_pendingOfflineSwitch = false;
+                m_pendingOnlineSwitch = false;
                 emit autoSwitchedToOfflineChanged();
             }
         }
@@ -292,6 +295,7 @@ void CompositeSttEngine::setActiveBackend(TranscriptionBackend backend, bool per
         }
         m_autoSwitchedToOffline = false;
         m_pendingOfflineSwitch = false;
+        m_pendingOnlineSwitch = false;
         emit autoSwitchedToOfflineChanged();
     }
 
@@ -326,9 +330,7 @@ void CompositeSttEngine::setAutoSwitchOffline(bool enable) {
 
     if (!m_autoSwitchOffline) {
         m_pendingOfflineSwitch = false;
-        if (m_autoSwitchedToOffline && !isBusy()) {
-            restoreOnlineBackend();
-        }
+        m_pendingOnlineSwitch = false;
     }
 }
 
@@ -447,6 +449,7 @@ void CompositeSttEngine::onNetworkOnlineChanged(bool online) {
     }
 
     if (!online) {
+        m_pendingOnlineSwitch = false;
         if (m_activeBackend != TranscriptionBackend::Cloud) {
             return;
         }
@@ -455,17 +458,19 @@ void CompositeSttEngine::onNetworkOnlineChanged(bool online) {
             m_pendingOfflineSwitch = true;
             emit networkDisconnectedDuringSession();
         } else {
-            applyOfflineSwitch();
+            promptOfflineSwitch();
         }
     } else {
-        if (!m_autoSwitchedToOffline) {
+        m_pendingOfflineSwitch = false;
+        if (!m_autoSwitchOffline || !m_autoSwitchedToOffline || m_activeBackend == TranscriptionBackend::Cloud) {
             return;
         }
 
         if (isBusy()) {
-            qCInfo(lcSpeech) << "CompositeSttEngine: Network restored while busy; will restore backend when idle";
+            qCInfo(lcSpeech) << "CompositeSttEngine: Network restored while busy; will suggest cloud switch when idle";
+            m_pendingOnlineSwitch = true;
         } else {
-            restoreOnlineBackend();
+            promptOnlineSwitch();
         }
     }
 }
@@ -479,20 +484,42 @@ void CompositeSttEngine::checkPendingOfflineOrOnlineSwitch() {
         m_pendingOfflineSwitch = false;
         const bool networkOnline = m_healthMonitor ? m_healthMonitor->isNetworkOnline() : true;
         if (m_autoSwitchOffline && !networkOnline && m_activeBackend == TranscriptionBackend::Cloud) {
-            applyOfflineSwitch();
+            promptOfflineSwitch();
             return;
         }
     }
 
-    if (m_autoSwitchedToOffline && m_healthMonitor && m_healthMonitor->isNetworkOnline()) {
-        restoreOnlineBackend();
+    if (m_pendingOnlineSwitch) {
+        m_pendingOnlineSwitch = false;
+        const bool networkOnline = m_healthMonitor ? m_healthMonitor->isNetworkOnline() : true;
+        if (m_autoSwitchOffline && m_autoSwitchedToOffline && networkOnline &&
+            m_activeBackend == TranscriptionBackend::TranscribeCpp) {
+            promptOnlineSwitch();
+        }
     }
+}
+
+void CompositeSttEngine::promptOfflineSwitch() {
+    if (!isOfflineModelAvailable()) {
+        qCWarning(lcSpeech) << "CompositeSttEngine: Offline switch prompted, but no transcribe.cpp model is available";
+        emit offlineModelRequired();
+        return;
+    }
+
+    const QString modelName = m_modelManager ? m_modelManager->selectedModelName() : QString();
+    qCInfo(lcSpeech) << "CompositeSttEngine: Offline switch suggested with model:" << modelName;
+    emit offlineSwitchSuggested(modelName);
+}
+
+void CompositeSttEngine::promptOnlineSwitch() {
+    qCInfo(lcSpeech) << "CompositeSttEngine: Online connection restored, cloud switch suggested";
+    emit onlineSwitchSuggested();
 }
 
 void CompositeSttEngine::applyOfflineSwitch() {
     if (!isOfflineModelAvailable()) {
         qCWarning(lcSpeech)
-            << "CompositeSttEngine: Automatic switch to offline requested, but no transcribe.cpp model is available";
+            << "CompositeSttEngine: Switch to offline requested, but no transcribe.cpp model is available";
         emit offlineModelRequired();
         return;
     }
@@ -506,6 +533,7 @@ void CompositeSttEngine::applyOfflineSwitch() {
 
 void CompositeSttEngine::restoreOnlineBackend() {
     qCInfo(lcSpeech) << "CompositeSttEngine: Restoring active backend back to Cloud";
+    m_pendingOnlineSwitch = false;
     setActiveBackend(TranscriptionBackend::Cloud, false);
     m_autoSwitchedToOffline = false;
     emit autoSwitchedToOfflineChanged();

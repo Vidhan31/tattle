@@ -16,6 +16,7 @@ SystemAdaptor::SystemAdaptor(SystemService* service, QObject* parent)
         connect(m_service, &SystemService::microphoneTestChanged, this, &SystemAdaptor::microphoneTestChanged);
         connect(m_service, &SystemService::microphoneTestLevelChanged, this,
                 &SystemAdaptor::microphoneTestLevelChanged);
+        connect(m_service, &SystemService::networkOnlineChanged, this, &SystemAdaptor::networkOnlineChanged);
         connect(m_service, &SystemService::requestShowWindow, this, &SystemAdaptor::requestShowWindow);
         connect(m_service, &SystemService::requestNavigate, this, &SystemAdaptor::requestNavigate);
         connect(m_service, &SystemService::requestQuitApp, this, &SystemAdaptor::requestQuitApp);
@@ -80,6 +81,10 @@ bool SystemAdaptor::microphoneTestActive() const {
 
 double SystemAdaptor::microphoneTestLevel() const {
     return m_service ? static_cast<double>(m_service->microphoneTestLevel()) : 0.0;
+}
+
+bool SystemAdaptor::networkOnline() const {
+    return m_service ? m_service->networkOnline() : true;
 }
 
 void SystemAdaptor::testTextInjection() {

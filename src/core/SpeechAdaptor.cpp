@@ -46,6 +46,18 @@ void SpeechAdaptor::setActiveBackend(int backend, bool persistSettings) {
     }
 }
 
+void SpeechAdaptor::applyOfflineSwitch() {
+    if (m_coordinator) {
+        m_coordinator->applyOfflineSwitch();
+    }
+}
+
+void SpeechAdaptor::restoreOnlineBackend() {
+    if (m_coordinator) {
+        m_coordinator->restoreOnlineBackend();
+    }
+}
+
 int SpeechAdaptor::recordingMode() const {
     return m_coordinator ? static_cast<int>(m_coordinator->recordingMode()) : 0;
 }

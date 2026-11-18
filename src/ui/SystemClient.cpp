@@ -129,6 +129,10 @@ qreal SystemClient::microphoneTestLevel() const noexcept {
     return m_microphoneTestLevel;
 }
 
+bool SystemClient::networkOnline() const noexcept {
+    return m_networkOnline;
+}
+
 bool SystemClient::sendRemoteCommand(const QString& command) {
     if (!QDBusConnection::sessionBus().isConnected()) {
         return false;
@@ -260,6 +264,7 @@ void SystemClient::setupDBusConnections() {
     bus.connect(kServiceName, kObjectPath, kInterface, u"microphoneTestChanged"_s, this, SLOT(syncFromDaemon()));
     bus.connect(kServiceName, kObjectPath, kInterface, u"microphoneTestLevelChanged"_s, this,
                 SLOT(onMicrophoneTestLevelChanged(double)));
+    bus.connect(kServiceName, kObjectPath, kInterface, u"networkOnlineChanged"_s, this, SLOT(syncFromDaemon()));
 
     bus.connect(kServiceName, kObjectPath, kInterface, u"requestShowWindow"_s, this, SIGNAL(requestShowWindow()));
 
@@ -303,6 +308,13 @@ void SystemClient::syncFromDaemon() {
     m_microphoneAvailable = m_interface->property("microphoneAvailable").toBool();
     m_microphoneTestActive = m_interface->property("microphoneTestActive").toBool();
     m_microphoneTestLevel = m_interface->property("microphoneTestLevel").toReal();
+
+    const auto propNet = m_interface->property("networkOnline");
+    const bool netOnline = propNet.isValid() ? propNet.toBool() : true;
+    if (m_networkOnline != netOnline) {
+        m_networkOnline = netOnline;
+        emit networkOnlineChanged();
+    }
 
     emit shortcutStatusChanged();
     emit textInjectionStatusChanged();
@@ -358,6 +370,12 @@ void SystemClient::onPropertiesChanged(const QString& interfaceName, const QVari
         } else if (key == u"microphoneTestLevel"_s) {
             m_microphoneTestLevel = val.toReal();
             emit microphoneTestLevelChanged(m_microphoneTestLevel);
+        } else if (key == u"networkOnline"_s) {
+            const bool netOnline = val.toBool();
+            if (m_networkOnline != netOnline) {
+                m_networkOnline = netOnline;
+                emit networkOnlineChanged();
+            }
         }
     }
 

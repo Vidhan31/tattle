@@ -20,6 +20,7 @@ class ModelCatalogModel : public QAbstractListModel {
     Q_PROPERTY(QString modelsDirectory READ modelsDirectory NOTIFY modelsDirectoryChanged FINAL)
     Q_PROPERTY(QString selectedModelName READ selectedModelName NOTIFY selectedModelNameChanged FINAL)
     Q_PROPERTY(bool isSelectedModelInstalled READ isSelectedModelInstalled NOTIFY selectedModelInstalledChanged FINAL)
+    Q_PROPERTY(bool hasDownloadedModels READ hasDownloadedModels NOTIFY hasDownloadedModelsChanged FINAL)
     Q_PROPERTY(bool isDownloadingAny READ isDownloadingAny NOTIFY isDownloadingAnyChanged FINAL)
     Q_PROPERTY(QString downloadingModelId READ downloadingModelId NOTIFY isDownloadingAnyChanged FINAL)
     Q_PROPERTY(qreal downloadProgress READ downloadProgress NOTIFY downloadProgressChanged FINAL)
@@ -72,6 +73,7 @@ public:
     [[nodiscard]] static QString modelsDirectory();
     [[nodiscard]] QString selectedModelName() const;
     [[nodiscard]] bool isSelectedModelInstalled() const;
+    [[nodiscard]] bool hasDownloadedModels() const noexcept;
     [[nodiscard]] bool isDownloadingAny() const;
     [[nodiscard]] QString downloadingModelId() const;
     [[nodiscard]] qreal downloadProgress() const;
@@ -99,6 +101,7 @@ signals:
     void modelsDirectoryChanged();
     void selectedModelNameChanged();
     void selectedModelInstalledChanged();
+    void hasDownloadedModelsChanged();
     void isDownloadingAnyChanged();
     void downloadProgressChanged();
     void lastErrorChanged();

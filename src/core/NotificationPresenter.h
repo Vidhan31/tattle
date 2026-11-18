@@ -48,6 +48,8 @@ public slots:
     void onFailoverTriggered();
     void onOnlineRestored();
     void onOfflineModelRequired();
+    void onOfflineSwitchSuggested(const QString& modelName);
+    void onOnlineSwitchSuggested();
     void onNetworkDisconnectedDuringSession();
     void onModelLoadFailed(const QString& modelPath, const QString& error);
 

@@ -69,6 +69,7 @@ class DaemonClient : public QObject {
     Q_PROPERTY(bool microphoneAvailable READ microphoneAvailable NOTIFY microphoneStatusChanged FINAL)
     Q_PROPERTY(bool microphoneTestActive READ microphoneTestActive NOTIFY microphoneTestChanged FINAL)
     Q_PROPERTY(qreal microphoneTestLevel READ microphoneTestLevel NOTIFY microphoneTestLevelChanged FINAL)
+    Q_PROPERTY(bool networkOnline READ networkOnline NOTIFY networkOnlineChanged FINAL)
 
     Q_PROPERTY(bool cloudApiKeySet READ cloudApiKeySet NOTIFY cloudStatusChanged FINAL)
     Q_PROPERTY(bool cloudApiKeyInvalid READ cloudApiKeyInvalid NOTIFY cloudStatusChanged FINAL)
@@ -154,6 +155,7 @@ public:
     [[nodiscard]] bool microphoneAvailable() const noexcept;
     [[nodiscard]] bool microphoneTestActive() const noexcept;
     [[nodiscard]] qreal microphoneTestLevel() const noexcept;
+    [[nodiscard]] bool networkOnline() const noexcept;
 
     [[nodiscard]] bool cloudApiKeySet() const noexcept;
     [[nodiscard]] bool cloudApiKeyInvalid() const noexcept;
@@ -196,6 +198,7 @@ signals:
     void microphoneStatusChanged();
     void microphoneTestChanged();
     void microphoneTestLevelChanged(qreal level);
+    void networkOnlineChanged();
     void cloudStatusChanged();
     void modelCatalogChanged();
 
@@ -210,6 +213,8 @@ signals:
 public slots:
     void setActiveBackend(TranscriptionBackend backend, bool persistSettings = true);
     void setActiveBackend(int backend, bool persistSettings = true);
+    void applyOfflineSwitch();
+    void restoreOnlineBackend();
     void setRecordingMode(RecordingMode mode);
     void setRecordingMode(int mode);
     void setAutoSwitchOffline(bool enable);

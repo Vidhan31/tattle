@@ -38,6 +38,7 @@ class SystemClient : public QObject {
     Q_PROPERTY(bool microphoneAvailable READ microphoneAvailable NOTIFY microphoneStatusChanged FINAL)
     Q_PROPERTY(bool microphoneTestActive READ microphoneTestActive NOTIFY microphoneTestChanged FINAL)
     Q_PROPERTY(qreal microphoneTestLevel READ microphoneTestLevel NOTIFY microphoneTestLevelChanged FINAL)
+    Q_PROPERTY(bool networkOnline READ networkOnline NOTIFY networkOnlineChanged FINAL)
 
 public:
     explicit SystemClient(QObject* parent = nullptr);
@@ -69,6 +70,7 @@ public:
     [[nodiscard]] bool microphoneAvailable() const noexcept;
     [[nodiscard]] bool microphoneTestActive() const noexcept;
     [[nodiscard]] qreal microphoneTestLevel() const noexcept;
+    [[nodiscard]] bool networkOnline() const noexcept;
 
     static bool sendRemoteCommand(const QString& command);
 
@@ -80,6 +82,7 @@ signals:
     void microphoneStatusChanged();
     void microphoneTestChanged();
     void microphoneTestLevelChanged(qreal level);
+    void networkOnlineChanged();
 
     void requestShowWindow();
     void requestNavigate(const QString& section);
@@ -129,4 +132,5 @@ private:
     bool m_microphoneAvailable = false;
     bool m_microphoneTestActive = false;
     qreal m_microphoneTestLevel = 0.0;
+    bool m_networkOnline = true;
 };

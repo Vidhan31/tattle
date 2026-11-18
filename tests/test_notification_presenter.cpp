@@ -1,3 +1,4 @@
+#include "AbstractOfflineSttClient.h"
 #include "AudioRecorder.h"
 #include "DictationCoordinator.h"
 
@@ -18,7 +19,7 @@ class FakeNotificationBackend : public LinuxNotificationService {
 public:
     explicit FakeNotificationBackend(QObject* parent = nullptr)
         : LinuxNotificationService(parent) {
-        m_activeNotificationIds = {101, 102, 103, 104, 105, 106};
+        m_activeNotificationIds = {101, 102, 103, 104, 105, 106, 107, 108};
     }
 
     uint showNotification(const QString& title, const QString& body, Urgency urgency, const QString& icon,
@@ -78,6 +79,41 @@ public:
     void setMockHasAudioInputDevice(bool hasDevice) { setHasAudioInputDevice(hasDevice); }
 };
 
+class FakeOfflineBackend : public AbstractOfflineSttClient {
+    Q_OBJECT
+
+public:
+    explicit FakeOfflineBackend(QObject* parent = nullptr)
+        : AbstractOfflineSttClient(parent) {}
+
+    void transcribe(const QByteArray&) override {}
+    void cancel() override {}
+
+    bool isReady() const override { return true; }
+    bool isBusy() const override { return false; }
+
+    bool isModelInstalled() const override { return true; }
+    bool isModelLoaded() const override { return m_modelLoaded; }
+    QString modelPath() const override { return {}; }
+    QString loadedModelPath() const override { return {}; }
+    QString computeDevice() const override { return u"CPU"_s; }
+
+    void loadModel(const QString&) override {
+        m_modelLoaded = true;
+        emit modelStatusChanged();
+        emit readyChanged();
+    }
+    void unloadModel() override {
+        m_modelLoaded = false;
+        emit modelStatusChanged();
+        emit readyChanged();
+    }
+    void checkModelStatus() override {}
+
+private:
+    bool m_modelLoaded = true;
+};
+
 class TestNotificationPresenter : public QObject {
     Q_OBJECT
 
@@ -122,6 +158,7 @@ void TestNotificationPresenter::init() {
     m_coordinator = new DictationCoordinator(this);
     m_recorder = new FakeAudioRecorderDevice(this);
     m_sttEngine = new CompositeSttEngine(this);
+    m_sttEngine->setOfflineClient(new FakeOfflineBackend(this));
 
     m_presenter->setNotificationService(m_service);
     m_presenter->setDictationCoordinator(m_coordinator);
@@ -202,7 +239,16 @@ void TestNotificationPresenter::testFailoverNotifications() {
     QCOMPARE(m_service->m_lastTitle, u"Tattle: Internet Connection Restored"_s);
 
     emit m_sttEngine->offlineModelRequired();
-    QCOMPARE(m_service->m_lastTitle, u"Tattle: Offline Model Required"_s);
+    QCOMPARE(m_service->m_lastTitle, u"Offline Model Required"_s);
+    QVERIFY(m_service->m_lastActions.contains(u"offline"_s));
+
+    emit m_sttEngine->offlineSwitchSuggested(u"Whisper Small"_s);
+    QCOMPARE(m_service->m_lastTitle, u"Internet Connection Offline"_s);
+    QVERIFY(m_service->m_lastActions.contains(u"switch_offline"_s));
+
+    emit m_sttEngine->onlineSwitchSuggested();
+    QCOMPARE(m_service->m_lastTitle, u"Internet Connection Restored"_s);
+    QVERIFY(m_service->m_lastActions.contains(u"switch_cloud"_s));
 
     emit m_sttEngine->networkDisconnectedDuringSession();
     QCOMPARE(m_service->m_lastTitle, u"Tattle: Network Disconnected"_s);
@@ -232,7 +278,29 @@ void TestNotificationPresenter::testActionInvokedRouting() {
     QCOMPARE(navSpy.count(), 4);
     QCOMPARE(navSpy.last().at(0).toString(), u"audio"_s);
 
-    m_service->onActionInvoked(106, u"quit"_s);
+    m_service->onActionInvoked(106, u"switch_offline"_s);
+    QCOMPARE(m_coordinator->activeBackend(), DictationCoordinator::TranscriptionBackend::TranscribeCpp);
+
+    m_service->onActionInvoked(107, u"switch_cloud"_s);
+    QCOMPARE(m_coordinator->activeBackend(), DictationCoordinator::TranscriptionBackend::Cloud);
+
+    m_coordinator->setAudioRecorder(m_recorder);
+    m_coordinator->setSttEngine(m_sttEngine);
+
+    m_coordinator->startRecording();
+    QCOMPARE(m_coordinator->dictationState(), DictationCoordinator::DictationState::Recording);
+    m_service->onActionInvoked(106, u"switch_offline"_s);
+    QCOMPARE(m_coordinator->dictationState(), DictationCoordinator::DictationState::Recording);
+    QCOMPARE(m_coordinator->activeBackend(), DictationCoordinator::TranscriptionBackend::Cloud);
+    m_coordinator->stopRecording();
+    QCOMPARE(m_coordinator->activeBackend(), DictationCoordinator::TranscriptionBackend::TranscribeCpp);
+    QVERIFY(m_sttEngine->isAutoSwitchedToOffline());
+
+    m_service->onActionInvoked(107, u"switch_cloud"_s);
+    QCOMPARE(m_coordinator->activeBackend(), DictationCoordinator::TranscriptionBackend::Cloud);
+    QVERIFY(!m_sttEngine->isAutoSwitchedToOffline());
+
+    m_service->onActionInvoked(108, u"quit"_s);
     QCOMPARE(quitSpy.count(), 1);
 }
 

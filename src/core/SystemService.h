@@ -9,6 +9,7 @@ class AbstractTextInjector;
 class DaemonConnector;
 class GlobalShortcutManager;
 class DictationCoordinator;
+class SystemHealthMonitor;
 
 class SystemService : public QObject {
     Q_OBJECT
@@ -31,6 +32,7 @@ class SystemService : public QObject {
     Q_PROPERTY(bool microphoneAvailable READ microphoneAvailable NOTIFY microphoneStatusChanged FINAL)
     Q_PROPERTY(bool microphoneTestActive READ microphoneTestActive NOTIFY microphoneTestChanged FINAL)
     Q_PROPERTY(qreal microphoneTestLevel READ microphoneTestLevel NOTIFY microphoneTestLevelChanged FINAL)
+    Q_PROPERTY(bool networkOnline READ networkOnline NOTIFY networkOnlineChanged FINAL)
 
 public:
     explicit SystemService(QObject* parent = nullptr);
@@ -53,6 +55,10 @@ public:
 
     void setDictationCoordinator(DictationCoordinator* coordinator);
     [[nodiscard]] DictationCoordinator* dictationCoordinator() const noexcept;
+
+    void setHealthMonitor(SystemHealthMonitor* monitor);
+    [[nodiscard]] SystemHealthMonitor* healthMonitor() const noexcept;
+    [[nodiscard]] bool networkOnline() const noexcept;
 
     [[nodiscard]] bool pushToTalkSupported() const noexcept;
     [[nodiscard]] bool shortcutAvailable() const noexcept;
@@ -97,6 +103,7 @@ signals:
     void microphoneStatusChanged();
     void microphoneTestChanged();
     void microphoneTestLevelChanged(qreal level);
+    void networkOnlineChanged(bool online);
 
     void requestShowWindow();
     void requestNavigate(const QString& section);
@@ -111,6 +118,7 @@ private:
     AudioRecorder* m_recorder = nullptr;
     AudioFeedbackPlayer* m_feedbackPlayer = nullptr;
     DictationCoordinator* m_coordinator = nullptr;
+    SystemHealthMonitor* m_healthMonitor = nullptr;
 
     bool m_microphoneTestActive = false;
     qreal m_microphoneTestLevel = 0.0;

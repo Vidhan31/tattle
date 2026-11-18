@@ -7,9 +7,6 @@ import "../controls"
 StyledCard {
     id: root
 
-    title: qsTr("Transcription Mode")
-    description: qsTr("Choose between fast cloud transcription and private on-device processing")
-
     GridLayout {
         Layout.fillWidth: true
         columns: root.width >= 560 ? 2 : 1
@@ -61,7 +58,7 @@ StyledCard {
 
                         StyledIcon {
                             anchors.centerIn: parent
-                            source: "qrc:/qt/qml/Tattle/assets/icons/sparkles.svg"
+                            source: "qrc:/qt/qml/Tattle/assets/icons/cloud.svg"
                             size: 16
                             color: cloudOptionCard.isSelected ? Theme.accentColor : Theme.textSecondary
                         }
@@ -78,7 +75,7 @@ StyledCard {
                         }
 
                         StyledText {
-                            text: qsTr("%1 Transcription").arg(CloudProviderModel.activeProviderName)
+                            text: qsTr("Cloud Speech Service")
                             variant: "caption"
                             colorRole: "secondary"
                         }
@@ -94,7 +91,7 @@ StyledCard {
                     spacing: 4
 
                     StyledText {
-                        text: qsTr("• Ultra-fast cloud speech recognition (<1s)")
+                        text: qsTr("• Fast cloud speech recognition")
                         variant: "caption"
                         colorRole: "secondary"
                     }
@@ -106,7 +103,7 @@ StyledCard {
                     }
 
                     StyledText {
-                        text: qsTr("• Multiple provider options (Groq & Gemini)")
+                        text: qsTr("• Multiple provider options")
                         variant: "caption"
                         colorRole: "secondary"
                     }
@@ -188,7 +185,9 @@ StyledCard {
                         }
 
                         StyledText {
-                            text: qsTr("Local Speech Model")
+                            text: ModelCatalog.selectedModelName.length > 0 ? qsTr("Local Model • %1").arg(
+                                                                                  ModelCatalog.selectedModelName) : qsTr(
+                                                                                  "Local Speech Model")
                             variant: "caption"
                             colorRole: "secondary"
                         }
@@ -244,9 +243,13 @@ StyledCard {
 
     PreferenceSwitch {
         Layout.fillWidth: true
-        title: qsTr("Automatic Offline Switching")
-        description: qsTr("Automatically switch to offline speech model when internet connection is lost")
-        checked: DaemonClient.autoSwitchOffline
+        title: qsTr("Prompt to Switch Offline")
+        description: ModelCatalog.selectedModelName.length > 0 ? qsTr(
+                                                                     "Send a notification to switch to offline model (%1) when internet connection is lost").arg(
+                                                                     ModelCatalog.selectedModelName) : qsTr(
+                                                                     "Send a notification to switch to offline speech model when internet connection is lost")
+        enabled: ModelCatalog.hasDownloadedModels
+        checked: DaemonClient.autoSwitchOffline && ModelCatalog.hasDownloadedModels
         onToggled: DaemonClient.autoSwitchOffline = checked
     }
 }

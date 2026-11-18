@@ -8,6 +8,7 @@
 
 #include "AudioFeedbackPlayer.h"
 #include "GlobalShortcutManager.h"
+#include "SystemHealthMonitor.h"
 
 using namespace Qt::StringLiterals;
 
@@ -137,6 +138,34 @@ void SystemService::setAudioFeedbackPlayer(AudioFeedbackPlayer* player) {
 
 AudioFeedbackPlayer* SystemService::audioFeedbackPlayer() const noexcept {
     return m_feedbackPlayer;
+}
+
+void SystemService::setHealthMonitor(SystemHealthMonitor* monitor) {
+    if (m_healthMonitor == monitor) {
+        return;
+    }
+
+    if (m_healthMonitor) {
+        disconnect(m_healthMonitor, &SystemHealthMonitor::networkOnlineChanged, this,
+                   &SystemService::networkOnlineChanged);
+    }
+
+    m_healthMonitor = monitor;
+
+    if (m_healthMonitor) {
+        connect(m_healthMonitor, &SystemHealthMonitor::networkOnlineChanged, this,
+                &SystemService::networkOnlineChanged);
+    }
+
+    emit networkOnlineChanged(networkOnline());
+}
+
+SystemHealthMonitor* SystemService::healthMonitor() const noexcept {
+    return m_healthMonitor;
+}
+
+bool SystemService::networkOnline() const noexcept {
+    return m_healthMonitor ? m_healthMonitor->isNetworkOnline() : true;
 }
 
 bool SystemService::pushToTalkSupported() const noexcept {

@@ -27,6 +27,7 @@ class SystemAdaptor : public QDBusAbstractAdaptor {
     Q_PROPERTY(bool microphoneAvailable READ microphoneAvailable NOTIFY microphoneStatusChanged)
     Q_PROPERTY(bool microphoneTestActive READ microphoneTestActive NOTIFY microphoneTestChanged)
     Q_PROPERTY(double microphoneTestLevel READ microphoneTestLevel NOTIFY microphoneTestLevelChanged)
+    Q_PROPERTY(bool networkOnline READ networkOnline NOTIFY networkOnlineChanged)
 
 public:
     explicit SystemAdaptor(SystemService* service, QObject* parent);
@@ -50,6 +51,7 @@ public:
     [[nodiscard]] bool microphoneAvailable() const;
     [[nodiscard]] bool microphoneTestActive() const;
     [[nodiscard]] double microphoneTestLevel() const;
+    [[nodiscard]] bool networkOnline() const;
 
 signals:
     void shortcutStatusChanged();
@@ -58,6 +60,7 @@ signals:
     void microphoneStatusChanged();
     void microphoneTestChanged();
     void microphoneTestLevelChanged(double level);
+    void networkOnlineChanged();
     void requestShowWindow();
     void requestNavigate(const QString& section);
     void requestQuitApp();

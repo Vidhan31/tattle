@@ -347,10 +347,11 @@ Item {
                                     anchors.fill: parent
                                     spacing: Theme.spacingSm
                                     visible: !modelCard.isDownloading && modelCard.isSelected
-                                             && DaemonClient.isModelLoaded
 
                                     StyledText {
-                                        text: qsTr("Active")
+                                        text: (DaemonClient.activeBackend === DaemonClient.TranscribeCpp
+                                               && DaemonClient.isModelLoaded) ? qsTr("Active") : qsTr(
+                                                                                    "Selected for Offline")
                                         variant: "caption"
                                         customWeight: Font.DemiBold
                                         customColor: Theme.accentColor
@@ -358,6 +359,17 @@ Item {
 
                                     Item {
                                         Layout.fillWidth: true
+                                    }
+
+                                    StyledButton {
+                                        text: qsTr("Load")
+                                        size: "small"
+                                        variant: "primary"
+                                        visible: !DaemonClient.isModelLoaded && modelCard.isInstalled
+                                        enabled: !DaemonClient.isModelBusy && !DaemonClient.isBusy
+                                        onClicked: {
+                                            DaemonClient.loadModel();
+                                        }
                                     }
 
                                     StyledButton {
@@ -386,20 +398,19 @@ Item {
                                 RowLayout {
                                     anchors.fill: parent
                                     spacing: Theme.spacingSm
-                                    visible: !modelCard.isDownloading && modelCard.isInstalled && (
-                                                 !modelCard.isSelected || !DaemonClient.isModelLoaded)
+                                    visible: !modelCard.isDownloading && modelCard.isInstalled && !modelCard.isSelected
 
                                     StyledButton {
-                                        text: modelCard.isSelected ? qsTr("Load") : qsTr("Activate")
+                                        text: qsTr("Select")
                                         size: "small"
-                                        variant: modelCard.isSelected ? "primary" : "secondary"
+                                        variant: "secondary"
                                         Layout.fillWidth: true
                                         enabled: !DaemonClient.isModelBusy && !DaemonClient.isBusy
                                         onClicked: {
-                                            if (!modelCard.isSelected) {
-                                                ModelCatalog.setSelectedModelId(modelCard.modelId);
+                                            ModelCatalog.setSelectedModelId(modelCard.modelId);
+                                            if (DaemonClient.activeBackend === DaemonClient.TranscribeCpp) {
+                                                DaemonClient.loadModel();
                                             }
-                                            DaemonClient.loadModel();
                                         }
                                     }
 

@@ -55,6 +55,7 @@ private slots:
     void testIdenticalSnapshotIsSilent();
     void testPrefixCountsAndMatching();
     void testRevisionIncrementsOnUpdate();
+    void testHasDownloadedModels();
 };
 
 void TestModelCatalogModel::initTestCase() {
@@ -213,6 +214,29 @@ void TestModelCatalogModel::testRevisionIncrementsOnUpdate() {
     model.applyCatalogJson(catalogJson(updated));
     QCOMPARE(model.revision(), initialRev + 2);
     QCOMPARE(revisionSpy.count(), 2);
+}
+
+void TestModelCatalogModel::testHasDownloadedModels() {
+    ModelCatalogModel model;
+    QSignalSpy hasDownloadedSpy(&model, &ModelCatalogModel::hasDownloadedModelsChanged);
+
+    QVERIFY(!model.hasDownloadedModels());
+
+    QJsonArray noInstalled = {
+        catalogEntry(u"tiny.en"_s, u"Tiny"_s, false, false, false, 0.0, 0),
+        catalogEntry(u"base.en"_s, u"Base"_s, false, false, false, 0.0, 0)
+    };
+    model.applyCatalogJson(catalogJson(noInstalled));
+    QVERIFY(!model.hasDownloadedModels());
+    QCOMPARE(hasDownloadedSpy.count(), 0);
+
+    model.applyCatalogJson(catalogJson(initialCatalog()));
+    QVERIFY(model.hasDownloadedModels());
+    QCOMPARE(hasDownloadedSpy.count(), 1);
+
+    model.applyCatalogJson(catalogJson(noInstalled));
+    QVERIFY(!model.hasDownloadedModels());
+    QCOMPARE(hasDownloadedSpy.count(), 2);
 }
 
 QTEST_MAIN(TestModelCatalogModel)

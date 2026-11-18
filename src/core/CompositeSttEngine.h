@@ -78,6 +78,10 @@ public:
 
     void onNetworkOnlineChanged(bool online);
     void checkPendingOfflineOrOnlineSwitch();
+    void applyOfflineSwitch();
+    void restoreOnlineBackend();
+    void promptOfflineSwitch();
+    void promptOnlineSwitch();
 
 signals:
     void activeBackendChanged();
@@ -88,6 +92,8 @@ signals:
     void failoverTriggered();
     void onlineRestored();
     void offlineModelRequired();
+    void offlineSwitchSuggested(const QString& modelName);
+    void onlineSwitchSuggested();
     void networkDisconnectedDuringSession();
     void modelLoadFailed(const QString& modelPath, const QString& error);
     void modelStatusChanged();
@@ -98,8 +104,6 @@ private:
     void onActiveClientError(const QString& error);
     void onOfflineModelLoadFailed(const QString& modelPath, const QString& error);
 
-    void applyOfflineSwitch();
-    void restoreOnlineBackend();
     [[nodiscard]] bool isOfflineModelAvailable() const;
     void setLastError(const QString& error);
 
@@ -113,6 +117,7 @@ private:
     TranscriptionBackend m_activeBackend = TranscriptionBackend::TranscribeCpp;
     bool m_autoSwitchOffline = true;
     bool m_pendingOfflineSwitch = false;
+    bool m_pendingOnlineSwitch = false;
     bool m_autoSwitchedToOffline = false;
     bool m_isBusy = false;
     bool m_active = false;

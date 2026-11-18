@@ -58,6 +58,7 @@ DaemonClient::DaemonClient(QObject* parent)
         connect(m_systemClient, &SystemClient::microphoneTestChanged, this, &DaemonClient::microphoneTestChanged);
         connect(m_systemClient, &SystemClient::microphoneTestLevelChanged, this,
                 &DaemonClient::microphoneTestLevelChanged);
+        connect(m_systemClient, &SystemClient::networkOnlineChanged, this, &DaemonClient::networkOnlineChanged);
         connect(m_systemClient, &SystemClient::requestShowWindow, this, &DaemonClient::requestShowWindow);
         connect(m_systemClient, &SystemClient::requestNavigate, this, &DaemonClient::requestNavigate);
         connect(m_systemClient, &SystemClient::requestQuitApp, this, &DaemonClient::requestQuitApp);
@@ -246,6 +247,10 @@ qreal DaemonClient::microphoneTestLevel() const noexcept {
     return m_systemClient ? m_systemClient->microphoneTestLevel() : 0.0;
 }
 
+bool DaemonClient::networkOnline() const noexcept {
+    return m_systemClient ? m_systemClient->networkOnline() : true;
+}
+
 bool DaemonClient::cloudApiKeySet() const noexcept {
     return m_speechClient && m_speechClient->cloudApiKeySet();
 }
@@ -319,6 +324,18 @@ void DaemonClient::setActiveBackend(TranscriptionBackend backend, bool persistSe
 void DaemonClient::setActiveBackend(int backend, bool persistSettings) {
     if (m_speechClient) {
         m_speechClient->setActiveBackend(backend, persistSettings);
+    }
+}
+
+void DaemonClient::applyOfflineSwitch() {
+    if (m_speechClient) {
+        m_speechClient->applyOfflineSwitch();
+    }
+}
+
+void DaemonClient::restoreOnlineBackend() {
+    if (m_speechClient) {
+        m_speechClient->restoreOnlineBackend();
     }
 }
 

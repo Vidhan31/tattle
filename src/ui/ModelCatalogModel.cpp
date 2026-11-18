@@ -137,6 +137,10 @@ bool ModelCatalogModel::isSelectedModelInstalled() const {
     return std::ranges::any_of(m_items, [](const auto& item) { return item.isSelected; });
 }
 
+bool ModelCatalogModel::hasDownloadedModels() const noexcept {
+    return std::ranges::any_of(m_items, [](const auto& item) { return item.isInstalled; });
+}
+
 bool ModelCatalogModel::isDownloadingAny() const {
     return std::ranges::any_of(m_items, [](const auto& item) { return item.isDownloading; });
 }
@@ -332,6 +336,7 @@ void ModelCatalogModel::applyCatalogJson(const QString& json) {
 
     const QString previousSelectedName = selectedModelName();
     const bool previousSelectedInstalled = isSelectedModelInstalled();
+    const bool previousHasDownloaded = hasDownloadedModels();
     const bool previousDownloadingAny = isDownloadingAny();
     const QString previousDownloadingId = downloadingModelId();
     const qreal previousProgress = downloadProgress();
@@ -350,6 +355,9 @@ void ModelCatalogModel::applyCatalogJson(const QString& json) {
     }
     if (previousSelectedInstalled != isSelectedModelInstalled()) {
         emit selectedModelInstalledChanged();
+    }
+    if (previousHasDownloaded != hasDownloadedModels()) {
+        emit hasDownloadedModelsChanged();
     }
 
     const bool downloadingAny = isDownloadingAny();
