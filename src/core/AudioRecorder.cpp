@@ -162,7 +162,7 @@ void AudioRecorder::startRecording() {
     m_ioDevice = m_source->start();
     if (!m_ioDevice) {
         qWarning() << "AudioRecorder: Failed to start QAudioSource IO device";
-        setStatusMessage(u"Failed to start audio capture"_s);
+        setStatusMessage(u"Failed to start recording"_s);
         delete m_source;
         m_source = nullptr;
         return;
@@ -218,7 +218,7 @@ void AudioRecorder::stopRecording() {
                      << "Duration:" << QString::number(durationSecs, 'f', 2) << "s"
                      << "WAV total size:" << wavData.size() << "bytes";
 
-    setStatusMessage(u"Captured %1s of audio (%2 KB)"_s.arg(durationSecs, 0, 'f', 1).arg(wavData.size() / 1024));
+    setStatusMessage(u"Recorded %1s of audio (%2 KB)"_s.arg(durationSecs, 0, 'f', 1).arg(wavData.size() / 1024));
 
     m_pcmData.clear();
     m_pcmData.squeeze();

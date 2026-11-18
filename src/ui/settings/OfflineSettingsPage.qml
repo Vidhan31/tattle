@@ -32,7 +32,7 @@ Item {
             }
 
             StyledText {
-                text: qsTr("Configure on-device transcribe.cpp speech recognition models and hardware acceleration")
+                text: qsTr("Configure on-device speech recognition models and hardware acceleration")
                 variant: "caption"
                 colorRole: "secondary"
                 wrapMode: Text.WordWrap
@@ -43,7 +43,7 @@ Item {
         StyledCard {
             id: libraryCard
             title: qsTr("Speech Model Library")
-            description: qsTr("Download and manage speech recognition models from HuggingFace")
+            description: qsTr("Download and manage speech recognition models")
 
             property string selectedFamily: {
                 const downloading = ModelCatalog.downloadingModelId;

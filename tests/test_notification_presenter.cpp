@@ -161,7 +161,7 @@ void TestNotificationPresenter::testLlmFallbackNotification() {
 
     QCOMPARE(m_service->m_callCount, 1);
     QCOMPARE(m_service->m_lastCategory, u"llm_fallback"_s);
-    QCOMPARE(m_service->m_lastTitle, u"AI Formatting Unavailable"_s);
+    QCOMPARE(m_service->m_lastTitle, u"Text Cleanup Unavailable"_s);
     QVERIFY(m_service->m_lastBody.contains(u"Timeout error"_s));
     QCOMPARE(m_service->m_lastUrgency, LinuxNotificationService::Urgency::Low);
 }

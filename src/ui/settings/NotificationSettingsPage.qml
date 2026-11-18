@@ -24,7 +24,7 @@ Item {
             }
 
             StyledText {
-                text: qsTr("Configure system notifications for transcription, downloads, hardware, and engine failover")
+                text: qsTr("Configure system notifications for transcription, downloads, hardware, and mode switching")
                 variant: "caption"
                 colorRole: "secondary"
             }
@@ -37,7 +37,7 @@ Item {
             PreferenceSwitch {
                 id: masterNotificationSwitch
                 title: qsTr("Enable Desktop Notifications")
-                description: qsTr("Show system notifications via desktop notification daemon (D-Bus)")
+                description: qsTr("Show system notifications for desktop events")
                 checked: AppSettings.notificationsEnabled
                 onToggled: {
                     AppSettings.notificationsEnabled = masterNotificationSwitch.checked;
@@ -59,7 +59,7 @@ Item {
                     id: transcriptionSwitch
                     title: qsTr("Dictation & Transcription Alerts")
                     description: qsTr(
-                                     "Notify on transcription errors, max recording duration limit (5m), and LLM formatting fallbacks")
+                                     "Notify on transcription errors, max recording duration limit (5m), and text cleanup fallbacks")
                     checked: AppSettings.notificationsTranscriptionEnabled
                     onToggled: {
                         AppSettings.notificationsTranscriptionEnabled = transcriptionSwitch.checked;
@@ -94,9 +94,9 @@ Item {
 
                 PreferenceSwitch {
                     id: failoverSwitch
-                    title: qsTr("Engine & Network Failover")
+                    title: qsTr("Mode & Network Switching")
                     description: qsTr(
-                                     "Notify when auto-switching between Cloud and Offline engines due to internet state")
+                                     "Notify when auto-switching between Cloud and Offline modes based on internet connection")
                     checked: AppSettings.notificationsFailoverEnabled
                     onToggled: {
                         AppSettings.notificationsFailoverEnabled = failoverSwitch.checked;
@@ -107,8 +107,8 @@ Item {
 
                 PreferenceSwitch {
                     id: systemSwitch
-                    title: qsTr("System Service & Daemon Alerts")
-                    description: qsTr("Notify if the background key injection daemon stops or encounters fatal errors")
+                    title: qsTr("System Service Alerts")
+                    description: qsTr("Notify if the background text paste service stops or encounters errors")
                     checked: AppSettings.notificationsSystemEnabled
                     onToggled: {
                         AppSettings.notificationsSystemEnabled = systemSwitch.checked;

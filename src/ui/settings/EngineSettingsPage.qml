@@ -26,12 +26,12 @@ Item {
             spacing: 4
 
             StyledText {
-                text: qsTr("Transcription Engine")
+                text: qsTr("Transcription Mode")
                 variant: "heading"
             }
 
             StyledText {
-                text: qsTr("Select your active speech recognition backend and configure automatic offline fallback")
+                text: qsTr("Choose how your speech is converted to text, and set up automatic offline mode")
                 variant: "caption"
                 colorRole: "secondary"
             }
@@ -42,14 +42,14 @@ Item {
         }
 
         StyledCard {
-            title: qsTr("Detailed Configuration")
+            title: qsTr("More Settings")
             description: DaemonClient.activeBackend === DaemonClient.Cloud ? qsTr(
-                                                                                 "Configure API credentials, cloud providers, and LLM text enhancement") :
-                                                                             qsTr("Manage on-device Whisper models, downloads, and hardware acceleration")
+                                                                                 "Set up your cloud account, choose a provider, and configure text cleanup") :
+                                                                             qsTr("Manage downloaded speech models and hardware acceleration")
 
             StyledButton {
-                text: DaemonClient.activeBackend === DaemonClient.Cloud ? qsTr("Configure Cloud Transcription") : qsTr(
-                                                                              "Configure Offline Transcription")
+                text: DaemonClient.activeBackend === DaemonClient.Cloud ? qsTr("Cloud Settings") : qsTr(
+                                                                              "Offline Settings")
                 iconSource: DaemonClient.activeBackend === DaemonClient.Cloud
                             ? "qrc:/qt/qml/Tattle/assets/icons/cloud.svg" : "qrc:/qt/qml/Tattle/assets/icons/cpu.svg"
                 variant: "secondary"

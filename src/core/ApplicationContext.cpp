@@ -309,9 +309,9 @@ void ApplicationContext::wireSubsystems() {
         connect(m_daemonConnector, &DaemonConnector::hasFatalErrorChanged, this, [this]() {
             if (m_daemonConnector->hasFatalError()) {
                 m_notificationService->showCategoryNotification(
-                    u"daemon_error"_s, tr("Text Injection Service Stopped"),
+                    u"daemon_error"_s, tr("Text Paste Service Stopped"),
                     m_daemonConnector->fatalErrorMessage().isEmpty()
-                        ? tr("Key injection daemon stopped. Text falling back to clipboard paste.")
+                        ? tr("Text paste service stopped. Automatic paste is unavailable.")
                         : m_daemonConnector->fatalErrorMessage(),
                     LinuxNotificationService::Urgency::Critical, u"dialog-warning"_s, 6000,
                     {u"system"_s, tr("System Settings")});

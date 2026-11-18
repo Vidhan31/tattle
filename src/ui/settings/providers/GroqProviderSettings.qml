@@ -179,7 +179,7 @@ Item {
                         }
 
                         StyledText {
-                            text: qsTr("Credentials & Speech Model")
+                            text: qsTr("API Key & Speech Model")
                             variant: "caption"
                             customWeight: root.activeSubTab === 0 ? Font.DemiBold : Font.Normal
                             customColor: root.activeSubTab === 0 ? Theme.accentColor : Theme.textSecondary
@@ -216,7 +216,7 @@ Item {
                         }
 
                         StyledText {
-                            text: qsTr("Text Enhancement")
+                            text: qsTr("Text Cleanup")
                             variant: "caption"
                             customWeight: root.activeSubTab === 1 ? Font.DemiBold : Font.Normal
                             customColor: root.activeSubTab === 1 ? Theme.accentColor : Theme.textSecondary
@@ -241,13 +241,12 @@ Item {
 
             ApiKeyConfigCard {
                 title: qsTr("Groq API Key")
-                description: qsTr(
-                                 "Required for cloud speech recognition and LLM text enhancement (Free tier available)")
-                rowDescription: qsTr("Enter your secret Groq API key starting with 'gsk_'")
+                description: qsTr("Required for cloud speech recognition and text cleanup (Free API key available)")
+                rowDescription: qsTr("Enter your Groq API key (starts with 'gsk_')")
                 apiKey: AppSettings.groqApiKey
                 placeholderText: qsTr("gsk_...")
                 helpText: qsTr(
-                              "Free API keys available with generous quotas at console.groq.com. Stored securely in system keychain (with configuration fallback).")
+                              "Free API keys available with generous usage limits at console.groq.com. Stored securely on your device.")
                 linkButtonText: qsTr("Get Free API Key")
                 linkUrl: "https://console.groq.com/keys"
                 onSaveRequested: key => {
@@ -308,8 +307,8 @@ Item {
 
             CustomVocabularyCard {
                 title: qsTr("Custom Vocabulary")
-                description: qsTr("Guide the cloud transcriber with specialized acronyms, names, or terminology")
-                fieldLabel: qsTr("Custom Prompt / Words")
+                description: qsTr("Guide the speech recognizer with specialized words, names, or abbreviations")
+                fieldLabel: qsTr("Custom Words")
                 placeholderText: qsTr("e.g. Tattle, Wayland, Qt6, CMake, JSON, PyTorch, Neovim, kubectl...")
                 vocabulary: AppSettings.groqCustomPrompt
                 maxCharacters: 800
@@ -328,14 +327,13 @@ Item {
             visible: root.activeSubTab === 1
 
             StyledCard {
-                title: qsTr("Text Enhancement (LLM)")
-                description: qsTr(
-                                 "Automatically polish, reformat, or correct transcribed text with cloud language models")
+                title: qsTr("Text Cleanup")
+                description: qsTr("Automatically polish, reformat, or fix transcribed text with language models")
 
                 PreferenceSwitch {
                     id: enableSwitch
-                    title: qsTr("Enable Text Enhancement")
-                    description: qsTr("Apply style formatting and corrections to transcribed text")
+                    title: qsTr("Enable Text Cleanup")
+                    description: qsTr("Apply formatting and corrections to transcribed text")
                     checked: AppSettings.llmEnabled
                     onToggled: {
                         AppSettings.llmEnabled = enableSwitch.checked;
@@ -345,8 +343,8 @@ Item {
                 StyledDivider {}
 
                 PreferenceRow {
-                    title: qsTr("Enhancement Model")
-                    description: qsTr("Cloud language model used for post-processing text")
+                    title: qsTr("Cleanup Model")
+                    description: qsTr("Language model used to clean up text")
                     layoutVertical: true
                     opacity: AppSettings.llmEnabled ? 1.0 : 0.5
                     enabled: AppSettings.llmEnabled
@@ -490,7 +488,7 @@ Item {
                         StyledText {
                             text: AppSettings.llmPreset === "custom" ? qsTr("%1 characters").arg(
                                                                            customPromptArea.text.length) : qsTr(
-                                                                           "Preset Managed")
+                                                                           "Managed by preset")
                             variant: "caption"
                             colorRole: "secondary"
                         }

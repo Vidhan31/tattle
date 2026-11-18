@@ -41,12 +41,12 @@ Item {
             spacing: 4
 
             StyledText {
-                text: qsTr("System & Advanced")
+                text: qsTr("System & Privacy")
                 variant: "heading"
             }
 
             StyledText {
-                text: qsTr("Configure appearance, text injection service, and clipboard privacy")
+                text: qsTr("Configure appearance, text pasting, and clipboard privacy")
                 variant: "caption"
                 colorRole: "secondary"
             }
@@ -80,8 +80,8 @@ Item {
         }
 
         StyledCard {
-            title: qsTr("Text Injection")
-            description: qsTr("Injects transcribed text directly into the active application")
+            title: qsTr("Direct Text Pasting")
+            description: qsTr("Pastes transcribed text directly into the active application")
 
             ColumnLayout {
                 Layout.fillWidth: true
@@ -106,10 +106,10 @@ Item {
                                                                          > 0 ? DaemonDiagnosticModel.fatalErrorMessage :
                                                                                qsTr("Service failed to start")) : (
                                                                             DaemonDiagnosticModel.connected ? qsTr(
-                                                                                                                  "Connected to background text injection service") :
+                                                                                                                  "Connected to background text paste service") :
                                                                                                               (DaemonDiagnosticModel.statusMessage.length
                                                                                                                > 0 ? DaemonDiagnosticModel.statusMessage :
-                                                                                                                     qsTr("Not running — using clipboard fallback")))
+                                                                                                                     qsTr("Not running — automatic paste unavailable")))
                             variant: "caption"
                             customColor: DaemonDiagnosticModel.connected ? Theme.colorSuccess : (
                                                                                DaemonDiagnosticModel.hasFatalError
@@ -171,13 +171,13 @@ Item {
                             spacing: 2
 
                             StyledText {
-                                text: qsTr("Pre-Injection Delay")
+                                text: qsTr("Pre-Paste Delay")
                                 variant: "body"
                                 customWeight: Font.Medium
                             }
 
                             StyledText {
-                                text: qsTr("Wait before injecting text into the active application")
+                                text: qsTr("Wait before pasting text into the active application")
                                 variant: "caption"
                                 colorRole: "secondary"
                             }
@@ -235,7 +235,7 @@ Item {
 
                     StyledText {
                         text: qsTr(
-                                  "Injects text using <b>Ctrl+Shift+V</b> keystrokes. Ensure target applications accept Ctrl+Shift+V for pasting.")
+                                  "Pastes text using <b>Ctrl+Shift+V</b> keystrokes. Ensure target applications accept Ctrl+Shift+V for pasting.")
                         textFormat: Text.StyledText
                         variant: "caption"
                         colorRole: "secondary"

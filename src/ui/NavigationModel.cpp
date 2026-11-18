@@ -78,7 +78,7 @@ void NavigationModel::rebuildItems() {
 
     m_items.append({u"MAIN"_s, tr("History"), u"qrc:/qt/qml/Tattle/assets/icons/history.svg"_s, u"history"_s, false});
 
-    m_items.append({u"PREFERENCES"_s, tr("Transcription Engine"), u"qrc:/qt/qml/Tattle/assets/icons/sparkles.svg"_s,
+    m_items.append({u"PREFERENCES"_s, tr("Transcription Mode"), u"qrc:/qt/qml/Tattle/assets/icons/sparkles.svg"_s,
                     u"engine"_s, true});
 
     if (m_isCloud) {
@@ -98,7 +98,7 @@ void NavigationModel::rebuildItems() {
     m_items.append({u"PREFERENCES"_s, tr("Notifications"), u"qrc:/qt/qml/Tattle/assets/icons/bell.svg"_s,
                     u"notifications"_s, false});
 
-    m_items.append({u"PREFERENCES"_s, tr("System & Advanced"), u"qrc:/qt/qml/Tattle/assets/icons/sliders.svg"_s,
+    m_items.append({u"PREFERENCES"_s, tr("System & Privacy"), u"qrc:/qt/qml/Tattle/assets/icons/sliders.svg"_s,
                     u"system"_s, false});
 
     m_items.append({u"INFO"_s, tr("About"), u"qrc:/qt/qml/Tattle/assets/icons/info.svg"_s, u"about"_s, true});

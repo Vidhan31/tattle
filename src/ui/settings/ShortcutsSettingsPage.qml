@@ -29,7 +29,7 @@ Item {
             }
 
             StyledText {
-                text: qsTr("Configure system-wide keyboard shortcuts and desktop environment triggers")
+                text: qsTr("Configure system-wide keyboard shortcuts and desktop hotkeys")
                 variant: "caption"
                 colorRole: "secondary"
             }
@@ -52,7 +52,7 @@ Item {
                         spacing: 2
 
                         StyledText {
-                            text: qsTr("Portal Status")
+                            text: qsTr("Shortcut Status")
                             variant: "body"
                             customWeight: Font.Medium
                         }
@@ -84,7 +84,7 @@ Item {
                         spacing: Theme.spacingSm
 
                         StyledText {
-                            text: qsTr("Desktop Environment Custom Shortcut (CLI)")
+                            text: qsTr("Desktop Environment Custom Shortcut")
                             variant: "caption"
                             customWeight: Font.DemiBold
                         }

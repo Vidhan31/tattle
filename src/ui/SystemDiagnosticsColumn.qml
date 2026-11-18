@@ -14,9 +14,9 @@ ColumnLayout {
     StatusBanner {
         visible: DaemonDiagnosticModel.clipboardWarningRequired && !DaemonDiagnosticModel.clipboardBannerDismissed
         bannerType: "warning"
-        title: qsTr("Paste Shortcut & Clipboard Notice")
+        title: qsTr("Clipboard & Paste Notice")
         message: qsTr(
-                     "Transcribing injects text via Ctrl+Shift+V. Text is restored, but images/media are overwritten unless saved or using a clipboard manager (e.g., Klipper, GPaste, Clipboard Indicator).")
+                     "Dictation pastes text via Ctrl+Shift+V. Text is restored, but images/media are overwritten unless saved or using a clipboard manager (e.g., Klipper, GPaste, Clipboard Indicator).")
         actionText: qsTr("Learn More")
         onActionClicked: root.clipboardWarningRequested()
         secondaryActionText: qsTr("Dismiss")
@@ -40,7 +40,7 @@ ColumnLayout {
         bannerType: "warning"
         title: qsTr("Invalid %1 API Key").arg(CloudProviderModel.activeProviderName)
         message: DaemonClient.cloudLastError.length > 0 ? DaemonClient.cloudLastError : qsTr(
-                                                              "Authentication failed. Please verify your %1 API key.").arg(
+                                                              "Authentication failed. Please check your %1 API key.").arg(
                                                               CloudProviderModel.activeProviderName)
         actionText: qsTr("Configure API Key")
         onActionClicked: root.navigateRequested("cloud")
@@ -51,7 +51,7 @@ ColumnLayout {
     StatusBanner {
         visible: DaemonClient.activeBackend === DaemonClient.Cloud && DaemonClient.cloudRateLimited
         bannerType: "warning"
-        title: qsTr("%1 Rate Limit Exceeded").arg(CloudProviderModel.activeProviderName)
+        title: qsTr("%1 Rate Limit Reached").arg(CloudProviderModel.activeProviderName)
         message: qsTr("Auto-retrying in %1s…").arg(DaemonClient.cloudRetrySecondsRemaining)
         actionText: qsTr("Dismiss")
         onActionClicked: DaemonClient.clearError()
@@ -71,7 +71,7 @@ ColumnLayout {
                  !DaemonClient.isModelLoaded
         bannerType: "info"
         title: qsTr("Loading Speech Model")
-        message: qsTr("Loading offline speech recognition model into memory…")
+        message: qsTr("Loading offline speech recognition model…")
         actionText: qsTr("Offline Settings")
         onActionClicked: root.navigateRequested("offline")
     }
@@ -88,9 +88,9 @@ ColumnLayout {
     StatusBanner {
         visible: DaemonDiagnosticModel.hasFatalError
         bannerType: "danger"
-        title: qsTr("Text Injection Service Stopped")
+        title: qsTr("Text Paste Service Stopped")
         message: DaemonDiagnosticModel.fatalErrorMessage.length > 0 ? DaemonDiagnosticModel.fatalErrorMessage : qsTr(
-                                                                          "The background key injection daemon encountered an error. Text will fallback to clipboard paste until restarted.")
+                                                                          "The background text paste service encountered an error. Automatic paste is unavailable until restarted.")
         actionText: qsTr("Restart Service")
         onActionClicked: DaemonDiagnosticModel.restartService()
         secondaryActionText: qsTr("Settings")

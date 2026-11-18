@@ -171,8 +171,8 @@ void NotificationPresenter::onCoordinatorMaxDurationWarning() {
 }
 
 void NotificationPresenter::onCoordinatorLlmFallbackWarning(const QString& warning) {
-    sendCategoryNotification(u"llm_fallback"_s, tr("AI Formatting Unavailable"),
-                             tr("Enhancement failed (%1). Injected raw speech transcript instead.").arg(warning),
+    sendCategoryNotification(u"llm_fallback"_s, tr("Text Cleanup Unavailable"),
+                             tr("Text cleanup failed (%1). Original speech dictation used instead.").arg(warning),
                              static_cast<int>(LinuxNotificationService::Urgency::Low), u"dialog-warning"_s,
                              {u"default"_s, tr("Open Tattle")});
 }
@@ -207,13 +207,13 @@ void NotificationPresenter::onAudioDeviceAvailabilityChanged() {
 
 void NotificationPresenter::onFailoverTriggered() {
     sendCategoryNotification(u"failover"_s, tr("Tattle: Switched to Offline Dictation"),
-                             tr("Internet connection offline. Automatically switched to local transcribe.cpp model."),
+                             tr("Internet connection offline. Automatically switched to local speech model."),
                              static_cast<int>(LinuxNotificationService::Urgency::Normal), u"network-offline"_s);
 }
 
 void NotificationPresenter::onOnlineRestored() {
     sendCategoryNotification(u"failover"_s, tr("Tattle: Internet Connection Restored"),
-                             tr("Switched back to Cloud transcription engine."),
+                             tr("Switched back to Cloud speech recognition."),
                              static_cast<int>(LinuxNotificationService::Urgency::Normal), u"network-wireless"_s);
 }
 
@@ -227,7 +227,7 @@ void NotificationPresenter::onOfflineModelRequired() {
 void NotificationPresenter::onNetworkDisconnectedDuringSession() {
     sendCategoryNotification(
         u"failover"_s, tr("Tattle: Network Disconnected"),
-        tr("Internet connection lost while recording. Model will not be changed during active session."),
+        tr("Internet connection lost while recording. The current mode will continue until this recording finishes."),
         static_cast<int>(LinuxNotificationService::Urgency::Normal), u"network-offline"_s);
 }
 
@@ -235,7 +235,7 @@ void NotificationPresenter::onModelLoadFailed(const QString& modelPath, const QS
     Q_UNUSED(error);
     sendCategoryNotification(
         u"model"_s, tr("Tattle: Model Load Failed"),
-        tr("Could not load offline speech model (%1). Please verify model integrity in Settings.").arg(modelPath),
+        tr("Could not load offline speech model (%1). Please verify the model in Settings.").arg(modelPath),
         static_cast<int>(LinuxNotificationService::Urgency::Normal), u"dialog-error"_s);
 }
 

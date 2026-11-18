@@ -135,7 +135,7 @@ Item {
 
         StyledCard {
             title: qsTr("Recording Mode")
-            description: qsTr("Choose how global shortcuts and recording triggers activate speech transcription")
+            description: qsTr("Choose how global shortcuts start and stop speech transcription")
 
             StatusBanner {
                 visible: !DaemonClient.pushToTalkSupported

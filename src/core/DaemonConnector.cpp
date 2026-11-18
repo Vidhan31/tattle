@@ -91,7 +91,7 @@ bool DaemonConnector::ensureDaemonRunning() {
             continue;
         }
 
-        setStatusMessage(u"Starting keyinjectord (%1)..."_s.arg(daemonExecutable));
+        setStatusMessage(u"Starting text paste service (%1)..."_s.arg(daemonExecutable));
 
         int fds[2];
         if (::socketpair(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0, fds) != 0) {
@@ -186,7 +186,7 @@ void DaemonConnector::stopDaemon() {
         m_socket->close();
     }
     if (m_daemonProcess && m_daemonProcess->state() != QProcess::NotRunning) {
-        setStatusMessage(u"Stopping keyinjectord daemon..."_s);
+        setStatusMessage(u"Stopping text paste service..."_s);
         m_daemonProcess->terminate();
         if (!m_daemonProcess->waitForFinished(1000)) {
             m_daemonProcess->kill();
@@ -247,14 +247,14 @@ bool DaemonConnector::sendCommand(keyinjectord::Opcode opcode, int timeoutMs) {
 }
 
 void DaemonConnector::onConnected() {
-    setStatusMessage(u"Connected to keyinjectord"_s);
+    setStatusMessage(u"Connected to text paste service"_s);
     setLastError({});
     setFatalError(false);
     emit connectedChanged();
 }
 
 void DaemonConnector::onDisconnected() {
-    setStatusMessage(u"Disconnected from keyinjectord"_s);
+    setStatusMessage(u"Disconnected from text paste service"_s);
     emit connectedChanged();
 }
 

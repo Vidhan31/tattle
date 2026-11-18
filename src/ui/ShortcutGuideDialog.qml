@@ -73,7 +73,7 @@ T.Dialog {
 
             StyledText {
                 text: qsTr(
-                          "Your desktop environment does not support the XDG Global Shortcuts portal directly, but you can easily set up a system-wide hotkey using the Tattle CLI command:")
+                          "Your desktop environment does not support the XDG Global Shortcuts portal directly, but you can easily set up a system-wide hotkey using this command:")
                 variant: "body"
                 wrapMode: Text.WordWrap
                 Layout.fillWidth: true
@@ -135,7 +135,7 @@ T.Dialog {
 
             StyledText {
                 text: qsTr(
-                          "<b>Note:</b> Custom desktop shortcuts operate in <b>Toggle mode</b>. Push-to-Talk requires native support for the <code>org.freedesktop.portal.GlobalShortcuts</code> portal (available on KDE Plasma 6+ and compatible Wayland compositors).")
+                          "<b>Note:</b> Custom desktop shortcuts operate in <b>Toggle mode</b>. Push-to-Talk requires desktop support for the <code>org.freedesktop.portal.GlobalShortcuts</code> portal (available on KDE Plasma 6+ and compatible Wayland compositors).")
                 textFormat: Text.StyledText
                 variant: "caption"
                 colorRole: "secondary"

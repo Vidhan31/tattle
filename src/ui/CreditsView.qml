@@ -136,7 +136,7 @@ Item {
                         }
 
                         StyledText {
-                            text: qsTr("Fast and modern speech-to-text dictation client for Wayland.")
+                            text: qsTr("Fast and modern voice dictation app for Wayland.")
                             variant: "body"
                             colorRole: "secondary"
                             wrapMode: Text.WordWrap
