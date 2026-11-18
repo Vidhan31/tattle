@@ -158,6 +158,8 @@ private slots:
     void testAutoSwitchOfflineDeferredDuringBusy();
     void testAutoSwitchOfflineOnCancelDuringBusy();
     void testAutoSwitchOfflineRestoreWhenNetworkReturns();
+    void testOnlineSwitchNotSuggestedWhenIndependentlySelected();
+    void testOnlineSwitchHonorsAutoSwitchPreference();
     void testLoadSettingsPreservesOfflineFallback();
     void testRetryLast();
     void testTranscribeModelDelegation();
@@ -316,6 +318,35 @@ void TestCompositeSttEngine::testAutoSwitchOfflineRestoreWhenNetworkReturns() {
     QVERIFY(!m_engine->isAutoSwitchedToOffline());
     QCOMPARE(m_engine->activeBackend(), CompositeSttEngine::TranscriptionBackend::Cloud);
     QCOMPARE(restoredSpy.count(), 1);
+}
+
+void TestCompositeSttEngine::testOnlineSwitchNotSuggestedWhenIndependentlySelected() {
+    // User chose offline mode independently via settings
+    m_engine->setActiveBackend(CompositeSttEngine::TranscriptionBackend::TranscribeCpp, true);
+    QVERIFY(!m_engine->isAutoSwitchedToOffline());
+
+    m_healthMonitor->setNetworkOnlineForTesting(false);
+    QSignalSpy suggestSpy(m_engine, &CompositeSttEngine::onlineSwitchSuggested);
+    m_healthMonitor->setNetworkOnlineForTesting(true);
+    QCOMPARE(suggestSpy.count(), 0);
+
+    // Transcription completing should not prompt either
+    m_offlineClient->m_simulatedText = u"Test"_s;
+    m_engine->transcribe(QByteArray("audio"));
+    QCOMPARE(suggestSpy.count(), 0);
+}
+
+void TestCompositeSttEngine::testOnlineSwitchHonorsAutoSwitchPreference() {
+    m_engine->setActiveBackend(CompositeSttEngine::TranscriptionBackend::Cloud, true);
+    m_healthMonitor->setNetworkOnlineForTesting(false);
+    m_engine->applyOfflineSwitch();
+    QVERIFY(m_engine->isAutoSwitchedToOffline());
+
+    m_engine->setAutoSwitchOffline(false);
+
+    QSignalSpy suggestSpy(m_engine, &CompositeSttEngine::onlineSwitchSuggested);
+    m_healthMonitor->setNetworkOnlineForTesting(true);
+    QCOMPARE(suggestSpy.count(), 0);
 }
 
 void TestCompositeSttEngine::testLoadSettingsPreservesOfflineFallback() {

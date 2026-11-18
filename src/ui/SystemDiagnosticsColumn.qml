@@ -77,7 +77,7 @@ ColumnLayout {
         actionEnabled: !DaemonClient.isBusy
         onActionClicked: {
             if (!DaemonClient.isBusy) {
-                DaemonClient.activeBackend = DaemonClient.TranscribeCpp;
+                DaemonClient.applyOfflineSwitch();
             }
         }
         secondaryActionText: qsTr("Dismiss")

@@ -113,6 +113,8 @@ public:
     void reloadSettings();
     void setActiveBackend(TranscriptionBackend backend, bool persistSettings = true);
     void setActiveBackend(int backend, bool persistSettings = true);
+    void applyOfflineSwitch();
+    void restoreOnlineBackend();
     void setAutoSwitchOffline(bool enable);
     void setRecordingMode(RecordingMode mode);
     void setRecordingMode(int mode);
@@ -192,6 +194,8 @@ private:
     bool m_initialized = false;
     std::optional<TranscriptionBackend> m_deferredBackendSwitch;
     bool m_deferredPersistSettings = true;
+    bool m_deferredOfflineSwitch = false;
+    bool m_deferredOnlineRestore = false;
 
     friend class TestDictationCoordinator;
 };

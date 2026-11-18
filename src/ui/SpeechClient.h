@@ -106,6 +106,8 @@ signals:
 
 public slots:
     void setActiveBackend(int backend, bool persistSettings = true);
+    void applyOfflineSwitch();
+    void restoreOnlineBackend();
     void setRecordingMode(int mode);
     void setAutoSwitchOffline(bool enable);
     void setClientWindowFocused(bool focused);

@@ -173,6 +173,18 @@ void SpeechClient::setActiveBackend(int backend, bool persistSettings) {
     }
 }
 
+void SpeechClient::applyOfflineSwitch() {
+    if (m_interface && m_interface->isValid()) {
+        m_interface->call(QDBus::NoBlock, u"applyOfflineSwitch"_s);
+    }
+}
+
+void SpeechClient::restoreOnlineBackend() {
+    if (m_interface && m_interface->isValid()) {
+        m_interface->call(QDBus::NoBlock, u"restoreOnlineBackend"_s);
+    }
+}
+
 void SpeechClient::setRecordingMode(int mode) {
     if (m_recordingMode != mode) {
         m_recordingMode = mode;

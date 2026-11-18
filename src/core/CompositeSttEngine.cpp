@@ -450,6 +450,7 @@ void CompositeSttEngine::onNetworkOnlineChanged(bool online) {
     }
 
     if (!online) {
+        m_pendingOnlineSwitch = false;
         if (m_activeBackend != TranscriptionBackend::Cloud) {
             return;
         }
@@ -461,7 +462,8 @@ void CompositeSttEngine::onNetworkOnlineChanged(bool online) {
             promptOfflineSwitch();
         }
     } else {
-        if (!m_autoSwitchedToOffline || m_activeBackend == TranscriptionBackend::Cloud) {
+        m_pendingOfflineSwitch = false;
+        if (!m_autoSwitchOffline || !m_autoSwitchedToOffline || m_activeBackend == TranscriptionBackend::Cloud) {
             return;
         }
 

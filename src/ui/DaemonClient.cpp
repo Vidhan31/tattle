@@ -327,6 +327,18 @@ void DaemonClient::setActiveBackend(int backend, bool persistSettings) {
     }
 }
 
+void DaemonClient::applyOfflineSwitch() {
+    if (m_speechClient) {
+        m_speechClient->applyOfflineSwitch();
+    }
+}
+
+void DaemonClient::restoreOnlineBackend() {
+    if (m_speechClient) {
+        m_speechClient->restoreOnlineBackend();
+    }
+}
+
 void DaemonClient::setRecordingMode(RecordingMode mode) {
     setRecordingMode(static_cast<int>(mode));
 }

@@ -276,6 +276,8 @@ private slots:
     void testSystemHealthMonitorDirect();
     void testAutoSwitchOfflineWhenNetworkLost();
     void testAutoSwitchOfflineDeferredDuringRecording();
+    void testQueuedSwitchPreservedDuringSettingsRefresh();
+    void testCoordinatorApplyOfflineSwitchDeferredDuringRecording();
     void testStartRecordingPreservesOfflineFallback();
     void testHistoryFilePermissionsAndSessionCleanup();
     void testClearHistory();
@@ -754,6 +756,48 @@ void TestDictationCoordinator::testAutoSwitchOfflineDeferredDuringRecording() {
 
     m_coordinator->stopRecording();
     QCOMPARE(m_coordinator->activeBackend(), DictationCoordinator::TranscriptionBackend::TranscribeCpp);
+}
+
+void TestDictationCoordinator::testQueuedSwitchPreservedDuringSettingsRefresh() {
+    m_llmClient->setEnabled(false);
+    m_coordinator->setActiveBackend(DictationCoordinator::TranscriptionBackend::Cloud, true);
+    QCOMPARE(m_coordinator->activeBackend(), DictationCoordinator::TranscriptionBackend::Cloud);
+
+    m_coordinator->startRecording();
+    QCOMPARE(m_coordinator->dictationState(), DictationCoordinator::DictationState::Recording);
+
+    // Queue switch while busy
+    m_coordinator->setActiveBackend(DictationCoordinator::TranscriptionBackend::TranscribeCpp, true);
+    QCOMPARE(m_coordinator->activeBackend(), DictationCoordinator::TranscriptionBackend::Cloud);
+
+    // Non-persistent same-backend call (like speechConfigChanged upon recording mode change)
+    m_coordinator->setActiveBackend(DictationCoordinator::TranscriptionBackend::Cloud, false);
+    QCOMPARE(m_coordinator->activeBackend(), DictationCoordinator::TranscriptionBackend::Cloud);
+
+    m_coordinator->stopRecording();
+    QCOMPARE(m_coordinator->activeBackend(), DictationCoordinator::TranscriptionBackend::TranscribeCpp);
+}
+
+void TestDictationCoordinator::testCoordinatorApplyOfflineSwitchDeferredDuringRecording() {
+    m_llmClient->setEnabled(false);
+    m_coordinator->setActiveBackend(DictationCoordinator::TranscriptionBackend::Cloud, true);
+    QCOMPARE(m_coordinator->activeBackend(), DictationCoordinator::TranscriptionBackend::Cloud);
+
+    m_coordinator->startRecording();
+    QCOMPARE(m_coordinator->dictationState(), DictationCoordinator::DictationState::Recording);
+
+    // Prompt acceptance while busy
+    m_coordinator->applyOfflineSwitch();
+    QCOMPARE(m_coordinator->dictationState(), DictationCoordinator::DictationState::Recording);
+    QCOMPARE(m_coordinator->activeBackend(), DictationCoordinator::TranscriptionBackend::Cloud);
+
+    m_coordinator->stopRecording();
+    QCOMPARE(m_coordinator->activeBackend(), DictationCoordinator::TranscriptionBackend::TranscribeCpp);
+    QVERIFY(m_sttEngine->isAutoSwitchedToOffline());
+
+    m_coordinator->restoreOnlineBackend();
+    QCOMPARE(m_coordinator->activeBackend(), DictationCoordinator::TranscriptionBackend::Cloud);
+    QVERIFY(!m_sttEngine->isAutoSwitchedToOffline());
 }
 
 void TestDictationCoordinator::testStartRecordingPreservesOfflineFallback() {

@@ -383,7 +383,11 @@ void DictationCoordinator::setActiveBackend(TranscriptionBackend backend, bool p
                 ? static_cast<TranscriptionBackend>(qobject_cast<CompositeSttEngine*>(m_sttEngine)->activeBackend())
                 : m_activeBackend;
         if (currentBackend == backend) {
-            m_deferredBackendSwitch.reset();
+            if (persistSettings) {
+                m_deferredBackendSwitch.reset();
+                m_deferredOfflineSwitch = false;
+                m_deferredOnlineRestore = false;
+            }
             return;
         }
 
@@ -404,6 +408,8 @@ void DictationCoordinator::setActiveBackend(TranscriptionBackend backend, bool p
                              << (backend == TranscriptionBackend::TranscribeCpp ? "TranscribeCpp" : "Cloud");
             m_deferredBackendSwitch = backend;
             m_deferredPersistSettings = persistSettings;
+            m_deferredOfflineSwitch = false;
+            m_deferredOnlineRestore = false;
             return;
         }
     }
@@ -435,6 +441,38 @@ void DictationCoordinator::setActiveBackend(TranscriptionBackend backend, bool p
 
 void DictationCoordinator::setActiveBackend(int backend, bool persistSettings) {
     setActiveBackend(backend == 1 ? TranscriptionBackend::TranscribeCpp : TranscriptionBackend::Cloud, persistSettings);
+}
+
+void DictationCoordinator::applyOfflineSwitch() {
+    if (isBusy()) {
+        qCInfo(lcSpeech) << "DictationCoordinator: Dictation busy; deferring offline switch";
+        m_deferredOfflineSwitch = true;
+        m_deferredOnlineRestore = false;
+        m_deferredBackendSwitch.reset();
+        return;
+    }
+
+    if (auto* comp = qobject_cast<CompositeSttEngine*>(m_sttEngine)) {
+        comp->applyOfflineSwitch();
+        return;
+    }
+    setActiveBackend(TranscriptionBackend::TranscribeCpp, false);
+}
+
+void DictationCoordinator::restoreOnlineBackend() {
+    if (isBusy()) {
+        qCInfo(lcSpeech) << "DictationCoordinator: Dictation busy; deferring cloud restore";
+        m_deferredOnlineRestore = true;
+        m_deferredOfflineSwitch = false;
+        m_deferredBackendSwitch.reset();
+        return;
+    }
+
+    if (auto* comp = qobject_cast<CompositeSttEngine*>(m_sttEngine)) {
+        comp->restoreOnlineBackend();
+        return;
+    }
+    setActiveBackend(TranscriptionBackend::Cloud, false);
 }
 
 bool DictationCoordinator::autoSwitchOffline() const {
@@ -940,11 +978,19 @@ void DictationCoordinator::setState(DictationState state) {
             emit canRecordChanged();
         }
 
-        if (!isBusy() && m_deferredBackendSwitch.has_value()) {
-            const auto pendingBackend = *m_deferredBackendSwitch;
-            const bool pendingPersist = m_deferredPersistSettings;
-            m_deferredBackendSwitch.reset();
-            setActiveBackend(pendingBackend, pendingPersist);
+        if (!isBusy()) {
+            if (m_deferredOfflineSwitch) {
+                m_deferredOfflineSwitch = false;
+                applyOfflineSwitch();
+            } else if (m_deferredOnlineRestore) {
+                m_deferredOnlineRestore = false;
+                restoreOnlineBackend();
+            } else if (m_deferredBackendSwitch.has_value()) {
+                const auto pendingBackend = *m_deferredBackendSwitch;
+                const bool pendingPersist = m_deferredPersistSettings;
+                m_deferredBackendSwitch.reset();
+                setActiveBackend(pendingBackend, pendingPersist);
+            }
         }
     }
 }

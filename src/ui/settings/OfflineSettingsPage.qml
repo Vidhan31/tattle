@@ -362,6 +362,17 @@ Item {
                                     }
 
                                     StyledButton {
+                                        text: qsTr("Load")
+                                        size: "small"
+                                        variant: "primary"
+                                        visible: !DaemonClient.isModelLoaded && modelCard.isInstalled
+                                        enabled: !DaemonClient.isModelBusy && !DaemonClient.isBusy
+                                        onClicked: {
+                                            DaemonClient.loadModel();
+                                        }
+                                    }
+
+                                    StyledButton {
                                         text: qsTr("Unload")
                                         size: "small"
                                         variant: "ghost"

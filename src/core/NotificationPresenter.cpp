@@ -154,11 +154,11 @@ void NotificationPresenter::onNotificationActionInvoked(uint id, const QString& 
         emit requestNavigate(u"offline"_s);
     } else if (actionKey == u"switch_offline"_s) {
         if (m_dictationCoordinator) {
-            m_dictationCoordinator->setActiveBackend(1);
+            m_dictationCoordinator->applyOfflineSwitch();
         }
     } else if (actionKey == u"switch_cloud"_s) {
         if (m_dictationCoordinator) {
-            m_dictationCoordinator->setActiveBackend(0);
+            m_dictationCoordinator->restoreOnlineBackend();
         }
     } else if (actionKey == u"quit"_s) {
         emit requestQuitApp();

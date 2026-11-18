@@ -213,6 +213,8 @@ signals:
 public slots:
     void setActiveBackend(TranscriptionBackend backend, bool persistSettings = true);
     void setActiveBackend(int backend, bool persistSettings = true);
+    void applyOfflineSwitch();
+    void restoreOnlineBackend();
     void setRecordingMode(RecordingMode mode);
     void setRecordingMode(int mode);
     void setAutoSwitchOffline(bool enable);
