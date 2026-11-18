@@ -18,7 +18,7 @@ class FakeNotificationBackend : public LinuxNotificationService {
 public:
     explicit FakeNotificationBackend(QObject* parent = nullptr)
         : LinuxNotificationService(parent) {
-        m_activeNotificationIds = {101, 102, 103, 104, 105, 106};
+        m_activeNotificationIds = {101, 102, 103, 104, 105, 106, 107, 108};
     }
 
     uint showNotification(const QString& title, const QString& body, Urgency urgency, const QString& icon,
@@ -202,7 +202,16 @@ void TestNotificationPresenter::testFailoverNotifications() {
     QCOMPARE(m_service->m_lastTitle, u"Tattle: Internet Connection Restored"_s);
 
     emit m_sttEngine->offlineModelRequired();
-    QCOMPARE(m_service->m_lastTitle, u"Tattle: Offline Model Required"_s);
+    QCOMPARE(m_service->m_lastTitle, u"Offline Model Required"_s);
+    QVERIFY(m_service->m_lastActions.contains(u"offline"_s));
+
+    emit m_sttEngine->offlineSwitchSuggested(u"Whisper Small"_s);
+    QCOMPARE(m_service->m_lastTitle, u"Internet Connection Offline"_s);
+    QVERIFY(m_service->m_lastActions.contains(u"switch_offline"_s));
+
+    emit m_sttEngine->onlineSwitchSuggested();
+    QCOMPARE(m_service->m_lastTitle, u"Internet Connection Restored"_s);
+    QVERIFY(m_service->m_lastActions.contains(u"switch_cloud"_s));
 
     emit m_sttEngine->networkDisconnectedDuringSession();
     QCOMPARE(m_service->m_lastTitle, u"Tattle: Network Disconnected"_s);
@@ -232,7 +241,13 @@ void TestNotificationPresenter::testActionInvokedRouting() {
     QCOMPARE(navSpy.count(), 4);
     QCOMPARE(navSpy.last().at(0).toString(), u"audio"_s);
 
-    m_service->onActionInvoked(106, u"quit"_s);
+    m_service->onActionInvoked(106, u"switch_offline"_s);
+    QCOMPARE(m_coordinator->activeBackend(), DictationCoordinator::TranscriptionBackend::TranscribeCpp);
+
+    m_service->onActionInvoked(107, u"switch_cloud"_s);
+    QCOMPARE(m_coordinator->activeBackend(), DictationCoordinator::TranscriptionBackend::Cloud);
+
+    m_service->onActionInvoked(108, u"quit"_s);
     QCOMPARE(quitSpy.count(), 1);
 }
 

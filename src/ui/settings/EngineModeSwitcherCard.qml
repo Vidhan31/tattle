@@ -185,7 +185,9 @@ StyledCard {
                         }
 
                         StyledText {
-                            text: qsTr("Local Speech Model")
+                            text: ModelCatalog.selectedModelName.length > 0 ? qsTr("Local Model • %1").arg(
+                                                                                  ModelCatalog.selectedModelName) : qsTr(
+                                                                                  "Local Speech Model")
                             variant: "caption"
                             colorRole: "secondary"
                         }
@@ -241,8 +243,11 @@ StyledCard {
 
     PreferenceSwitch {
         Layout.fillWidth: true
-        title: qsTr("Automatic Offline Switching")
-        description: qsTr("Automatically switch to offline speech model when internet connection is lost")
+        title: qsTr("Prompt to Switch Offline")
+        description: ModelCatalog.selectedModelName.length > 0 ? qsTr(
+                                                                     "Send a notification to switch to offline model (%1) when internet connection is lost").arg(
+                                                                     ModelCatalog.selectedModelName) : qsTr(
+                                                                     "Send a notification to switch to offline speech model when internet connection is lost")
         enabled: ModelCatalog.hasDownloadedModels
         checked: DaemonClient.autoSwitchOffline && ModelCatalog.hasDownloadedModels
         onToggled: DaemonClient.autoSwitchOffline = checked

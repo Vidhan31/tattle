@@ -233,6 +233,7 @@ void ApplicationContext::wireSubsystems() {
         m_systemService->setAudioRecorder(m_audioRecorder);
         m_systemService->setAudioFeedbackPlayer(m_feedbackPlayer);
         m_systemService->setDictationCoordinator(m_dictationCoordinator);
+        m_systemService->setHealthMonitor(m_healthMonitor);
     }
 
     if (m_notificationPresenter) {

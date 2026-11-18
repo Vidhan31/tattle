@@ -455,17 +455,17 @@ void CompositeSttEngine::onNetworkOnlineChanged(bool online) {
             m_pendingOfflineSwitch = true;
             emit networkDisconnectedDuringSession();
         } else {
-            applyOfflineSwitch();
+            promptOfflineSwitch();
         }
     } else {
-        if (!m_autoSwitchedToOffline) {
+        if (m_activeBackend == TranscriptionBackend::Cloud) {
             return;
         }
 
         if (isBusy()) {
-            qCInfo(lcSpeech) << "CompositeSttEngine: Network restored while busy; will restore backend when idle";
+            qCInfo(lcSpeech) << "CompositeSttEngine: Network restored while busy; will suggest cloud switch when idle";
         } else {
-            restoreOnlineBackend();
+            promptOnlineSwitch();
         }
     }
 }
@@ -479,20 +479,38 @@ void CompositeSttEngine::checkPendingOfflineOrOnlineSwitch() {
         m_pendingOfflineSwitch = false;
         const bool networkOnline = m_healthMonitor ? m_healthMonitor->isNetworkOnline() : true;
         if (m_autoSwitchOffline && !networkOnline && m_activeBackend == TranscriptionBackend::Cloud) {
-            applyOfflineSwitch();
+            promptOfflineSwitch();
             return;
         }
     }
 
-    if (m_autoSwitchedToOffline && m_healthMonitor && m_healthMonitor->isNetworkOnline()) {
-        restoreOnlineBackend();
+    if (m_activeBackend == TranscriptionBackend::TranscribeCpp && m_healthMonitor &&
+        m_healthMonitor->isNetworkOnline()) {
+        promptOnlineSwitch();
     }
+}
+
+void CompositeSttEngine::promptOfflineSwitch() {
+    if (!isOfflineModelAvailable()) {
+        qCWarning(lcSpeech) << "CompositeSttEngine: Offline switch prompted, but no transcribe.cpp model is available";
+        emit offlineModelRequired();
+        return;
+    }
+
+    const QString modelName = m_modelManager ? m_modelManager->selectedModelName() : QString();
+    qCInfo(lcSpeech) << "CompositeSttEngine: Offline switch suggested with model:" << modelName;
+    emit offlineSwitchSuggested(modelName);
+}
+
+void CompositeSttEngine::promptOnlineSwitch() {
+    qCInfo(lcSpeech) << "CompositeSttEngine: Online connection restored, cloud switch suggested";
+    emit onlineSwitchSuggested();
 }
 
 void CompositeSttEngine::applyOfflineSwitch() {
     if (!isOfflineModelAvailable()) {
         qCWarning(lcSpeech)
-            << "CompositeSttEngine: Automatic switch to offline requested, but no transcribe.cpp model is available";
+            << "CompositeSttEngine: Switch to offline requested, but no transcribe.cpp model is available";
         emit offlineModelRequired();
         return;
     }

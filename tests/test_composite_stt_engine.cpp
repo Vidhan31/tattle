@@ -251,9 +251,14 @@ void TestCompositeSttEngine::testAutoSwitchOfflineWhenNetworkLost() {
     m_engine->setActiveBackend(CompositeSttEngine::TranscriptionBackend::Cloud);
     QCOMPARE(m_engine->activeBackend(), CompositeSttEngine::TranscriptionBackend::Cloud);
 
-    QSignalSpy failoverSpy(m_engine, &CompositeSttEngine::failoverTriggered);
+    QSignalSpy suggestSpy(m_engine, &CompositeSttEngine::offlineSwitchSuggested);
     m_healthMonitor->setNetworkOnlineForTesting(false);
 
+    QCOMPARE(suggestSpy.count(), 1);
+    QCOMPARE(m_engine->activeBackend(), CompositeSttEngine::TranscriptionBackend::Cloud);
+
+    QSignalSpy failoverSpy(m_engine, &CompositeSttEngine::failoverTriggered);
+    m_engine->applyOfflineSwitch();
     QVERIFY(m_engine->isAutoSwitchedToOffline());
     QCOMPARE(m_engine->activeBackend(), CompositeSttEngine::TranscriptionBackend::TranscribeCpp);
     QCOMPARE(failoverSpy.count(), 1);
@@ -271,9 +276,10 @@ void TestCompositeSttEngine::testAutoSwitchOfflineDeferredDuringBusy() {
     QVERIFY(!m_engine->isAutoSwitchedToOffline());
     QCOMPARE(m_engine->activeBackend(), CompositeSttEngine::TranscriptionBackend::Cloud);
 
+    QSignalSpy suggestSpy(m_engine, &CompositeSttEngine::offlineSwitchSuggested);
     m_cloudClient->completeManual(u"Finished"_s);
-    QVERIFY(m_engine->isAutoSwitchedToOffline());
-    QCOMPARE(m_engine->activeBackend(), CompositeSttEngine::TranscriptionBackend::TranscribeCpp);
+    QCOMPARE(suggestSpy.count(), 1);
+    QCOMPARE(m_engine->activeBackend(), CompositeSttEngine::TranscriptionBackend::Cloud);
 }
 
 void TestCompositeSttEngine::testAutoSwitchOfflineOnCancelDuringBusy() {
@@ -288,20 +294,25 @@ void TestCompositeSttEngine::testAutoSwitchOfflineOnCancelDuringBusy() {
     QVERIFY(!m_engine->isAutoSwitchedToOffline());
     QCOMPARE(m_engine->activeBackend(), CompositeSttEngine::TranscriptionBackend::Cloud);
 
+    QSignalSpy suggestSpy(m_engine, &CompositeSttEngine::offlineSwitchSuggested);
     m_engine->cancel();
-    QVERIFY(m_engine->isAutoSwitchedToOffline());
-    QCOMPARE(m_engine->activeBackend(), CompositeSttEngine::TranscriptionBackend::TranscribeCpp);
+    QCOMPARE(suggestSpy.count(), 1);
+    QCOMPARE(m_engine->activeBackend(), CompositeSttEngine::TranscriptionBackend::Cloud);
 }
 
 void TestCompositeSttEngine::testAutoSwitchOfflineRestoreWhenNetworkReturns() {
     m_engine->setActiveBackend(CompositeSttEngine::TranscriptionBackend::Cloud);
     m_healthMonitor->setNetworkOnlineForTesting(false);
+    m_engine->applyOfflineSwitch();
     QVERIFY(m_engine->isAutoSwitchedToOffline());
     QCOMPARE(m_engine->activeBackend(), CompositeSttEngine::TranscriptionBackend::TranscribeCpp);
 
-    QSignalSpy restoredSpy(m_engine, &CompositeSttEngine::onlineRestored);
+    QSignalSpy suggestSpy(m_engine, &CompositeSttEngine::onlineSwitchSuggested);
     m_healthMonitor->setNetworkOnlineForTesting(true);
+    QCOMPARE(suggestSpy.count(), 1);
 
+    QSignalSpy restoredSpy(m_engine, &CompositeSttEngine::onlineRestored);
+    m_engine->restoreOnlineBackend();
     QVERIFY(!m_engine->isAutoSwitchedToOffline());
     QCOMPARE(m_engine->activeBackend(), CompositeSttEngine::TranscriptionBackend::Cloud);
     QCOMPARE(restoredSpy.count(), 1);
@@ -312,7 +323,7 @@ void TestCompositeSttEngine::testLoadSettingsPreservesOfflineFallback() {
     m_engine->setSettingsManager(settings);
     m_engine->setActiveBackend(CompositeSttEngine::TranscriptionBackend::Cloud);
 
-    m_healthMonitor->setNetworkOnlineForTesting(false);
+    m_engine->applyOfflineSwitch();
     QVERIFY(m_engine->isAutoSwitchedToOffline());
     QCOMPARE(m_engine->activeBackend(), CompositeSttEngine::TranscriptionBackend::TranscribeCpp);
 
@@ -385,6 +396,7 @@ void TestCompositeSttEngine::testExplicitSameBackendClearsFallback() {
     m_engine->setSettingsManager(settings);
     m_engine->setActiveBackend(CompositeSttEngine::TranscriptionBackend::Cloud, true);
     m_healthMonitor->setNetworkOnlineForTesting(false);
+    m_engine->applyOfflineSwitch();
     QCOMPARE(m_engine->activeBackend(), CompositeSttEngine::TranscriptionBackend::TranscribeCpp);
     QVERIFY(m_engine->isAutoSwitchedToOffline());
 

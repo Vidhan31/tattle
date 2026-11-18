@@ -9,6 +9,21 @@ ColumnLayout {
     signal navigateRequested(string target)
     signal clipboardWarningRequested
 
+    property bool offlineSwitchBannerDismissed: false
+
+    Connections {
+        target: DaemonClient
+        function onNetworkOnlineChanged() {
+            root.offlineSwitchBannerDismissed = false;
+        }
+    }
+
+    readonly property bool showOfflineSwitchPrompt: !DaemonClient.networkOnline && DaemonClient.activeBackend
+                                                    === DaemonClient.Cloud && DaemonClient.autoSwitchOffline
+                                                    && ModelCatalog.hasDownloadedModels && !offlineSwitchBannerDismissed
+    readonly property bool showOfflineNoModelWarning: !DaemonClient.networkOnline && DaemonClient.activeBackend
+                                                      === DaemonClient.Cloud && !ModelCatalog.hasDownloadedModels
+
     readonly property bool showClipboardWarning: DaemonDiagnosticModel.clipboardWarningRequired &&
                                                  !DaemonDiagnosticModel.clipboardBannerDismissed
     readonly property bool showApiKeyWarning: DaemonClient.activeBackend === DaemonClient.Cloud &&
@@ -28,7 +43,8 @@ ColumnLayout {
                                                               !DaemonClient.cloudApiKeyInvalid &&
                                                               !DaemonClient.cloudRateLimited))
 
-    readonly property bool hasVisibleBanners: (showClipboardWarning || showApiKeyWarning || showInvalidApiKeyWarning
+    readonly property bool hasVisibleBanners: (showOfflineSwitchPrompt || showOfflineNoModelWarning
+                                               || showClipboardWarning || showApiKeyWarning || showInvalidApiKeyWarning
                                                || showRateLimitedWarning || showMissingModelWarning
                                                || showLoadingModelWarning || showNoMicWarning || showFatalErrorWarning
                                                || showDictationErrorWarning)
@@ -39,6 +55,45 @@ ColumnLayout {
     implicitHeight: hasVisibleBanners ? -1 : 0
 
     spacing: Theme.spacingMd
+
+    StatusBanner {
+        id: offlineSwitchBanner
+        visible: root.showOfflineSwitchPrompt
+        Layout.fillWidth: true
+        Layout.preferredHeight: visible ? implicitHeight : 0
+        bannerType: "warning"
+        title: qsTr("Internet Connection Offline")
+        message: {
+            const name = ModelCatalog.selectedModelName;
+            return name.length > 0 ? qsTr(
+                                         "Cloud speech transcription is unavailable. Switch to offline model (%1)?").arg(
+                                         name) : qsTr(
+                                         "Cloud speech transcription is unavailable. Switch to offline speech model?");
+        }
+        actionText: {
+            const name = ModelCatalog.selectedModelName;
+            return name.length > 0 ? qsTr("Switch to %1").arg(name) : qsTr("Switch to Offline");
+        }
+        onActionClicked: {
+            DaemonClient.activeBackend = DaemonClient.TranscribeCpp;
+        }
+        secondaryActionText: qsTr("Dismiss")
+        onSecondaryActionClicked: {
+            root.offlineSwitchBannerDismissed = true;
+        }
+    }
+
+    StatusBanner {
+        id: offlineNoModelBanner
+        visible: root.showOfflineNoModelWarning
+        Layout.fillWidth: true
+        Layout.preferredHeight: visible ? implicitHeight : 0
+        bannerType: "warning"
+        title: qsTr("Internet Connection Offline")
+        message: qsTr("Cloud speech transcription is unavailable. Download a model to use offline transcription.")
+        actionText: qsTr("Download Model")
+        onActionClicked: root.navigateRequested("offline")
+    }
 
     StatusBanner {
         id: clipboardBanner

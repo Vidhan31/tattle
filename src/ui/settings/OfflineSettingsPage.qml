@@ -350,7 +350,9 @@ Item {
                                              && DaemonClient.isModelLoaded
 
                                     StyledText {
-                                        text: qsTr("Active")
+                                        text: DaemonClient.activeBackend === DaemonClient.TranscribeCpp ? qsTr(
+                                                                                                              "Active") :
+                                                                                                          qsTr("Selected for Offline")
                                         variant: "caption"
                                         customWeight: Font.DemiBold
                                         customColor: Theme.accentColor
@@ -390,7 +392,7 @@ Item {
                                                  !modelCard.isSelected || !DaemonClient.isModelLoaded)
 
                                     StyledButton {
-                                        text: modelCard.isSelected ? qsTr("Load") : qsTr("Activate")
+                                        text: modelCard.isSelected ? qsTr("Load") : qsTr("Select")
                                         size: "small"
                                         variant: modelCard.isSelected ? "primary" : "secondary"
                                         Layout.fillWidth: true
