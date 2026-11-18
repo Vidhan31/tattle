@@ -42,6 +42,7 @@ qt_add_qml_module(tattle_ui
         SpeechPanel.qml
         SystemDiagnosticsColumn.qml
         RecordingControl.qml
+        AudioWaveformVisualizer.qml
         SystemStatusFooter.qml
         HistoryView.qml
         CreditsView.qml

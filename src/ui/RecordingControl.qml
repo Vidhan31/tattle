@@ -12,77 +12,94 @@ StyledCard {
     signal shortcutGuideRequested
 
     customRadius: Theme.radiusMd
-    customBorderColor: DaemonClient.recording ? Theme.colorDanger : Theme.cardBorder
+    customBorderColor: {
+        if (DaemonClient.recording) {
+            return Theme.colorDanger;
+        }
+        if (DaemonClient.isBusy) {
+            return Theme.colorWarning;
+        }
+        return Theme.cardBorder;
+    }
     customBorderWidth: DaemonClient.recording ? 2 : 1
-    padding: Theme.spacingLg
+    padding: Theme.spacingMd
 
     Behavior on customBorderColor {
         ColorAnimation {
             duration: Theme.animNormal
+            easing.type: Easing.OutCubic
         }
     }
 
-    Item {
-        Layout.fillWidth: true
-        implicitHeight: 96
+    property int recordingSeconds: 0
 
-        Item {
-            anchors.centerIn: parent
-            width: 96
-            height: 96
+    Timer {
+        id: recordingTimer
+        interval: 1000
+        repeat: true
+        running: DaemonClient.recording
+        onTriggered: {
+            root.recordingSeconds += 1;
+        }
+    }
 
-            Rectangle {
-                anchors.fill: parent
-                radius: width / 2
-                color: Theme.colorDanger
-                opacity: DaemonClient.recording ? 0.25 : 0.0
-                visible: DaemonClient.recording
-
-                Behavior on opacity {
-                    NumberAnimation {
-                        duration: Theme.animNormal
-                    }
-                }
-
-                SequentialAnimation on scale {
-                    running: DaemonClient.recording
-                    loops: Animation.Infinite
-                    ScaleAnimator {
-                        to: 1.18
-                        duration: 650
-                    }
-                    ScaleAnimator {
-                        to: 1.0
-                        duration: 650
-                    }
-                }
+    Connections {
+        target: DaemonClient
+        function onRecordingChanged() {
+            if (DaemonClient.recording) {
+                root.recordingSeconds = 0;
             }
+        }
+    }
+
+    function formatDuration(totalSecs: int): string {
+        const mins = Math.floor(totalSecs / 60);
+        const secs = totalSecs % 60;
+        const mStr = mins < 10 ? "0" + mins : "" + mins;
+        const sStr = secs < 10 ? "0" + secs : "" + secs;
+        return mStr + ":" + sStr;
+    }
+
+    ColumnLayout {
+        Layout.fillWidth: true
+        spacing: Theme.spacingSm
+
+        RowLayout {
+            Layout.fillWidth: true
+            spacing: Theme.spacingMd
 
             T.Button {
                 id: recordBtn
-                anchors.fill: parent
+                implicitWidth: 52
+                implicitHeight: 52
                 activeFocusOnTab: true
                 Accessible.role: Accessible.Button
-                Accessible.name: DaemonClient.recording ? qsTr("Stop Dictation") : (DaemonClient.recordingMode
-                                                                                    === DaemonClient.PushToTalk ? qsTr(
-                                                                                                                      "Push to Talk") :
-                                                                                                                  qsTr("Start Dictation"))
-                Accessible.description: DaemonClient.recordingMode === DaemonClient.PushToTalk ? qsTr(
-                                                                                                     "Push to talk speech recognition") :
-                                                                                                 qsTr("Toggle speech recognition recording")
+                Accessible.name: DaemonClient.recording ? qsTr("Stop Dictation") : qsTr("Start Dictation")
+                Accessible.description: qsTr("Toggle speech recognition recording")
                 enabled: DaemonClient.canRecord
+                scale: recordBtn.down ? 0.94 : (recordBtn.hovered ? 1.05 : 1.0)
+
+                Behavior on scale {
+                    NumberAnimation {
+                        duration: Theme.animFast
+                        easing.type: Easing.OutCubic
+                    }
+                }
 
                 background: Rectangle {
                     radius: recordBtn.width / 2
                     color: {
-                        if (!recordBtn.enabled)
-                        return Theme.controlBg;
-                        if (DaemonClient.recording)
-                        return recordBtn.down ? Theme.buttonDangerBgPressed : (recordBtn.hovered
-                                                                               ? Theme.buttonDangerBgHover :
-                                                                                 Theme.buttonDangerBg);
-                        if (DaemonClient.isBusy)
-                        return Theme.colorWarning;
+                        if (!recordBtn.enabled) {
+                            return Theme.controlBg;
+                        }
+                        if (DaemonClient.recording) {
+                            return recordBtn.down ? Theme.buttonDangerBgPressed : (recordBtn.hovered
+                                                                                   ? Theme.buttonDangerBgHover :
+                                                                                     Theme.buttonDangerBg);
+                        }
+                        if (DaemonClient.isBusy) {
+                            return Theme.colorWarning;
+                        }
                         return recordBtn.down ? Theme.buttonPrimaryBgPressed : (recordBtn.hovered
                                                                                 ? Theme.buttonPrimaryBgHover :
                                                                                   Theme.buttonPrimaryBg);
@@ -97,68 +114,48 @@ StyledCard {
                     }
                 }
 
-                contentItem: ColumnLayout {
-                    spacing: 2
-                    anchors.centerIn: parent
+                contentItem: Item {
+                    anchors.fill: parent
 
-                    Item {
-                        Layout.alignment: Qt.AlignHCenter
-                        implicitWidth: 28
-                        implicitHeight: 28
-
-                        Image {
-                            anchors.centerIn: parent
-                            width: 24
-                            height: 24
-                            source: "qrc:/qt/qml/Tattle/assets/icons/mic.svg"
-                            sourceSize.width: 24
-                            sourceSize.height: 24
-                            visible: !DaemonClient.recording && !DaemonClient.isBusy
-                            smooth: true
-                        }
-
-                        Image {
-                            anchors.centerIn: parent
-                            width: 22
-                            height: 22
-                            source: "qrc:/qt/qml/Tattle/assets/icons/stop.svg"
-                            sourceSize.width: 22
-                            sourceSize.height: 22
-                            visible: DaemonClient.recording
-                            smooth: true
-                        }
-
-                        Image {
-                            anchors.centerIn: parent
-                            width: 24
-                            height: 24
-                            source: "qrc:/qt/qml/Tattle/assets/icons/spinner.svg"
-                            sourceSize.width: 24
-                            sourceSize.height: 24
-                            visible: DaemonClient.isBusy
-                            smooth: true
-
-                            RotationAnimation on rotation {
-                                running: DaemonClient.isBusy
-                                loops: Animation.Infinite
-                                from: 0
-                                to: 360
-                                duration: 1000
-                            }
-                        }
+                    Image {
+                        anchors.centerIn: parent
+                        width: 24
+                        height: 24
+                        source: "qrc:/qt/qml/Tattle/assets/icons/mic.svg"
+                        sourceSize.width: 24
+                        sourceSize.height: 24
+                        visible: !DaemonClient.recording && !DaemonClient.isBusy
+                        smooth: true
                     }
 
-                    StyledText {
-                        text: DaemonClient.recording ? qsTr("Stop") : (DaemonClient.isBusy ? qsTr("Processing…") : (
-                                                                                                 DaemonClient.recordingMode
-                                                                                                 === DaemonClient.PushToTalk
-                                                                                                 ? qsTr("Talk") : qsTr(
-                                                                                                       "Record")))
-                        variant: "caption"
-                        customWeight: Font.DemiBold
-                        colorRole: "onAccent"
-                        Layout.alignment: Qt.AlignHCenter
-                        horizontalAlignment: Text.AlignHCenter
+                    Image {
+                        anchors.centerIn: parent
+                        width: 20
+                        height: 20
+                        source: "qrc:/qt/qml/Tattle/assets/icons/stop.svg"
+                        sourceSize.width: 20
+                        sourceSize.height: 20
+                        visible: DaemonClient.recording
+                        smooth: true
+                    }
+
+                    Image {
+                        anchors.centerIn: parent
+                        width: 22
+                        height: 22
+                        source: "qrc:/qt/qml/Tattle/assets/icons/spinner.svg"
+                        sourceSize.width: 22
+                        sourceSize.height: 22
+                        visible: DaemonClient.isBusy && !DaemonClient.recording
+                        smooth: true
+
+                        RotationAnimation on rotation {
+                            running: DaemonClient.isBusy && !DaemonClient.recording
+                            loops: Animation.Infinite
+                            from: 0
+                            to: 360
+                            duration: 1000
+                        }
                     }
                 }
 
@@ -170,86 +167,75 @@ StyledCard {
                     }
                 }
             }
-        }
-    }
 
-    Item {
-        Layout.fillWidth: true
-        implicitHeight: 32
-        visible: DaemonClient.recording
+            ColumnLayout {
+                Layout.alignment: Qt.AlignVCenter
+                spacing: 3
 
-        RowLayout {
-            anchors.centerIn: parent
-            spacing: 5
-
-            Repeater {
-                model: 7
-                delegate: Item {
-                    id: waveformBar
-                    required property int index
-                    Layout.preferredWidth: 4
-                    Layout.preferredHeight: 28
-
-                    readonly property real multiplier: {
-                        switch (index) {
-                            case 0:
-                            case 6:
-                            return 0.5;
-                            case 1:
-                            case 5:
-                            return 0.8;
-                            case 2:
-                            case 4:
-                            return 1.1;
-                            default:
-                            return 1.4;
+                StyledText {
+                    text: {
+                        if (DaemonClient.recording) {
+                            return qsTr("Recording…");
                         }
+                        if (DaemonClient.isBusy) {
+                            return qsTr("Transcribing…");
+                        }
+                        if (DaemonClient.dictationState === DaemonClient.Error) {
+                            return qsTr("Error");
+                        }
+                        if (DaemonClient.statusMessage.length > 0) {
+                            return DaemonClient.statusMessage;
+                        }
+                        return qsTr("Ready to record");
                     }
-
-                    Rectangle {
-                        anchors.bottom: parent.bottom
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        width: 4
-                        height: Math.max(4, 28 * Math.min(DaemonClient.audioLevel * waveformBar.multiplier, 1.0))
-
-                        radius: Theme.radiusXs / 2
-                        color: Theme.colorSuccess
-
-                        Behavior on height {
-                            NumberAnimation {
-                                duration: 50
-                            }
+                    variant: "subheading"
+                    customWeight: Font.DemiBold
+                    customColor: {
+                        if (DaemonClient.recording) {
+                            return Theme.colorDanger;
                         }
+                        if (DaemonClient.isBusy) {
+                            return Theme.colorWarning;
+                        }
+                        if (DaemonClient.dictationState === DaemonClient.Error) {
+                            return Theme.colorDanger;
+                        }
+                        return Theme.textPrimary;
                     }
                 }
+
+                StyledText {
+                    text: {
+                        if (DaemonClient.recording) {
+                            return root.formatDuration(root.recordingSeconds) + " • " + qsTr(
+                                "Press Ctrl+Shift+Space to stop");
+                        }
+                        if (DaemonClient.isBusy) {
+                            return qsTr("Converting speech audio to text…");
+                        }
+                        return DaemonClient.recordingMode === DaemonClient.PushToTalk ? qsTr(
+                                                                                            "Hold Ctrl+Shift+Space to talk") :
+                                                                                        qsTr("Press Ctrl+Shift+Space to start / stop");
+                    }
+                    variant: "caption"
+                    colorRole: "secondary"
+                }
+            }
+
+            AudioWaveformVisualizer {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 36
+                Layout.alignment: Qt.AlignVCenter
+                Layout.leftMargin: Theme.spacingMd
+                active: DaemonClient.recording
+                busy: DaemonClient.isBusy && !DaemonClient.recording
+                audioLevel: DaemonClient.audioLevel
             }
         }
-    }
 
-    StyledText {
-        id: audioStatusText
-        text: DaemonClient.statusMessage
-        variant: "caption"
-        colorRole: "secondary"
-        horizontalAlignment: Text.AlignHCenter
-        wrapMode: Text.WordWrap
-        Layout.fillWidth: true
-        visible: audioStatusText.text.length > 0
-    }
-
-    StyledText {
-        id: modeHintText
-        text: DaemonClient.recordingMode === DaemonClient.PushToTalk ? qsTr(
-                                                                           "Push-to-Talk: Hold Ctrl+Shift+Space to talk") :
-                                                                       qsTr("Toggle Mode: Press Ctrl+Shift+Space to start / stop")
-        variant: "caption"
-        colorRole: "secondary"
-        horizontalAlignment: Text.AlignHCenter
-        Layout.fillWidth: true
-        visible: !DaemonClient.recording && !DaemonClient.isBusy
-    }
-
-    SystemStatusFooter {
-        onShortcutGuideRequested: root.shortcutGuideRequested()
+        SystemStatusFooter {
+            Layout.fillWidth: true
+            onShortcutGuideRequested: root.shortcutGuideRequested()
+        }
     }
 }
