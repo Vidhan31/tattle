@@ -343,6 +343,8 @@ void TestCompositeSttEngine::testOnlineSwitchHonorsAutoSwitchPreference() {
     QVERIFY(m_engine->isAutoSwitchedToOffline());
 
     m_engine->setAutoSwitchOffline(false);
+    QCOMPARE(m_engine->activeBackend(), CompositeSttEngine::TranscriptionBackend::TranscribeCpp);
+    QVERIFY(m_engine->isAutoSwitchedToOffline());
 
     QSignalSpy suggestSpy(m_engine, &CompositeSttEngine::onlineSwitchSuggested);
     m_healthMonitor->setNetworkOnlineForTesting(true);

@@ -45,8 +45,9 @@ void CompositeSttEngine::setSettingsManager(SettingsManager* settings) {
                     if (m_autoSwitchOffline != config.autoSwitchOffline) {
                         m_autoSwitchOffline = config.autoSwitchOffline;
                         emit autoSwitchOfflineChanged();
-                        if (!m_autoSwitchOffline && m_autoSwitchedToOffline && !isBusy()) {
-                            restoreOnlineBackend();
+                        if (!m_autoSwitchOffline) {
+                            m_pendingOfflineSwitch = false;
+                            m_pendingOnlineSwitch = false;
                         }
                     }
                 });
@@ -88,8 +89,9 @@ void CompositeSttEngine::loadSettings() {
     if (m_autoSwitchOffline != autoSwitch) {
         m_autoSwitchOffline = autoSwitch;
         emit autoSwitchOfflineChanged();
-        if (!m_autoSwitchOffline && m_autoSwitchedToOffline && !isBusy()) {
-            restoreOnlineBackend();
+        if (!m_autoSwitchOffline) {
+            m_pendingOfflineSwitch = false;
+            m_pendingOnlineSwitch = false;
         }
     }
 
@@ -329,9 +331,6 @@ void CompositeSttEngine::setAutoSwitchOffline(bool enable) {
     if (!m_autoSwitchOffline) {
         m_pendingOfflineSwitch = false;
         m_pendingOnlineSwitch = false;
-        if (m_autoSwitchedToOffline && !isBusy()) {
-            restoreOnlineBackend();
-        }
     }
 }
 

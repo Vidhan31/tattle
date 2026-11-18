@@ -279,6 +279,7 @@ private slots:
     void testQueuedSwitchPreservedDuringSettingsRefresh();
     void testCoordinatorApplyOfflineSwitchDeferredDuringRecording();
     void testStartRecordingPreservesOfflineFallback();
+    void testDisablingAutoSwitchPreservesActiveBackend();
     void testHistoryFilePermissionsAndSessionCleanup();
     void testClearHistory();
     void testNotificationIntegration();
@@ -825,6 +826,27 @@ void TestDictationCoordinator::testStartRecordingPreservesOfflineFallback() {
     m_sttEngine->restoreOnlineBackend();
     QCOMPARE(m_coordinator->activeBackend(), DictationCoordinator::TranscriptionBackend::Cloud);
     QVERIFY(!m_sttEngine->isAutoSwitchedToOffline());
+}
+
+void TestDictationCoordinator::testDisablingAutoSwitchPreservesActiveBackend() {
+    m_coordinator->setActiveBackend(DictationCoordinator::TranscriptionBackend::Cloud, true);
+    QCOMPARE(m_coordinator->activeBackend(), DictationCoordinator::TranscriptionBackend::Cloud);
+
+    m_healthMonitor->setNetworkOnlineForTesting(false);
+    m_coordinator->applyOfflineSwitch();
+    QCOMPARE(m_coordinator->activeBackend(), DictationCoordinator::TranscriptionBackend::TranscribeCpp);
+    QVERIFY(m_sttEngine->isAutoSwitchedToOffline());
+
+    // Disabling prompt to switch offline must keep the chosen offline mode, not revert to Cloud
+    m_coordinator->setAutoSwitchOffline(false);
+    QCOMPARE(m_coordinator->activeBackend(), DictationCoordinator::TranscriptionBackend::TranscribeCpp);
+
+    m_coordinator->loadSettings();
+    QCOMPARE(m_coordinator->activeBackend(), DictationCoordinator::TranscriptionBackend::TranscribeCpp);
+
+    m_coordinator->startRecording();
+    QCOMPARE(m_coordinator->activeBackend(), DictationCoordinator::TranscriptionBackend::TranscribeCpp);
+    m_coordinator->stopRecording();
 }
 
 void TestDictationCoordinator::testHistoryFilePermissionsAndSessionCleanup() {
