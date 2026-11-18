@@ -9,6 +9,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <optional>
 
 class AudioRecorder;
 class AbstractCloudSttClient;
@@ -189,6 +190,8 @@ private:
     bool m_autoSwitchOffline = true;
     bool m_clientWindowFocused = false;
     bool m_initialized = false;
+    std::optional<TranscriptionBackend> m_deferredBackendSwitch;
+    bool m_deferredPersistSettings = true;
 
     friend class TestDictationCoordinator;
 };

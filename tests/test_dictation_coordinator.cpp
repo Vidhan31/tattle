@@ -718,10 +718,20 @@ void TestDictationCoordinator::testAutoSwitchOfflineWhenNetworkLost() {
     m_coordinator->setActiveBackend(DictationCoordinator::TranscriptionBackend::Cloud);
     QCOMPARE(m_coordinator->activeBackend(), DictationCoordinator::TranscriptionBackend::Cloud);
 
+    QSignalSpy suggestSpy(m_sttEngine, &CompositeSttEngine::offlineSwitchSuggested);
     m_healthMonitor->setNetworkOnlineForTesting(false);
+    QCOMPARE(suggestSpy.count(), 1);
+    QCOMPARE(m_coordinator->activeBackend(), DictationCoordinator::TranscriptionBackend::Cloud);
+
+    m_sttEngine->applyOfflineSwitch();
     QCOMPARE(m_coordinator->activeBackend(), DictationCoordinator::TranscriptionBackend::TranscribeCpp);
 
+    QSignalSpy onlineSpy(m_sttEngine, &CompositeSttEngine::onlineSwitchSuggested);
     m_healthMonitor->setNetworkOnlineForTesting(true);
+    QCOMPARE(onlineSpy.count(), 1);
+    QCOMPARE(m_coordinator->activeBackend(), DictationCoordinator::TranscriptionBackend::TranscribeCpp);
+
+    m_sttEngine->restoreOnlineBackend();
     QCOMPARE(m_coordinator->activeBackend(), DictationCoordinator::TranscriptionBackend::Cloud);
 }
 
@@ -733,7 +743,13 @@ void TestDictationCoordinator::testAutoSwitchOfflineDeferredDuringRecording() {
     m_coordinator->startRecording();
     QCOMPARE(m_coordinator->dictationState(), DictationCoordinator::DictationState::Recording);
 
+    QSignalSpy disconnectSpy(m_sttEngine, &CompositeSttEngine::networkDisconnectedDuringSession);
     m_healthMonitor->setNetworkOnlineForTesting(false);
+    QCOMPARE(disconnectSpy.count(), 1);
+    QCOMPARE(m_coordinator->activeBackend(), DictationCoordinator::TranscriptionBackend::Cloud);
+
+    m_coordinator->setActiveBackend(DictationCoordinator::TranscriptionBackend::TranscribeCpp);
+    QCOMPARE(m_coordinator->dictationState(), DictationCoordinator::DictationState::Recording);
     QCOMPARE(m_coordinator->activeBackend(), DictationCoordinator::TranscriptionBackend::Cloud);
 
     m_coordinator->stopRecording();
@@ -744,7 +760,7 @@ void TestDictationCoordinator::testStartRecordingPreservesOfflineFallback() {
     m_coordinator->setActiveBackend(DictationCoordinator::TranscriptionBackend::Cloud, true);
     QCOMPARE(m_coordinator->activeBackend(), DictationCoordinator::TranscriptionBackend::Cloud);
 
-    m_healthMonitor->setNetworkOnlineForTesting(false);
+    m_sttEngine->applyOfflineSwitch();
     QCOMPARE(m_coordinator->activeBackend(), DictationCoordinator::TranscriptionBackend::TranscribeCpp);
     QVERIFY(m_sttEngine->isAutoSwitchedToOffline());
 
@@ -762,6 +778,7 @@ void TestDictationCoordinator::testStartRecordingPreservesOfflineFallback() {
     QVERIFY(m_sttEngine->isAutoSwitchedToOffline());
 
     m_healthMonitor->setNetworkOnlineForTesting(true);
+    m_sttEngine->restoreOnlineBackend();
     QCOMPARE(m_coordinator->activeBackend(), DictationCoordinator::TranscriptionBackend::Cloud);
     QVERIFY(!m_sttEngine->isAutoSwitchedToOffline());
 }

@@ -247,6 +247,17 @@ void TestNotificationPresenter::testActionInvokedRouting() {
     m_service->onActionInvoked(107, u"switch_cloud"_s);
     QCOMPARE(m_coordinator->activeBackend(), DictationCoordinator::TranscriptionBackend::Cloud);
 
+    m_coordinator->setAudioRecorder(m_recorder);
+    m_coordinator->setSttEngine(m_sttEngine);
+
+    m_coordinator->startRecording();
+    QCOMPARE(m_coordinator->dictationState(), DictationCoordinator::DictationState::Recording);
+    m_service->onActionInvoked(106, u"switch_offline"_s);
+    QCOMPARE(m_coordinator->dictationState(), DictationCoordinator::DictationState::Recording);
+    QCOMPARE(m_coordinator->activeBackend(), DictationCoordinator::TranscriptionBackend::Cloud);
+    m_coordinator->stopRecording();
+    QCOMPARE(m_coordinator->activeBackend(), DictationCoordinator::TranscriptionBackend::TranscribeCpp);
+
     m_service->onActionInvoked(108, u"quit"_s);
     QCOMPARE(quitSpy.count(), 1);
 }

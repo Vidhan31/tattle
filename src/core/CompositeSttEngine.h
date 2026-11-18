@@ -117,6 +117,7 @@ private:
     TranscriptionBackend m_activeBackend = TranscriptionBackend::TranscribeCpp;
     bool m_autoSwitchOffline = true;
     bool m_pendingOfflineSwitch = false;
+    bool m_pendingOnlineSwitch = false;
     bool m_autoSwitchedToOffline = false;
     bool m_isBusy = false;
     bool m_active = false;

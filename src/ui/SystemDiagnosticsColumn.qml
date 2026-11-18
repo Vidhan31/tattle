@@ -74,8 +74,11 @@ ColumnLayout {
             const name = ModelCatalog.selectedModelName;
             return name.length > 0 ? qsTr("Switch to %1").arg(name) : qsTr("Switch to Offline");
         }
+        actionEnabled: !DaemonClient.isBusy
         onActionClicked: {
-            DaemonClient.activeBackend = DaemonClient.TranscribeCpp;
+            if (!DaemonClient.isBusy) {
+                DaemonClient.activeBackend = DaemonClient.TranscribeCpp;
+            }
         }
         secondaryActionText: qsTr("Dismiss")
         onSecondaryActionClicked: {
