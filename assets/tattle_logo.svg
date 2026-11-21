@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-labelledby="logo-title">
+  <title id="logo-title">Geometric Equalizer Logo</title>
+
+  <!-- Rounded square black background container -->
+  <rect x="0" y="0" width="512" height="512" rx="128" ry="128" fill="#000000" />
+
+  <!-- Five vertically aligned white parallelogram bars with 45-degree slanted caps -->
+  <g fill="#FFFFFF">
+    <!-- Bar 1 (Far Left) -->
+    <polygon points="114,218 150,182 150,294 114,330" />
+
+    <!-- Bar 2 (Mid Left) -->
+    <polygon points="176,156 212,120 212,356 176,392" />
+
+    <!-- Bar 3 (Center) -->
+    <polygon points="238,94 274,58 274,418 238,454" />
+
+    <!-- Bar 4 (Mid Right) -->
+    <polygon points="300,156 336,120 336,356 300,392" />
+
+    <!-- Bar 5 (Far Right) -->
+    <polygon points="362,218 398,182 398,294 362,330" />
+  </g>
+</svg>

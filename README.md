@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/tattle_logo.svg" alt="Tattle Logo" width="128" height="128" />
+</p>
+
 # Tattle
 
 Voice typing for Wayland. Press a shortcut, speak, and your words appear directly in the active input field.
@@ -5,7 +9,7 @@ Voice typing for Wayland. Press a shortcut, speak, and your words appear directl
 Offline transcription runs locally on your device. Audio stays private. You can also connect cloud providers like Groq or Google Gemini for online transcription.
 
 <p align="center">
-  <img src="assets/screenshots/Tattle-Screenshots-1.png" alt="Tattle main window" width="800" />
+  <img src="assets/screenshots/Tattle-Screenshots-1.png" alt="Tattle main dictation window" width="800" />
 </p>
 
 ---
@@ -13,16 +17,19 @@ Offline transcription runs locally on your device. Audio stays private. You can 
 ## Screenshots
 
 <p align="center">
-  <img src="assets/screenshots/Tattle-Screenshots-3.png" alt="Offline speech engine settings" width="400" />
-  <img src="assets/screenshots/Tattle-Screenshots-4.png" alt="Local model library" width="400" />
+  <img src="assets/screenshots/Tattle-Screenshots-2.png" alt="Voice dictation with live waveform visualizer" width="400" />
+  <img src="assets/screenshots/Tattle-Screenshots-3.png" alt="Dictation history and search" width="400" />
 </p>
 <p align="center">
-  <img src="assets/screenshots/Tattle-Screenshots-5.png" alt="Cloud provider configuration" width="400" />
-  <img src="assets/screenshots/Tattle-Screenshots-6.png" alt="Language settings" width="400" />
+  <img src="assets/screenshots/Tattle-Screenshots-4.png" alt="Transcription mode and fallback options" width="400" />
+  <img src="assets/screenshots/Tattle-Screenshots-5.png" alt="Cloud transcription provider settings" width="400" />
 </p>
 <p align="center">
-  <img src="assets/screenshots/Tattle-Screenshots-8.png" alt="Audio device settings" width="400" />
-  <img src="assets/screenshots/Tattle-Screenshots-9.png" alt="Shortcut configuration" width="400" />
+  <img src="assets/screenshots/Tattle-Screenshots-6.png" alt="Offline speech recognition models and acceleration" width="400" />
+  <img src="assets/screenshots/Tattle-Screenshots-7.png" alt="Audio input and feedback configuration" width="400" />
+</p>
+<p align="center">
+  <img src="assets/screenshots/Tattle-Screenshots-8.png" alt="System notification settings" width="400" />
 </p>
 
 ---

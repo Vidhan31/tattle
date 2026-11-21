@@ -170,6 +170,8 @@ RUN set -eux; \
     desktop-file-validate /etc/xdg/autostart/io.github.tattle.daemon.desktop; \
     test -f /usr/share/icons/hicolor/512x512/apps/tattle.png; \
     test -f /usr/share/icons/hicolor/512x512/apps/io.github.tattle.png; \
+    test -f /usr/share/icons/hicolor/scalable/apps/tattle.svg; \
+    test -f /usr/share/icons/hicolor/scalable/apps/io.github.tattle.svg; \
     \
     echo "--- Checking keyinjectord capability (cap_dac_override) ---"; \
     getcap /opt/tattle/bin/keyinjectord | grep -E 'cap_dac_override'; \

@@ -126,8 +126,9 @@ qt_add_resources(tattle_core "tattle_core_assets"
     FILES
         ${CMAKE_SOURCE_DIR}/assets/chime_start.wav
         ${CMAKE_SOURCE_DIR}/assets/chime_stop.wav
-        ${CMAKE_SOURCE_DIR}/assets/speech-to-text-16.png
-        ${CMAKE_SOURCE_DIR}/assets/speech-to-text-24.png
-        ${CMAKE_SOURCE_DIR}/assets/speech-to-text-32.png
-        ${CMAKE_SOURCE_DIR}/assets/speech-to-text-64.png
+        ${CMAKE_SOURCE_DIR}/assets/tattle_logo.svg
+        ${CMAKE_SOURCE_DIR}/assets/tattle_logo_16.png
+        ${CMAKE_SOURCE_DIR}/assets/tattle_logo_24.png
+        ${CMAKE_SOURCE_DIR}/assets/tattle_logo_32.png
+        ${CMAKE_SOURCE_DIR}/assets/tattle_logo_64.png
 )

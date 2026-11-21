@@ -103,7 +103,7 @@ Item {
                     spacing: Theme.spacingMd
 
                     Image {
-                        source: "qrc:/qt/qml/Tattle/assets/speech-to-text-64.png"
+                        source: "qrc:/qt/qml/Tattle/assets/tattle_logo.svg"
                         sourceSize: Qt.size(44, 44)
                         Layout.preferredWidth: 44
                         Layout.preferredHeight: 44
@@ -218,16 +218,6 @@ Item {
                     url: "https://github.com/FortAwesome/Font-Awesome"
                     urlLabel: "FortAwesome/Font-Awesome"
                     description: qsTr("Vector icon assets for UI controls and action buttons.")
-                }
-
-                StyledDivider {}
-
-                ComponentItem {
-                    title: qsTr("Speech to Text Icon")
-                    badgeText: qsTr("Flaticon License")
-                    url: "https://www.flaticon.com/free-icons/speech-to-text"
-                    urlLabel: "flaticon.com"
-                    description: qsTr("Application branding icon created by Fajrul Fitrianto on Flaticon.")
                 }
             }
         }

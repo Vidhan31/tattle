@@ -74,6 +74,8 @@ QT_QPA_PLATFORM=offscreen %ctest
 %{_sysconfdir}/xdg/autostart/io.github.tattle.daemon.desktop
 %{_datadir}/icons/hicolor/*/apps/io.github.tattle.png
 %{_datadir}/icons/hicolor/*/apps/tattle.png
+%{_datadir}/icons/hicolor/*/apps/io.github.tattle.svg
+%{_datadir}/icons/hicolor/*/apps/tattle.svg
 
 %changelog
 * Mon Nov 09 2026 Vidhan Raut <rautvidhan31@gmail.com> - 1.0.0-1

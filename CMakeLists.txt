@@ -277,15 +277,24 @@ install(
 
 set(APP_ICON_SIZES 16 24 32 64 128 256 512)
 foreach(SIZE ${APP_ICON_SIZES})
-    install(FILES "assets/speech-to-text-${SIZE}.png"
+    install(FILES "assets/tattle_logo_${SIZE}.png"
         DESTINATION "${DESKTOP_AND_ICON_PREFIX}/icons/hicolor/${SIZE}x${SIZE}/apps"
         RENAME "io.github.tattle.png"
     )
-    install(FILES "assets/speech-to-text-${SIZE}.png"
+    install(FILES "assets/tattle_logo_${SIZE}.png"
         DESTINATION "${DESKTOP_AND_ICON_PREFIX}/icons/hicolor/${SIZE}x${SIZE}/apps"
         RENAME "tattle.png"
     )
 endforeach()
+
+install(FILES "assets/tattle_logo.svg"
+    DESTINATION "${DESKTOP_AND_ICON_PREFIX}/icons/hicolor/scalable/apps"
+    RENAME "io.github.tattle.svg"
+)
+install(FILES "assets/tattle_logo.svg"
+    DESTINATION "${DESKTOP_AND_ICON_PREFIX}/icons/hicolor/scalable/apps"
+    RENAME "tattle.svg"
+)
 
 if(ENABLE_QT_DEPLOYMENT)
     qt_generate_deploy_qml_app_script(

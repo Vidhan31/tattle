@@ -152,9 +152,10 @@ int main(int argc, char* argv[]) {
     }
 
     QIcon appIcon;
+    appIcon.addFile(u":/qt/qml/Tattle/assets/tattle_logo.svg"_s);
     constexpr auto kIconSizes = std::to_array({16, 24, 32, 64, 128, 256, 512});
     for (const int sz : kIconSizes) {
-        appIcon.addFile(QString(u":/qt/qml/Tattle/assets/speech-to-text-%1.png"_s).arg(sz), QSize(sz, sz));
+        appIcon.addFile(QString(u":/qt/qml/Tattle/assets/tattle_logo_%1.png"_s).arg(sz), QSize(sz, sz));
     }
     QGuiApplication::setWindowIcon(appIcon);
 

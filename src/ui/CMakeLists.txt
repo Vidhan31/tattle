@@ -80,13 +80,15 @@ qt_add_resources(tattle_ui "tattle_assets"
     PREFIX "/qt/qml/Tattle/assets"
     BASE "${CMAKE_SOURCE_DIR}/assets"
     FILES
-        ${CMAKE_SOURCE_DIR}/assets/speech-to-text-16.png
-        ${CMAKE_SOURCE_DIR}/assets/speech-to-text-24.png
-        ${CMAKE_SOURCE_DIR}/assets/speech-to-text-32.png
-        ${CMAKE_SOURCE_DIR}/assets/speech-to-text-64.png
-        ${CMAKE_SOURCE_DIR}/assets/speech-to-text-128.png
-        ${CMAKE_SOURCE_DIR}/assets/speech-to-text-256.png
-        ${CMAKE_SOURCE_DIR}/assets/speech-to-text-512.png
+        ${CMAKE_SOURCE_DIR}/assets/tattle_logo.svg
+        ${CMAKE_SOURCE_DIR}/assets/tattle_logo.png
+        ${CMAKE_SOURCE_DIR}/assets/tattle_logo_16.png
+        ${CMAKE_SOURCE_DIR}/assets/tattle_logo_24.png
+        ${CMAKE_SOURCE_DIR}/assets/tattle_logo_32.png
+        ${CMAKE_SOURCE_DIR}/assets/tattle_logo_64.png
+        ${CMAKE_SOURCE_DIR}/assets/tattle_logo_128.png
+        ${CMAKE_SOURCE_DIR}/assets/tattle_logo_256.png
+        ${CMAKE_SOURCE_DIR}/assets/tattle_logo_512.png
         ${CMAKE_SOURCE_DIR}/assets/icons/mic.svg
         ${CMAKE_SOURCE_DIR}/assets/icons/stop.svg
         ${CMAKE_SOURCE_DIR}/assets/icons/spinner.svg

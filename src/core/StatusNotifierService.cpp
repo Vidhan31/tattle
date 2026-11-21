@@ -398,7 +398,7 @@ void StatusNotifierService::loadIcons() {
 
     const QList<int> sizes = {16, 24, 32, 64};
     for (const int sz : sizes) {
-        const QString path = QString(u":/qt/qml/Tattle/assets/speech-to-text-%1.png"_s).arg(sz);
+        const QString path = QString(u":/qt/qml/Tattle/assets/tattle_logo_%1.png"_s).arg(sz);
         const QImage img(path);
         if (!img.isNull()) {
             m_iconPixmap.append(imageToDbusPixmap(img));
