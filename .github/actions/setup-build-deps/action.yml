@@ -5,9 +5,21 @@ inputs:
     description: "Additional packages to install"
     required: false
     default: ""
+  github-token:
+    description: "GitHub token for authenticating git operations"
+    required: false
+    default: ""
 runs:
   using: "composite"
   steps:
+    - name: Configure Git authentication for GitHub
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.github-token || github.token }}
+      run: |
+        if [ -n "$GH_TOKEN" ]; then
+          git config --global url."https://x-access-token:${GH_TOKEN}@github.com/".insteadOf "https://github.com/"
+        fi
     - name: Install APT dependencies
       shell: bash
       env:

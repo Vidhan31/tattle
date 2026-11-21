@@ -224,6 +224,8 @@ jobs:
 
       - name: Install build dependencies
         uses: ./.github/actions/setup-build-deps
+        with:
+          github-token: ${{ github.token }}
 
       - name: Cache compiler objects
         # zizmor: ignore[cache-poisoning]
@@ -302,6 +304,8 @@ jobs:
 
       - name: Install Build Tools
         uses: ./.github/actions/setup-build-deps
+        with:
+          github-token: ${{ github.token }}
 
       - name: Cache compiler objects
         # zizmor: ignore[cache-poisoning]
@@ -371,6 +375,7 @@ jobs:
         uses: ./.github/actions/setup-build-deps
         with:
           extra-packages: "libasan8 libubsan1 libtsan2"
+          github-token: ${{ github.token }}
 
       - name: Cache compiler objects
         # zizmor: ignore[cache-poisoning]
