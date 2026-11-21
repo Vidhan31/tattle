@@ -261,8 +261,8 @@ Packaging scripts live in [`packaging/`](packaging/) and use Docker Buildx. They
 <summary><strong>Debian and Ubuntu (.deb)</strong></summary>
 
 ```bash
-./packaging/deb/build-deb.sh 24.04 1.0.0
-sudo apt install ./dist/deb/tattle_1.0.0_amd64.deb
+./packaging/deb/build-deb.sh 24.04 1.1.0
+sudo apt install ./dist/deb/tattle_1.1.0_amd64.deb
 ```
 
 Omit arguments to build with defaults from `VERSION`:
@@ -276,8 +276,8 @@ Omit arguments to build with defaults from `VERSION`:
 <summary><strong>Fedora and RHEL RPM (.rpm)</strong></summary>
 
 ```bash
-./packaging/rpm/build-rpm.sh 44 1.0.0 1
-sudo dnf install ./dist/rpm/tattle-1.0.0-1.fc44.x86_64.rpm
+./packaging/rpm/build-rpm.sh 44 1.1.0 1
+sudo dnf install ./dist/rpm/tattle-1.1.0-1.fc44.x86_64.rpm
 ```
 
 Omit arguments to build with defaults from `VERSION`:
@@ -291,8 +291,8 @@ Omit arguments to build with defaults from `VERSION`:
 <summary><strong>Arch Linux (.pkg.tar.zst)</strong></summary>
 
 ```bash
-./packaging/arch/build-arch.sh 1.0.0 1
-sudo pacman -U ./dist/arch/tattle-1.0.0-1-x86_64.pkg.tar.zst
+./packaging/arch/build-arch.sh 1.1.0 1
+sudo pacman -U ./dist/arch/tattle-1.1.0-1-x86_64.pkg.tar.zst
 ```
 
 Omit arguments to build with defaults from `VERSION`:

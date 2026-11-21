@@ -1,6 +1,6 @@
 pkgbase = tattle
 	pkgdesc = Fast and modern speech-to-text desktop application
-	pkgver = 1.0.0
+	pkgver = 1.1.0
 	pkgrel = 1
 	url = https://github.com/Vidhan31/tattle
 	install = tattle.install
@@ -29,7 +29,7 @@ pkgbase = tattle
 	depends = hicolor-icon-theme
 	options = !debug
 	options = strip
-	source = tattle-1.0.0.tar.gz::https://github.com/Vidhan31/tattle/archive/v1.0.0.tar.gz
+	source = tattle-1.1.0.tar.gz::https://github.com/Vidhan31/tattle/archive/v1.1.0.tar.gz
 	sha256sums = 945e6dda130fb597389d828384ce5d097fe2988327578a243cf341cce207d734
 
 pkgname = tattle

@@ -1,7 +1,7 @@
 # shellcheck shell=bash
 # Maintainer: Vidhan31 <rautvidhan31@gmail.com>
 pkgname=tattle
-pkgver=1.0.0
+pkgver=1.1.0
 pkgrel=1
 pkgdesc="Fast and modern speech-to-text desktop application"
 arch=('x86_64')

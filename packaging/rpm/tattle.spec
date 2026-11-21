@@ -1,7 +1,7 @@
 %global debug_package %{nil}
 
 Name:           tattle
-Version:        %{?version}%{!?version:1.0.0}
+Version:        %{?version}%{!?version:1.1.0}
 Release:        %{?release}%{!?release:1}%{?dist}
 Summary:        Fast and modern speech-to-text desktop application
 
@@ -78,5 +78,8 @@ QT_QPA_PLATFORM=offscreen %ctest
 %{_datadir}/icons/hicolor/*/apps/tattle.svg
 
 %changelog
+* Sun Nov 22 2026 Vidhan Raut <rautvidhan31@gmail.com> - 1.1.0-1
+- Release v1.1.0
+
 * Mon Nov 09 2026 Vidhan Raut <rautvidhan31@gmail.com> - 1.0.0-1
 - Initial RPM release for Fedora 43

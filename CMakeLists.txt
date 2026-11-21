@@ -30,7 +30,7 @@ if(NOT DEFINED TATTLE_VERSION)
         file(READ "${CMAKE_CURRENT_SOURCE_DIR}/VERSION" TATTLE_VERSION_FILE)
         string(STRIP "${TATTLE_VERSION_FILE}" TATTLE_VERSION)
     else()
-        set(TATTLE_VERSION "1.0.0")
+        set(TATTLE_VERSION "1.1.0")
     endif()
 endif()
 
