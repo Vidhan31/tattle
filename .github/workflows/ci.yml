@@ -28,8 +28,10 @@ jobs:
       cpp: ${{ steps.filter.outputs.cpp }}
       qml: ${{ steps.filter.outputs.qml }}
       workflows_scripts: ${{ steps.filter.outputs.workflows_scripts }}
+      packaging: ${{ steps.filter.outputs.packaging }}
       version: ${{ steps.filter.outputs.version }}
       changelog: ${{ steps.filter.outputs.changelog }}
+      package_matrix: ${{ steps.pkg-matrix.outputs.matrix }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -56,10 +58,30 @@ jobs:
               - '.github/**'
               - 'packaging/**'
               - 'scripts/**'
+            packaging:
+              - 'packaging/**'
             version:
               - 'VERSION'
             changelog:
               - 'CHANGELOG.md'
+
+      - name: Determine packaging matrix
+        id: pkg-matrix
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          GITHUB_REF: ${{ github.ref }}
+          VERSION_CHANGED: ${{ steps.filter.outputs.version }}
+          PACKAGING_CHANGED: ${{ steps.filter.outputs.packaging }}
+        run: |
+          FULL='{"include":[{"target":"deb","name":"Debian (.deb)","file":"packaging/deb/Dockerfile.deb","outdir":"dist/deb"},{"target":"arch","name":"Arch Linux (.pkg.tar.zst)","file":"packaging/arch/Dockerfile.arch","outdir":"dist/arch"},{"target":"rpm","name":"Fedora RPM (.rpm)","file":"packaging/rpm/Dockerfile.rpm","outdir":"dist/rpm"}]}'
+          PR_FAST='{"include":[{"target":"rpm","name":"Fedora RPM (.rpm)","file":"packaging/rpm/Dockerfile.rpm","outdir":"dist/rpm"}]}'
+          if { [ "${EVENT_NAME}" = "push" ] && [ "${GITHUB_REF}" = "refs/heads/main" ]; } || [ "${EVENT_NAME}" = "workflow_dispatch" ]; then
+            echo "matrix=${FULL}" >> "$GITHUB_OUTPUT"
+          elif [ "${EVENT_NAME}" = "pull_request" ] && { [ "${VERSION_CHANGED}" = "true" ] || [ "${PACKAGING_CHANGED}" = "true" ]; }; then
+            echo "matrix=${FULL}" >> "$GITHUB_OUTPUT"
+          else
+            echo "matrix=${PR_FAST}" >> "$GITHUB_OUTPUT"
+          fi
 
   validate-version:
     name: Validate VERSION File (Semantic Versioning)
@@ -404,25 +426,13 @@ jobs:
   package-validation:
     name: Package Validation
     runs-on: ubuntu-24.04
-    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch'
+    needs: [detect-changes]
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request'
     permissions:
       contents: read
     strategy:
       fail-fast: false
-      matrix:
-        include:
-          - target: deb
-            name: Debian (.deb)
-            file: packaging/deb/Dockerfile.deb
-            outdir: dist/deb
-          - target: arch
-            name: Arch Linux (.pkg.tar.zst)
-            file: packaging/arch/Dockerfile.arch
-            outdir: dist/arch
-          - target: rpm
-            name: Fedora RPM (.rpm)
-            file: packaging/rpm/Dockerfile.rpm
-            outdir: dist/rpm
+      matrix: ${{ fromJSON(needs.detect-changes.outputs.package_matrix) }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
