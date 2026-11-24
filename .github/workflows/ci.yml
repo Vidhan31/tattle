@@ -74,7 +74,7 @@ jobs:
           PACKAGING_CHANGED: ${{ steps.filter.outputs.packaging }}
         run: |
           FULL='{"include":[{"target":"deb","name":"Debian (.deb)","file":"packaging/deb/Dockerfile.deb","outdir":"dist/deb"},{"target":"arch","name":"Arch Linux (.pkg.tar.zst)","file":"packaging/arch/Dockerfile.arch","outdir":"dist/arch"},{"target":"rpm","name":"Fedora RPM (.rpm)","file":"packaging/rpm/Dockerfile.rpm","outdir":"dist/rpm"}]}'
-          PR_FAST='{"include":[{"target":"rpm","name":"Fedora RPM (.rpm)","file":"packaging/rpm/Dockerfile.rpm","outdir":"dist/rpm"}]}'
+          PR_FAST='{"include":[{"target":"deb","name":"Debian (.deb)","file":"packaging/deb/Dockerfile.deb","outdir":"dist/deb"}]}'
           if { [ "${EVENT_NAME}" = "push" ] && [ "${GITHUB_REF}" = "refs/heads/main" ]; } || [ "${EVENT_NAME}" = "workflow_dispatch" ]; then
             echo "matrix=${FULL}" >> "$GITHUB_OUTPUT"
           elif [ "${EVENT_NAME}" = "pull_request" ] && { [ "${VERSION_CHANGED}" = "true" ] || [ "${PACKAGING_CHANGED}" = "true" ]; }; then
