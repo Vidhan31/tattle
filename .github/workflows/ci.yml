@@ -461,11 +461,13 @@ jobs:
           cache-to: type=gha,mode=min,scope=pkg-${{ matrix.target }}
 
       - name: Verify package artifacts
+        env:
+          OUTDIR: ${{ matrix.outdir }}
         run: |
-          echo "Listing generated package artifacts in ./${{ matrix.outdir }}:"
-          ls -lh ./${{ matrix.outdir }}
-          if [ -z "$(ls -A ./${{ matrix.outdir }})" ]; then
-            echo "ERROR: No package artifacts found in ./${{ matrix.outdir }}"
+          echo "Listing generated package artifacts in ./${OUTDIR}:"
+          ls -lh "./${OUTDIR}"
+          if [ -z "$(ls -A "./${OUTDIR}")" ]; then
+            echo "ERROR: No package artifacts found in ./${OUTDIR}"
             exit 1
           fi
 
