@@ -18,8 +18,11 @@ class TestSarvamSttClient : public QObject {
 
 private:
     static QByteArray createFakeWav(double durationSeconds, quint32 sampleRate = 16000) {
-        QByteArray wav;
-        wav.resize(44);
+        const quint32 byteRate = sampleRate * 2;
+        const auto pcmBytes = static_cast<quint32>(durationSeconds * byteRate);
+        const quint32 fileSize = 36 + pcmBytes;
+
+        QByteArray wav(44 + static_cast<qsizetype>(pcmBytes), '\0');
         auto* data = reinterpret_cast<quint8*>(wav.data());
 
         // "RIFF"
@@ -27,6 +30,12 @@ private:
         data[1] = 'I';
         data[2] = 'F';
         data[3] = 'F';
+
+        // File size - 8
+        data[4] = static_cast<quint8>(fileSize & 0xFF);
+        data[5] = static_cast<quint8>((fileSize >> 8) & 0xFF);
+        data[6] = static_cast<quint8>((fileSize >> 16) & 0xFF);
+        data[7] = static_cast<quint8>((fileSize >> 24) & 0xFF);
 
         // "WAVE"
         data[8] = 'W';
@@ -61,7 +70,6 @@ private:
         data[27] = static_cast<quint8>((sampleRate >> 24) & 0xFF);
 
         // ByteRate = SampleRate * 2 (16-bit mono)
-        const quint32 byteRate = sampleRate * 2;
         data[28] = static_cast<quint8>(byteRate & 0xFF);
         data[29] = static_cast<quint8>((byteRate >> 8) & 0xFF);
         data[30] = static_cast<quint8>((byteRate >> 16) & 0xFF);
@@ -82,20 +90,10 @@ private:
         data[39] = 'a';
 
         // Data size
-        const auto pcmBytes = static_cast<quint32>(durationSeconds * byteRate);
         data[40] = static_cast<quint8>(pcmBytes & 0xFF);
         data[41] = static_cast<quint8>((pcmBytes >> 8) & 0xFF);
         data[42] = static_cast<quint8>((pcmBytes >> 16) & 0xFF);
         data[43] = static_cast<quint8>((pcmBytes >> 24) & 0xFF);
-
-        wav.append(QByteArray(static_cast<int>(pcmBytes), 0));
-
-        // File size - 8
-        const quint32 fileSize = 36 + pcmBytes;
-        data[4] = static_cast<quint8>(fileSize & 0xFF);
-        data[5] = static_cast<quint8>((fileSize >> 8) & 0xFF);
-        data[6] = static_cast<quint8>((fileSize >> 16) & 0xFF);
-        data[7] = static_cast<quint8>((fileSize >> 24) & 0xFF);
 
         return wav;
     }
