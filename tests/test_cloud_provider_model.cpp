@@ -42,8 +42,8 @@ void TestCloudProviderModel::cleanup() {
 
 void TestCloudProviderModel::testInitialModelPopulation() {
     CloudProviderModel model;
-    QCOMPARE(model.count(), 3);
-    QCOMPARE(model.rowCount(), 3);
+    QCOMPARE(model.count(), 4);
+    QCOMPARE(model.rowCount(), 4);
 
     const QModelIndex firstIdx = model.index(0, 0);
     QVERIFY(firstIdx.isValid());
@@ -79,6 +79,13 @@ void TestCloudProviderModel::testInitialModelPopulation() {
     QCOMPARE(model.data(thirdIdx, CloudProviderModel::NameRole).toString(), tr("Meta Musa"));
     QCOMPARE(model.data(thirdIdx, CloudProviderModel::ComponentSourceRole).toString(), u"providers/MetaMusaProviderSettings.qml"_s);
     QCOMPARE(model.data(thirdIdx, CloudProviderModel::WebsiteUrlRole).toString(), u"https://dev.meta.ai/"_s);
+
+    const QModelIndex fourthIdx = model.index(3, 0);
+    QVERIFY(fourthIdx.isValid());
+    QCOMPARE(model.data(fourthIdx, CloudProviderModel::IdRole).toString(), u"sarvam"_s);
+    QCOMPARE(model.data(fourthIdx, CloudProviderModel::NameRole).toString(), tr("Sarvam AI"));
+    QCOMPARE(model.data(fourthIdx, CloudProviderModel::ComponentSourceRole).toString(), u"providers/SarvamProviderSettings.qml"_s);
+    QCOMPARE(model.data(fourthIdx, CloudProviderModel::WebsiteUrlRole).toString(), u"https://dashboard.sarvam.ai/"_s);
 }
 
 void TestCloudProviderModel::testActiveProviderProperties() {
@@ -96,6 +103,7 @@ void TestCloudProviderModel::testProviderLookupAndIndex() {
     QCOMPARE(model.indexOfProvider(u"groq"_s), 0);
     QCOMPARE(model.indexOfProvider(u"gemini"_s), 1);
     QCOMPARE(model.indexOfProvider(u"meta-musa"_s), 2);
+    QCOMPARE(model.indexOfProvider(u"sarvam"_s), 3);
     QCOMPARE(model.indexOfProvider(u"non_existent"_s), -1);
     QCOMPARE(model.providerIdAt(0), u"groq"_s);
     QCOMPARE(model.providerIdAt(1), u"gemini"_s);

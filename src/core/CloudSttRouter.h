@@ -43,6 +43,7 @@ public:
     bool isReady() const override;
     bool isBusy() const override;
     bool handlesSmartFormatting() const override;
+    std::optional<std::chrono::milliseconds> maxAudioDuration() const override;
     QString lastError() const override;
 
     void activate() override;

@@ -59,6 +59,20 @@ QString SettingsManager::validateMetaMusaModel(const QString& model) {
     return trimmed.isEmpty() ? u"muse-voice-transcribe-1.0"_s : trimmed;
 }
 
+QString SettingsManager::validateSarvamMode(const QString& mode) {
+    if (mode == u"transcribe"_s || mode == u"codemix"_s || mode == u"translit"_s || mode == u"verbatim"_s) {
+        return mode;
+    }
+    return u"transcribe"_s;
+}
+
+QString SettingsManager::validateSarvamStylePreset(const QString& preset) {
+    if (preset == u"clean"_s || preset == u"light"_s || preset == u"none"_s) {
+        return preset;
+    }
+    return u"clean"_s;
+}
+
 QString SettingsManager::validateLlmModel(const QString& model) {
     if (model.isEmpty() || model == u"llama-3.1-8b-instant"_s) {
         return u"openai/gpt-oss-20b"_s;
@@ -113,6 +127,16 @@ void SettingsManager::load() {
         settings.value(SettingsKeys::kMetaMusaModel.toString(), u"muse-voice-transcribe-1.0"_s).toString());
     newMetaMusa.keywords = settings.value(SettingsKeys::kMetaMusaKeywords.toString(), QString()).toString();
 
+    SarvamSttConfig newSarvam;
+    newSarvam.model = settings.value(SettingsKeys::kSarvamModel.toString(), QString()).toString().trimmed();
+    newSarvam.language = settings.value(SettingsKeys::kSarvamLanguage.toString(), u"auto"_s).toString();
+    newSarvam.mode =
+        validateSarvamMode(settings.value(SettingsKeys::kSarvamMode.toString(), u"transcribe"_s).toString());
+    newSarvam.stylePreset =
+        validateSarvamStylePreset(settings.value(SettingsKeys::kSarvamStylePreset.toString(), u"clean"_s).toString());
+    newSarvam.styleRules = settings.value(SettingsKeys::kSarvamStyleRules.toString(), QString()).toString();
+    newSarvam.customVocabulary = settings.value(SettingsKeys::kSarvamCustomVocabulary.toString(), QString()).toString();
+
     LlmConfig newLlm;
     newLlm.enabled = settings.value(SettingsKeys::kGroqLlmEnabled.toString(), false).toBool();
     newLlm.model =
@@ -152,6 +176,7 @@ void SettingsManager::load() {
     const bool groqChanged = (m_groqSttConfig != newGroq);
     const bool geminiChanged = (m_geminiSttConfig != newGemini);
     const bool metaMusaChanged = (m_metaMusaSttConfig != newMetaMusa);
+    const bool sarvamChanged = (m_sarvamSttConfig != newSarvam);
     const bool llmChanged = (m_llmConfig != newLlm);
     const bool injectorChanged = (m_textInjectorConfig != newInjector);
     const bool audioChanged = (m_audioFeedbackConfig != newAudio);
@@ -163,6 +188,7 @@ void SettingsManager::load() {
     m_groqSttConfig = newGroq;
     m_geminiSttConfig = newGemini;
     m_metaMusaSttConfig = newMetaMusa;
+    m_sarvamSttConfig = newSarvam;
     m_llmConfig = newLlm;
     m_textInjectorConfig = newInjector;
     m_audioFeedbackConfig = newAudio;
@@ -181,6 +207,9 @@ void SettingsManager::load() {
     }
     if (metaMusaChanged) {
         emit metaMusaSttConfigChanged(m_metaMusaSttConfig);
+    }
+    if (sarvamChanged) {
+        emit sarvamSttConfigChanged(m_sarvamSttConfig);
     }
     if (llmChanged) {
         emit llmConfigChanged(m_llmConfig);
@@ -221,6 +250,13 @@ void SettingsManager::save() const {
 
     settings.setValue(SettingsKeys::kMetaMusaModel.toString(), m_metaMusaSttConfig.model);
     settings.setValue(SettingsKeys::kMetaMusaKeywords.toString(), m_metaMusaSttConfig.keywords);
+
+    settings.setValue(SettingsKeys::kSarvamModel.toString(), m_sarvamSttConfig.model);
+    settings.setValue(SettingsKeys::kSarvamLanguage.toString(), m_sarvamSttConfig.language);
+    settings.setValue(SettingsKeys::kSarvamMode.toString(), m_sarvamSttConfig.mode);
+    settings.setValue(SettingsKeys::kSarvamStylePreset.toString(), m_sarvamSttConfig.stylePreset);
+    settings.setValue(SettingsKeys::kSarvamStyleRules.toString(), m_sarvamSttConfig.styleRules);
+    settings.setValue(SettingsKeys::kSarvamCustomVocabulary.toString(), m_sarvamSttConfig.customVocabulary);
 
     settings.setValue(SettingsKeys::kGroqLlmEnabled.toString(), m_llmConfig.enabled);
     settings.setValue(SettingsKeys::kGroqLlmModel.toString(), m_llmConfig.model);
@@ -388,6 +424,95 @@ void SettingsManager::setMetaMusaModel(const QString& model) {
         settings.sync();
         emit metaMusaSttConfigChanged(m_metaMusaSttConfig);
         emit settingChanged(SettingsKeys::kMetaMusaModel.toString(), valid);
+    }
+}
+
+void SettingsManager::setSarvamSttConfig(const SarvamSttConfig& config) {
+    SarvamSttConfig validated = config;
+    validated.mode = validateSarvamMode(validated.mode);
+    validated.stylePreset = validateSarvamStylePreset(validated.stylePreset);
+    if (m_sarvamSttConfig == validated) {
+        return;
+    }
+    m_sarvamSttConfig = validated;
+    QSettings settings;
+    settings.setValue(SettingsKeys::kSarvamModel.toString(), m_sarvamSttConfig.model);
+    settings.setValue(SettingsKeys::kSarvamLanguage.toString(), m_sarvamSttConfig.language);
+    settings.setValue(SettingsKeys::kSarvamMode.toString(), m_sarvamSttConfig.mode);
+    settings.setValue(SettingsKeys::kSarvamStylePreset.toString(), m_sarvamSttConfig.stylePreset);
+    settings.setValue(SettingsKeys::kSarvamStyleRules.toString(), m_sarvamSttConfig.styleRules);
+    settings.setValue(SettingsKeys::kSarvamCustomVocabulary.toString(), m_sarvamSttConfig.customVocabulary);
+    settings.sync();
+    emit sarvamSttConfigChanged(m_sarvamSttConfig);
+}
+
+void SettingsManager::setSarvamModel(const QString& model) {
+    const QString trimmed = model.trimmed();
+    if (m_sarvamSttConfig.model != trimmed) {
+        m_sarvamSttConfig.model = trimmed;
+        QSettings settings;
+        settings.setValue(SettingsKeys::kSarvamModel.toString(), trimmed);
+        settings.sync();
+        emit sarvamSttConfigChanged(m_sarvamSttConfig);
+        emit settingChanged(SettingsKeys::kSarvamModel.toString(), trimmed);
+    }
+}
+
+void SettingsManager::setSarvamLanguage(const QString& language) {
+    const QString trimmed = language.trimmed();
+    if (m_sarvamSttConfig.language != trimmed) {
+        m_sarvamSttConfig.language = trimmed;
+        QSettings settings;
+        settings.setValue(SettingsKeys::kSarvamLanguage.toString(), trimmed);
+        settings.sync();
+        emit sarvamSttConfigChanged(m_sarvamSttConfig);
+        emit settingChanged(SettingsKeys::kSarvamLanguage.toString(), trimmed);
+    }
+}
+
+void SettingsManager::setSarvamMode(const QString& mode) {
+    const QString valid = validateSarvamMode(mode);
+    if (m_sarvamSttConfig.mode != valid) {
+        m_sarvamSttConfig.mode = valid;
+        QSettings settings;
+        settings.setValue(SettingsKeys::kSarvamMode.toString(), valid);
+        settings.sync();
+        emit sarvamSttConfigChanged(m_sarvamSttConfig);
+        emit settingChanged(SettingsKeys::kSarvamMode.toString(), valid);
+    }
+}
+
+void SettingsManager::setSarvamStylePreset(const QString& preset) {
+    const QString valid = validateSarvamStylePreset(preset);
+    if (m_sarvamSttConfig.stylePreset != valid) {
+        m_sarvamSttConfig.stylePreset = valid;
+        QSettings settings;
+        settings.setValue(SettingsKeys::kSarvamStylePreset.toString(), valid);
+        settings.sync();
+        emit sarvamSttConfigChanged(m_sarvamSttConfig);
+        emit settingChanged(SettingsKeys::kSarvamStylePreset.toString(), valid);
+    }
+}
+
+void SettingsManager::setSarvamStyleRules(const QString& rules) {
+    if (m_sarvamSttConfig.styleRules != rules) {
+        m_sarvamSttConfig.styleRules = rules;
+        QSettings settings;
+        settings.setValue(SettingsKeys::kSarvamStyleRules.toString(), rules);
+        settings.sync();
+        emit sarvamSttConfigChanged(m_sarvamSttConfig);
+        emit settingChanged(SettingsKeys::kSarvamStyleRules.toString(), rules);
+    }
+}
+
+void SettingsManager::setSarvamCustomVocabulary(const QString& vocabulary) {
+    if (m_sarvamSttConfig.customVocabulary != vocabulary) {
+        m_sarvamSttConfig.customVocabulary = vocabulary;
+        QSettings settings;
+        settings.setValue(SettingsKeys::kSarvamCustomVocabulary.toString(), vocabulary);
+        settings.sync();
+        emit sarvamSttConfigChanged(m_sarvamSttConfig);
+        emit settingChanged(SettingsKeys::kSarvamCustomVocabulary.toString(), vocabulary);
     }
 }
 
@@ -734,6 +859,18 @@ void SettingsManager::setSetting(const QString& key, const QVariant& value) {
         setMetaMusaModel(value.toString());
     } else if (key == SettingsKeys::kMetaMusaKeywords) {
         setMetaMusaKeywords(value.toString());
+    } else if (key == SettingsKeys::kSarvamModel) {
+        setSarvamModel(value.toString());
+    } else if (key == SettingsKeys::kSarvamLanguage) {
+        setSarvamLanguage(value.toString());
+    } else if (key == SettingsKeys::kSarvamMode) {
+        setSarvamMode(value.toString());
+    } else if (key == SettingsKeys::kSarvamStylePreset) {
+        setSarvamStylePreset(value.toString());
+    } else if (key == SettingsKeys::kSarvamStyleRules) {
+        setSarvamStyleRules(value.toString());
+    } else if (key == SettingsKeys::kSarvamCustomVocabulary) {
+        setSarvamCustomVocabulary(value.toString());
     } else if (key == SettingsKeys::kGroqLlmEnabled) {
         setLlmEnabled(value.toBool());
     } else if (key == SettingsKeys::kGroqLlmModel) {
@@ -811,6 +948,24 @@ QVariant SettingsManager::getSetting(const QString& key, const QVariant& default
     if (key == SettingsKeys::kMetaMusaKeywords) {
         return m_metaMusaSttConfig.keywords;
     }
+    if (key == SettingsKeys::kSarvamModel) {
+        return m_sarvamSttConfig.model;
+    }
+    if (key == SettingsKeys::kSarvamLanguage) {
+        return m_sarvamSttConfig.language;
+    }
+    if (key == SettingsKeys::kSarvamMode) {
+        return m_sarvamSttConfig.mode;
+    }
+    if (key == SettingsKeys::kSarvamStylePreset) {
+        return m_sarvamSttConfig.stylePreset;
+    }
+    if (key == SettingsKeys::kSarvamStyleRules) {
+        return m_sarvamSttConfig.styleRules;
+    }
+    if (key == SettingsKeys::kSarvamCustomVocabulary) {
+        return m_sarvamSttConfig.customVocabulary;
+    }
     if (key == SettingsKeys::kGroqLlmEnabled) {
         return m_llmConfig.enabled;
     }
@@ -880,6 +1035,12 @@ QVariantMap SettingsManager::allSettings() const {
     map.insert(SettingsKeys::kGeminiCustomVocabulary.toString(), m_geminiSttConfig.customVocabulary);
     map.insert(SettingsKeys::kMetaMusaModel.toString(), m_metaMusaSttConfig.model);
     map.insert(SettingsKeys::kMetaMusaKeywords.toString(), m_metaMusaSttConfig.keywords);
+    map.insert(SettingsKeys::kSarvamModel.toString(), m_sarvamSttConfig.model);
+    map.insert(SettingsKeys::kSarvamLanguage.toString(), m_sarvamSttConfig.language);
+    map.insert(SettingsKeys::kSarvamMode.toString(), m_sarvamSttConfig.mode);
+    map.insert(SettingsKeys::kSarvamStylePreset.toString(), m_sarvamSttConfig.stylePreset);
+    map.insert(SettingsKeys::kSarvamStyleRules.toString(), m_sarvamSttConfig.styleRules);
+    map.insert(SettingsKeys::kSarvamCustomVocabulary.toString(), m_sarvamSttConfig.customVocabulary);
     map.insert(SettingsKeys::kGroqLlmEnabled.toString(), m_llmConfig.enabled);
     map.insert(SettingsKeys::kGroqLlmModel.toString(), m_llmConfig.model);
     map.insert(SettingsKeys::kGroqLlmPreset.toString(), m_llmConfig.preset);

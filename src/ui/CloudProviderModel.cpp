@@ -186,6 +186,16 @@ void CloudProviderModel::initializeProviders() {
         .isDefault = false,
     });
 
+    m_providers.append({
+        .id = u"sarvam"_s,
+        .name = tr("Sarvam AI"),
+        .description = tr("State-of-the-art dictation and transliteration for English and 22 Indian languages."),
+        .iconSource = u"qrc:/qt/qml/Tattle/assets/icons/sparkles.svg"_s,
+        .componentSource = u"providers/SarvamProviderSettings.qml"_s,
+        .websiteUrl = u"https://dashboard.sarvam.ai/"_s,
+        .isDefault = false,
+    });
+
     endResetModel();
     emit countChanged();
 }

@@ -71,6 +71,7 @@ public:
     [[nodiscard]] bool isReady() const override;
     [[nodiscard]] bool isBusy() const override;
     [[nodiscard]] bool handlesSmartFormatting() const override;
+    [[nodiscard]] std::optional<std::chrono::milliseconds> maxAudioDuration() const override;
     [[nodiscard]] QString lastError() const override;
 
     void activate() override;
