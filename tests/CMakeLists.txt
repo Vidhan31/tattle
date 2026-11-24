@@ -204,6 +204,11 @@ add_tattle_test(sarvam_stt_client
     LIBRARIES Qt6::Network
 )
 
+add_tattle_test(audio_recorder
+    TEST_NAME AudioRecorderTest
+    LIBRARIES Qt6::Multimedia Qt6::Network
+)
+
 add_tattle_test(cloud_stt_router
     TEST_NAME CloudSttRouterTest
     LIBRARIES Qt6::Network

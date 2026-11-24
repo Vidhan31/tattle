@@ -53,6 +53,7 @@ protected:
     void setCurrentDeviceName(const QString& name);
     void setStatusMessage(const QString& message);
     void setAudioLevel(qreal level);
+    void startTestCapture(QIODevice* ioDevice, const QAudioFormat& format);
 
 private:
     Q_SLOT

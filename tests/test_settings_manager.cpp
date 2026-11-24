@@ -231,6 +231,30 @@ private slots:
         QCOMPARE(manager.speechConfig().backend, SettingsManager::TranscriptionBackend::TranscribeCpp);
         QCOMPARE(settings.value(SettingsKeys::kSpeechBackend.toString()).toString(), u"TranscribeCpp"_s);
     }
+
+    void testSetMetaMusaConfigDoesNotOverwriteSarvamSettings() {
+        {
+            QSettings settings;
+            settings.setValue(SettingsKeys::kSarvamLanguage.toString(), u"hi-IN"_s);
+            settings.setValue(SettingsKeys::kSarvamMode.toString(), u"codemix"_s);
+            settings.sync();
+        }
+
+        SettingsManager manager;
+        SettingsManager::MetaMusaSttConfig metaMusa;
+        metaMusa.model = u"muse-voice-transcribe-1.0"_s;
+        metaMusa.keywords = u"custom, terms"_s;
+        manager.setMetaMusaSttConfig(metaMusa);
+
+        QSettings settings;
+        QCOMPARE(settings.value(SettingsKeys::kMetaMusaKeywords.toString()).toString(), u"custom, terms"_s);
+        QCOMPARE(settings.value(SettingsKeys::kSarvamLanguage.toString()).toString(), u"hi-IN"_s);
+        QCOMPARE(settings.value(SettingsKeys::kSarvamMode.toString()).toString(), u"codemix"_s);
+        QVERIFY(!settings.contains(SettingsKeys::kSarvamStylePreset.toString()));
+        QVERIFY(!settings.contains(SettingsKeys::kSarvamStyleRules.toString()));
+        QVERIFY(!settings.contains(SettingsKeys::kSarvamCustomVocabulary.toString()));
+        QVERIFY(!settings.contains(SettingsKeys::kSarvamModel.toString()));
+    }
 };
 
 QTEST_MAIN(TestSettingsManager)

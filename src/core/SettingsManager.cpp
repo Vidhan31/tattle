@@ -411,13 +411,6 @@ void SettingsManager::setMetaMusaSttConfig(const MetaMusaSttConfig& config) {
     QSettings settings;
     settings.setValue(SettingsKeys::kMetaMusaModel.toString(), m_metaMusaSttConfig.model);
     settings.setValue(SettingsKeys::kMetaMusaKeywords.toString(), m_metaMusaSttConfig.keywords);
-
-    settings.setValue(SettingsKeys::kSarvamModel.toString(), m_sarvamSttConfig.model);
-    settings.setValue(SettingsKeys::kSarvamLanguage.toString(), m_sarvamSttConfig.language);
-    settings.setValue(SettingsKeys::kSarvamMode.toString(), m_sarvamSttConfig.mode);
-    settings.setValue(SettingsKeys::kSarvamStylePreset.toString(), m_sarvamSttConfig.stylePreset);
-    settings.setValue(SettingsKeys::kSarvamStyleRules.toString(), m_sarvamSttConfig.styleRules);
-    settings.setValue(SettingsKeys::kSarvamCustomVocabulary.toString(), m_sarvamSttConfig.customVocabulary);
     settings.sync();
     emit metaMusaSttConfigChanged(m_metaMusaSttConfig);
 }

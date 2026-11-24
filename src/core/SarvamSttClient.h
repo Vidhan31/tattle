@@ -69,6 +69,7 @@ private:
     QString m_stylePreset {QStringLiteral("clean")};
     QString m_styleRules;
     QString m_customVocabulary;
+    bool m_lastTranscriptWasRawFallback = false;
 
     static constexpr QStringView kDefaultLanguage = u"auto";
     static constexpr QStringView kDefaultMode = u"transcribe";

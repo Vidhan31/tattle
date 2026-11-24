@@ -212,6 +212,17 @@ void AudioRecorder::stopRecording() {
     setRecording(false);
     setAudioLevel(0.0);
 
+    const qint64 bytesPerFrame = m_format.bytesPerFrame();
+    if (m_maxRecordingDuration.count() > 0 && bytesPerFrame > 0 && m_format.sampleRate() > 0) {
+        const qint64 maxFrames = (static_cast<qint64>(m_format.sampleRate()) * m_maxRecordingDuration.count()) / 1000;
+        const qint64 maxBytes = maxFrames * bytesPerFrame;
+        if (m_pcmData.size() > maxBytes) {
+            qCDebug(lcAudio) << "AudioRecorder: Trimming captured PCM from" << m_pcmData.size() << "to" << maxBytes
+                             << "bytes to enforce max recording duration";
+            m_pcmData.truncate(static_cast<qsizetype>(maxBytes));
+        }
+    }
+
     if (m_pcmData.isEmpty()) {
         qCDebug(lcAudio) << "Audio recording stopped: zero bytes captured";
         setStatusMessage(u"No audio captured"_s);
@@ -385,4 +396,16 @@ void AudioRecorder::setCurrentDeviceName(const QString& name) {
         m_currentDeviceName = name;
         emit currentDeviceNameChanged();
     }
+}
+
+void AudioRecorder::startTestCapture(QIODevice* ioDevice, const QAudioFormat& format) {
+    m_format = format;
+    m_pcmData.clear();
+    m_ioDevice = ioDevice;
+    if (m_ioDevice) {
+        connect(m_ioDevice, &QIODevice::readyRead, this, &AudioRecorder::onReadyRead);
+    }
+    setRecording(true);
+    setAudioLevel(0.0);
+    m_maxDurationTimer->start(m_maxRecordingDuration);
 }

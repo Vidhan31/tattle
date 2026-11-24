@@ -68,6 +68,9 @@ SarvamSttClient* SarvamSttClient::instance() {
 }
 
 bool SarvamSttClient::handlesSmartFormatting() const {
+    if (m_lastTranscriptWasRawFallback) {
+        return false;
+    }
     return m_mode != u"verbatim"_s && m_stylePreset != u"none"_s;
 }
 
@@ -245,6 +248,7 @@ void SarvamSttClient::setMode(const QString& mode) {
     }
     if (m_mode != trimmed) {
         m_mode = trimmed;
+        m_lastTranscriptWasRawFallback = false;
         if (m_settingsManager) {
             m_settingsManager->setSarvamMode(m_mode);
         } else {
@@ -267,6 +271,7 @@ void SarvamSttClient::setStylePreset(const QString& preset) {
     }
     if (m_stylePreset != trimmed) {
         m_stylePreset = trimmed;
+        m_lastTranscriptWasRawFallback = false;
         if (m_settingsManager) {
             m_settingsManager->setSarvamStylePreset(m_stylePreset);
         } else {
@@ -315,6 +320,7 @@ void SarvamSttClient::setCustomVocabulary(const QString& vocab) {
 }
 
 void SarvamSttClient::transcribe(const QByteArray& wavData) {
+    m_lastTranscriptWasRawFallback = false;
     const double dur = extractWavDurationSeconds(wavData);
     if (dur > kMaxClipDurationSeconds) {
         qWarning() << m_providerLogName << "Audio duration" << dur << "s exceeds 30-second limit";
@@ -444,12 +450,16 @@ bool SarvamSttClient::parseTranscript(const CloudApiResponse& res, QString& outT
         outText = res.json.value(u"text"_s).toString();
         if (outText.isEmpty() && res.json.contains(u"transcript"_s)) {
             outText = res.json.value(u"transcript"_s).toString();
+            m_lastTranscriptWasRawFallback = !outText.isEmpty();
+        } else {
+            m_lastTranscriptWasRawFallback = false;
         }
         return true;
     }
 
     if (res.json.contains(u"transcript"_s)) {
         outText = res.json.value(u"transcript"_s).toString();
+        m_lastTranscriptWasRawFallback = !outText.isEmpty();
         return true;
     }
 

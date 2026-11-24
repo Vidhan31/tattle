@@ -267,6 +267,16 @@ private slots:
 
         QTRY_COMPARE(readySpy.count(), 1);
         QCOMPARE(readySpy.first().at(0).toString(), u"Raw speech without cleanup"_s);
+        // Raw fallback text is unformatted, so LLM cleanup must still be allowed.
+        QCOMPARE(client.handlesSmartFormatting(), false);
+
+        // Subsequent formatted response restores smart-formatting status.
+        mockNam->nextResponseData =
+            R"({"request_id": "req-2b", "transcript": "um formatted", "text": "Formatted.", "degraded": null})";
+        client.transcribe(shortWav);
+        QTRY_COMPARE(readySpy.count(), 2);
+        QCOMPARE(readySpy.at(1).at(0).toString(), u"Formatted."_s);
+        QVERIFY(client.handlesSmartFormatting());
     }
 
     void testMultipartPayloadAndHeaders() {
