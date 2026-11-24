@@ -66,6 +66,14 @@ qreal AudioRecorder::audioLevel() const {
     return m_audioLevel;
 }
 
+void AudioRecorder::setMaxRecordingDuration(std::chrono::milliseconds duration) {
+    m_maxRecordingDuration = duration;
+}
+
+std::chrono::milliseconds AudioRecorder::maxRecordingDuration() const {
+    return m_maxRecordingDuration;
+}
+
 void AudioRecorder::onAudioInputsChanged() {
     const auto inputs = QMediaDevices::audioInputs();
     const QAudioDevice defaultDev = QMediaDevices::defaultAudioInput();
@@ -173,8 +181,9 @@ void AudioRecorder::startRecording() {
     setRecording(true);
     setAudioLevel(0.0);
     setStatusMessage(u"Recording…"_s);
-    m_maxDurationTimer->start(kMaxRecordingDuration);
-    qCDebug(lcAudio) << "Recording started successfully (5m safety ceiling active)";
+    m_maxDurationTimer->start(m_maxRecordingDuration);
+    qCDebug(lcAudio) << "Recording started successfully (" << m_maxRecordingDuration.count()
+                     << "ms safety ceiling active)";
 }
 
 void AudioRecorder::stopRecording() {

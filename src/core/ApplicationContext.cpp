@@ -21,6 +21,7 @@
 #include "MetaMusaSttClient.h"
 #include "ModelService.h"
 #include "NotificationPresenter.h"
+#include "SarvamSttClient.h"
 #include "SettingsManager.h"
 #include "SettingsService.h"
 #include "StatusNotifierService.h"
@@ -48,6 +49,7 @@ void ApplicationContext::initializeHeadless(bool startServices) {
     m_groqSttClient = new GroqSttClient(this);
     m_geminiSttClient = new GeminiSttClient(this);
     m_metaMusaSttClient = new MetaMusaSttClient(this);
+    m_sarvamSttClient = new SarvamSttClient(this);
     m_cloudSttRouter = new CloudSttRouter(this);
     m_transcribeModelManager = new TranscribeModelManager(this);
     m_transcribeSttClient = new TranscribeSttClient(this);
@@ -117,6 +119,9 @@ void ApplicationContext::reloadSettings() {
     if (m_metaMusaSttClient) {
         m_metaMusaSttClient->loadSettings();
     }
+    if (m_sarvamSttClient) {
+        m_sarvamSttClient->loadSettings();
+    }
     if (m_groqLlmClient) {
         m_groqLlmClient->loadSettings();
     }
@@ -170,6 +175,9 @@ void ApplicationContext::wireSubsystems() {
         if (m_metaMusaSttClient) {
             m_metaMusaSttClient->setSettingsManager(m_settingsManager);
         }
+        if (m_sarvamSttClient) {
+            m_sarvamSttClient->setSettingsManager(m_settingsManager);
+        }
         if (m_groqLlmClient) {
             m_groqLlmClient->setSettingsManager(m_settingsManager);
         }
@@ -201,6 +209,7 @@ void ApplicationContext::wireSubsystems() {
         m_cloudSttRouter->registerProvider(u"groq"_s, m_groqSttClient);
         m_cloudSttRouter->registerProvider(u"gemini"_s, m_geminiSttClient);
         m_cloudSttRouter->registerProvider(u"meta-musa"_s, m_metaMusaSttClient);
+        m_cloudSttRouter->registerProvider(u"sarvam"_s, m_sarvamSttClient);
     }
 
     if (m_compositeSttEngine) {
@@ -375,6 +384,10 @@ GeminiSttClient* ApplicationContext::geminiSttClient() const noexcept {
 
 MetaMusaSttClient* ApplicationContext::metaMusaSttClient() const noexcept {
     return m_metaMusaSttClient;
+}
+
+SarvamSttClient* ApplicationContext::sarvamSttClient() const noexcept {
+    return m_sarvamSttClient;
 }
 
 CloudSttRouter* ApplicationContext::cloudSttRouter() const noexcept {

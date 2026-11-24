@@ -393,6 +393,11 @@ bool CompositeSttEngine::handlesSmartFormatting() const {
     return client ? client->handlesSmartFormatting() : false;
 }
 
+std::optional<std::chrono::milliseconds> CompositeSttEngine::maxAudioDuration() const {
+    auto* client = activeSttClient();
+    return client ? client->maxAudioDuration() : std::nullopt;
+}
+
 QString CompositeSttEngine::lastError() const {
     if (!m_lastError.isEmpty()) {
         return m_lastError;

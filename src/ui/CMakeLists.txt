@@ -69,6 +69,7 @@ qt_add_qml_module(tattle_ui
         settings/providers/GroqProviderSettings.qml
         settings/providers/GeminiProviderSettings.qml
         settings/providers/MetaMusaProviderSettings.qml
+        settings/providers/SarvamProviderSettings.qml
         settings/OfflineSettingsPage.qml
         settings/AudioSettingsPage.qml
         settings/ShortcutsSettingsPage.qml

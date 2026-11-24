@@ -46,6 +46,16 @@ public:
         bool operator==(const MetaMusaSttConfig&) const = default;
     };
 
+    struct SarvamSttConfig {
+        QString model;
+        QString language = QStringLiteral("auto");
+        QString mode = QStringLiteral("transcribe");
+        QString stylePreset = QStringLiteral("clean");
+        QString styleRules;
+        QString customVocabulary;
+        bool operator==(const SarvamSttConfig&) const = default;
+    };
+
     struct LlmConfig {
         bool enabled = false;
         QString model = QStringLiteral("openai/gpt-oss-20b");
@@ -99,6 +109,7 @@ public:
     [[nodiscard]] const GroqSttConfig& groqSttConfig() const noexcept { return m_groqSttConfig; }
     [[nodiscard]] const GeminiSttConfig& geminiSttConfig() const noexcept { return m_geminiSttConfig; }
     [[nodiscard]] const MetaMusaSttConfig& metaMusaSttConfig() const noexcept { return m_metaMusaSttConfig; }
+    [[nodiscard]] const SarvamSttConfig& sarvamSttConfig() const noexcept { return m_sarvamSttConfig; }
     [[nodiscard]] const LlmConfig& llmConfig() const noexcept { return m_llmConfig; }
     [[nodiscard]] const TextInjectorConfig& textInjectorConfig() const noexcept { return m_textInjectorConfig; }
     [[nodiscard]] const AudioFeedbackConfig& audioFeedbackConfig() const noexcept { return m_audioFeedbackConfig; }
@@ -110,6 +121,7 @@ public:
     void setGroqSttConfig(const GroqSttConfig& config);
     void setGeminiSttConfig(const GeminiSttConfig& config);
     void setMetaMusaSttConfig(const MetaMusaSttConfig& config);
+    void setSarvamSttConfig(const SarvamSttConfig& config);
     void setLlmConfig(const LlmConfig& config);
     void setTextInjectorConfig(const TextInjectorConfig& config);
     void setAudioFeedbackConfig(const AudioFeedbackConfig& config);
@@ -131,6 +143,13 @@ public:
 
     void setMetaMusaModel(const QString& model);
     void setMetaMusaKeywords(const QString& keywords);
+
+    void setSarvamModel(const QString& model);
+    void setSarvamLanguage(const QString& language);
+    void setSarvamMode(const QString& mode);
+    void setSarvamStylePreset(const QString& preset);
+    void setSarvamStyleRules(const QString& rules);
+    void setSarvamCustomVocabulary(const QString& vocabulary);
 
     void setLlmEnabled(bool enabled);
     void setLlmModel(const QString& model);
@@ -160,6 +179,7 @@ signals:
     void groqSttConfigChanged(const SettingsManager::GroqSttConfig& config);
     void geminiSttConfigChanged(const SettingsManager::GeminiSttConfig& config);
     void metaMusaSttConfigChanged(const SettingsManager::MetaMusaSttConfig& config);
+    void sarvamSttConfigChanged(const SettingsManager::SarvamSttConfig& config);
     void llmConfigChanged(const SettingsManager::LlmConfig& config);
     void textInjectorConfigChanged(const SettingsManager::TextInjectorConfig& config);
     void audioFeedbackConfigChanged(const SettingsManager::AudioFeedbackConfig& config);
@@ -173,6 +193,8 @@ private:
     static QString validateGeminiModel(const QString& model);
     static QString validateGeminiMode(const QString& mode);
     static QString validateMetaMusaModel(const QString& model);
+    static QString validateSarvamMode(const QString& mode);
+    static QString validateSarvamStylePreset(const QString& preset);
     static QString validateLlmModel(const QString& model);
     static QString validateLlmPreset(const QString& preset);
     static double validateLlmTemperature(double temp);
@@ -182,6 +204,7 @@ private:
     GroqSttConfig m_groqSttConfig;
     GeminiSttConfig m_geminiSttConfig;
     MetaMusaSttConfig m_metaMusaSttConfig;
+    SarvamSttConfig m_sarvamSttConfig;
     LlmConfig m_llmConfig;
     TextInjectorConfig m_textInjectorConfig;
     AudioFeedbackConfig m_audioFeedbackConfig;

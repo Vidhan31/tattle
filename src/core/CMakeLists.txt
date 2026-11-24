@@ -31,6 +31,8 @@ add_library(tattle_core STATIC
     GeminiSttClient.cpp
     MetaMusaSttClient.h
     MetaMusaSttClient.cpp
+    SarvamSttClient.h
+    SarvamSttClient.cpp
     CloudSttRouter.h
     CloudSttRouter.cpp
     WavDecoder.h

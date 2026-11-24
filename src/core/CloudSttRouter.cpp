@@ -6,6 +6,7 @@
 #include "common/SettingsKeys.h"
 #include "GeminiSttClient.h"
 #include "MetaMusaSttClient.h"
+#include "SarvamSttClient.h"
 #include "SettingsManager.h"
 
 #include <QSettings>
@@ -71,6 +72,10 @@ void CloudSttRouter::initDefaultProviders() {
     if (!m_clients.contains(u"meta-musa"_s)) {
         auto* metaMusa = MetaMusaSttClient::instance();
         registerProvider(u"meta-musa"_s, metaMusa ? metaMusa : new MetaMusaSttClient(this));
+    }
+    if (!m_clients.contains(u"sarvam"_s)) {
+        auto* sarvam = SarvamSttClient::instance();
+        registerProvider(u"sarvam"_s, sarvam ? sarvam : new SarvamSttClient(this));
     }
 }
 
@@ -232,6 +237,10 @@ bool CloudSttRouter::isBusy() const {
 
 bool CloudSttRouter::handlesSmartFormatting() const {
     return m_activeClient && m_activeClient->handlesSmartFormatting();
+}
+
+std::optional<std::chrono::milliseconds> CloudSttRouter::maxAudioDuration() const {
+    return m_activeClient ? m_activeClient->maxAudioDuration() : std::nullopt;
 }
 
 QString CloudSttRouter::lastError() const {

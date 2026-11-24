@@ -705,7 +705,11 @@ void DictationCoordinator::startRecording() {
     setLastError({});
     setState(DictationState::Recording);
     setStatusMessage(tr("Listening…"));
-    m_recorder->startRecording();
+    if (m_recorder) {
+        const auto maxDur = m_sttEngine ? m_sttEngine->maxAudioDuration() : std::nullopt;
+        m_recorder->setMaxRecordingDuration(maxDur.value_or(std::chrono::minutes(5)));
+        m_recorder->startRecording();
+    }
 }
 
 void DictationCoordinator::stopRecording() {

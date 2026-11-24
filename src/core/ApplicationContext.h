@@ -24,6 +24,7 @@ class TranscribeModelManager;
 class TranscribeSttClient;
 class GeminiSttClient;
 class MetaMusaSttClient;
+class SarvamSttClient;
 class CloudSttRouter;
 class CompositeSttEngine;
 class NotificationPresenter;
@@ -54,6 +55,7 @@ public:
     [[nodiscard]] GroqSttClient* groqSttClient() const noexcept;
     [[nodiscard]] GeminiSttClient* geminiSttClient() const noexcept;
     [[nodiscard]] MetaMusaSttClient* metaMusaSttClient() const noexcept;
+    [[nodiscard]] SarvamSttClient* sarvamSttClient() const noexcept;
     [[nodiscard]] CloudSttRouter* cloudSttRouter() const noexcept;
     [[nodiscard]] AudioRecorder* audioRecorder() const noexcept;
     [[nodiscard]] GlobalShortcutManager* shortcutManager() const noexcept;
@@ -73,6 +75,7 @@ private:
     GroqSttClient* m_groqSttClient = nullptr;
     GeminiSttClient* m_geminiSttClient = nullptr;
     MetaMusaSttClient* m_metaMusaSttClient = nullptr;
+    SarvamSttClient* m_sarvamSttClient = nullptr;
     CloudSttRouter* m_cloudSttRouter = nullptr;
     TranscribeSttClient* m_transcribeSttClient = nullptr;
     TranscribeModelManager* m_transcribeModelManager = nullptr;

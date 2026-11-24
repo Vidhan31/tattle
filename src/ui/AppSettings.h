@@ -31,6 +31,14 @@ class AppSettings : public QObject {
     Q_PROPERTY(QString metaMusaModel READ metaMusaModel WRITE setMetaMusaModel NOTIFY metaMusaModelChanged FINAL)
     Q_PROPERTY(QString metaMusaKeywords READ metaMusaKeywords WRITE setMetaMusaKeywords NOTIFY metaMusaKeywordsChanged FINAL)
 
+    Q_PROPERTY(QString sarvamApiKey READ sarvamApiKey WRITE setSarvamApiKey NOTIFY sarvamApiKeyChanged FINAL)
+    Q_PROPERTY(QString sarvamModel READ sarvamModel WRITE setSarvamModel NOTIFY sarvamModelChanged FINAL)
+    Q_PROPERTY(QString sarvamLanguage READ sarvamLanguage WRITE setSarvamLanguage NOTIFY sarvamLanguageChanged FINAL)
+    Q_PROPERTY(QString sarvamMode READ sarvamMode WRITE setSarvamMode NOTIFY sarvamModeChanged FINAL)
+    Q_PROPERTY(QString sarvamStylePreset READ sarvamStylePreset WRITE setSarvamStylePreset NOTIFY sarvamStylePresetChanged FINAL)
+    Q_PROPERTY(QString sarvamStyleRules READ sarvamStyleRules WRITE setSarvamStyleRules NOTIFY sarvamStyleRulesChanged FINAL)
+    Q_PROPERTY(QString sarvamCustomVocabulary READ sarvamCustomVocabulary WRITE setSarvamCustomVocabulary NOTIFY sarvamCustomVocabularyChanged FINAL)
+
     Q_PROPERTY(bool llmEnabled READ llmEnabled WRITE setLlmEnabled NOTIFY llmEnabledChanged FINAL)
     Q_PROPERTY(QString llmModel READ llmModel WRITE setLlmModel NOTIFY llmModelChanged FINAL)
     Q_PROPERTY(QString llmPreset READ llmPreset WRITE setLlmPreset NOTIFY llmPresetChanged FINAL)
@@ -75,6 +83,21 @@ public:
     [[nodiscard]] QString metaMusaKeywords() const;
     void setMetaMusaKeywords(const QString& keywords);
 
+    [[nodiscard]] QString sarvamApiKey() const;
+    void setSarvamApiKey(const QString& key);
+    [[nodiscard]] QString sarvamModel() const;
+    void setSarvamModel(const QString& model);
+    [[nodiscard]] QString sarvamLanguage() const;
+    void setSarvamLanguage(const QString& language);
+    [[nodiscard]] QString sarvamMode() const;
+    void setSarvamMode(const QString& mode);
+    [[nodiscard]] QString sarvamStylePreset() const;
+    void setSarvamStylePreset(const QString& preset);
+    [[nodiscard]] QString sarvamStyleRules() const;
+    void setSarvamStyleRules(const QString& rules);
+    [[nodiscard]] QString sarvamCustomVocabulary() const;
+    void setSarvamCustomVocabulary(const QString& vocabulary);
+
     [[nodiscard]] bool llmEnabled() const;
     void setLlmEnabled(bool enabled);
     [[nodiscard]] QString llmModel() const;
@@ -116,6 +139,13 @@ signals:
     void metaMusaApiKeyChanged();
     void metaMusaModelChanged();
     void metaMusaKeywordsChanged();
+    void sarvamApiKeyChanged();
+    void sarvamModelChanged();
+    void sarvamLanguageChanged();
+    void sarvamModeChanged();
+    void sarvamStylePresetChanged();
+    void sarvamStyleRulesChanged();
+    void sarvamCustomVocabularyChanged();
     void llmEnabledChanged();
     void llmModelChanged();
     void llmPresetChanged();
@@ -131,7 +161,7 @@ signals:
 
 private:
     // NOLINTNEXTLINE(performance-enum-size) small private enum, no QML exposure
-    enum class ApiKeyKind { Groq, Gemini, MetaMusa };
+    enum class ApiKeyKind { Groq, Gemini, MetaMusa, Sarvam };
 
     void loadPersistedValues();
     void loadApiKey(ApiKeyKind kind);
@@ -146,6 +176,7 @@ private:
     QString m_groqApiKey;
     QString m_geminiApiKey;
     QString m_metaMusaApiKey;
+    QString m_sarvamApiKey;
 
     QString m_groqSttModel;
     QString m_groqLanguage;
@@ -155,6 +186,12 @@ private:
     QString m_geminiCustomVocabulary;
     QString m_metaMusaModel;
     QString m_metaMusaKeywords;
+    QString m_sarvamModel;
+    QString m_sarvamLanguage;
+    QString m_sarvamMode;
+    QString m_sarvamStylePreset;
+    QString m_sarvamStyleRules;
+    QString m_sarvamCustomVocabulary;
     QString m_llmModel;
     QString m_llmPreset;
     QString m_llmCustomPrompt;

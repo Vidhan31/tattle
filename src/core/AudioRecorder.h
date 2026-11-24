@@ -27,6 +27,9 @@ public:
     QString statusMessage() const;
     qreal audioLevel() const;
 
+    void setMaxRecordingDuration(std::chrono::milliseconds duration);
+    [[nodiscard]] std::chrono::milliseconds maxRecordingDuration() const;
+
     Q_SLOT
     virtual void startRecording();
     Q_SLOT
@@ -72,6 +75,7 @@ private:
     QString m_statusMessage;
     qreal m_audioLevel = 0.0;
     QTimer* m_maxDurationTimer = nullptr;
+    std::chrono::milliseconds m_maxRecordingDuration {kMaxRecordingDuration};
 
     static constexpr int kSampleRate = 16000;
     static constexpr int kChannelCount = 1;

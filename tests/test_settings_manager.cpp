@@ -46,6 +46,13 @@ private slots:
         QCOMPARE(metaMusa.model, u"muse-voice-transcribe-1.0"_s);
         QCOMPARE(metaMusa.keywords, QString());
 
+        const auto& sarvam = manager.sarvamSttConfig();
+        QCOMPARE(sarvam.language, u"auto"_s);
+        QCOMPARE(sarvam.mode, u"transcribe"_s);
+        QCOMPARE(sarvam.stylePreset, u"clean"_s);
+        QCOMPARE(sarvam.styleRules, QString());
+        QCOMPARE(sarvam.customVocabulary, QString());
+
         const auto& llm = manager.llmConfig();
         QCOMPARE(llm.enabled, false);
         QCOMPARE(llm.model, u"openai/gpt-oss-20b"_s);
@@ -88,6 +95,16 @@ private slots:
         QCOMPARE(manager.metaMusaSttConfig().model, u"muse-voice-transcribe-1.0"_s);
         manager.setMetaMusaKeywords(u"test, keywords"_s);
         QCOMPARE(manager.metaMusaSttConfig().keywords, u"test, keywords"_s);
+
+        manager.setSarvamMode(u"invalid-mode"_s);
+        QCOMPARE(manager.sarvamSttConfig().mode, u"transcribe"_s);
+        manager.setSarvamMode(u"codemix"_s);
+        QCOMPARE(manager.sarvamSttConfig().mode, u"codemix"_s);
+
+        manager.setSarvamStylePreset(u"bad-preset"_s);
+        QCOMPARE(manager.sarvamSttConfig().stylePreset, u"clean"_s);
+        manager.setSarvamStylePreset(u"light"_s);
+        QCOMPARE(manager.sarvamSttConfig().stylePreset, u"light"_s);
 
         manager.setLlmModel(u"llama-3.1-8b-instant"_s);
         QCOMPARE(manager.llmConfig().model, u"openai/gpt-oss-20b"_s);

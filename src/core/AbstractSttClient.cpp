@@ -16,3 +16,7 @@ QString AbstractSttClient::lastError() const {
 bool AbstractSttClient::handlesSmartFormatting() const {
     return false;
 }
+
+std::optional<std::chrono::milliseconds> AbstractSttClient::maxAudioDuration() const {
+    return std::nullopt;
+}

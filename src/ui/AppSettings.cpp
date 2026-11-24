@@ -24,10 +24,16 @@ const auto kGeminiSettingsKey = SettingsKeys::kGeminiSettingsKey.toString();
 constexpr auto kMetaMusaKeychainKey = "meta_musa_api_key";
 const auto kMetaMusaSettingsKey = SettingsKeys::kMetaMusaSettingsKey.toString();
 
+constexpr auto kSarvamKeychainKey = "sarvam_api_key";
+const auto kSarvamSettingsKey = SettingsKeys::kSarvamSettingsKey.toString();
+
 const auto kDefaultGroqModel = u"whisper-large-v3-turbo"_s;
 const auto kDefaultGeminiModel = u"gemini-3.5-transcribe"_s;
 const auto kDefaultGeminiMode = u"smart"_s;
 const auto kDefaultMetaMusaModel = u"muse-voice-transcribe-1.0"_s;
+const auto kDefaultSarvamLanguage = u"auto"_s;
+const auto kDefaultSarvamMode = u"transcribe"_s;
+const auto kDefaultSarvamStylePreset = u"clean"_s;
 const auto kDefaultLlmModel = u"openai/gpt-oss-20b"_s;
 const auto kDefaultLlmPreset = u"grammar"_s;
 } // namespace
@@ -38,6 +44,7 @@ AppSettings::AppSettings(QObject* parent)
     loadApiKey(ApiKeyKind::Groq);
     loadApiKey(ApiKeyKind::Gemini);
     loadApiKey(ApiKeyKind::MetaMusa);
+    loadApiKey(ApiKeyKind::Sarvam);
 
     if (auto* sc = SettingsClient::instance()) {
         connect(sc, &SettingsClient::settingChanged, this, [this](const QString& key, const QVariant& value) {
@@ -88,6 +95,42 @@ AppSettings::AppSettings(QObject* parent)
                 if (m_metaMusaKeywords != val) {
                     m_metaMusaKeywords = val;
                     emit metaMusaKeywordsChanged();
+                }
+            } else if (key == SettingsKeys::kSarvamModel) {
+                const QString val = value.toString();
+                if (m_sarvamModel != val) {
+                    m_sarvamModel = val;
+                    emit sarvamModelChanged();
+                }
+            } else if (key == SettingsKeys::kSarvamLanguage) {
+                const QString val = value.toString();
+                if (m_sarvamLanguage != val) {
+                    m_sarvamLanguage = val;
+                    emit sarvamLanguageChanged();
+                }
+            } else if (key == SettingsKeys::kSarvamMode) {
+                const QString val = value.toString();
+                if (m_sarvamMode != val) {
+                    m_sarvamMode = val;
+                    emit sarvamModeChanged();
+                }
+            } else if (key == SettingsKeys::kSarvamStylePreset) {
+                const QString val = value.toString();
+                if (m_sarvamStylePreset != val) {
+                    m_sarvamStylePreset = val;
+                    emit sarvamStylePresetChanged();
+                }
+            } else if (key == SettingsKeys::kSarvamStyleRules) {
+                const QString val = value.toString();
+                if (m_sarvamStyleRules != val) {
+                    m_sarvamStyleRules = val;
+                    emit sarvamStyleRulesChanged();
+                }
+            } else if (key == SettingsKeys::kSarvamCustomVocabulary) {
+                const QString val = value.toString();
+                if (m_sarvamCustomVocabulary != val) {
+                    m_sarvamCustomVocabulary = val;
+                    emit sarvamCustomVocabularyChanged();
                 }
             } else if (key == SettingsKeys::kGroqLlmEnabled) {
                 const bool val = value.toBool();
@@ -194,6 +237,20 @@ void AppSettings::loadPersistedValues() {
         m_metaMusaModel = kDefaultMetaMusaModel;
     }
     m_metaMusaKeywords = getVal(SettingsKeys::kMetaMusaKeywords, QString()).toString();
+
+    m_sarvamModel = getVal(SettingsKeys::kSarvamModel, QString()).toString().trimmed();
+    m_sarvamLanguage = getVal(SettingsKeys::kSarvamLanguage, kDefaultSarvamLanguage).toString();
+    m_sarvamMode = getVal(SettingsKeys::kSarvamMode, kDefaultSarvamMode).toString();
+    if (m_sarvamMode != u"transcribe"_s && m_sarvamMode != u"codemix"_s && m_sarvamMode != u"translit"_s &&
+        m_sarvamMode != u"verbatim"_s) {
+        m_sarvamMode = kDefaultSarvamMode;
+    }
+    m_sarvamStylePreset = getVal(SettingsKeys::kSarvamStylePreset, kDefaultSarvamStylePreset).toString();
+    if (m_sarvamStylePreset != u"clean"_s && m_sarvamStylePreset != u"light"_s && m_sarvamStylePreset != u"none"_s) {
+        m_sarvamStylePreset = kDefaultSarvamStylePreset;
+    }
+    m_sarvamStyleRules = getVal(SettingsKeys::kSarvamStyleRules, QString()).toString();
+    m_sarvamCustomVocabulary = getVal(SettingsKeys::kSarvamCustomVocabulary, QString()).toString();
 
     m_llmEnabled = getVal(SettingsKeys::kGroqLlmEnabled, false).toBool();
     m_llmModel = getVal(SettingsKeys::kGroqLlmModel, kDefaultLlmModel).toString();
@@ -360,6 +417,108 @@ void AppSettings::setMetaMusaKeywords(const QString& keywords) {
     m_metaMusaKeywords = keywords;
     persistValue(u"MetaMusa/Keywords"_s, keywords);
     emit metaMusaKeywordsChanged();
+}
+
+QString AppSettings::sarvamApiKey() const {
+    return m_sarvamApiKey;
+}
+
+void AppSettings::setSarvamApiKey(const QString& key) {
+    const QString trimmed = key.trimmed();
+    if (m_sarvamApiKey == trimmed) {
+        return;
+    }
+    m_sarvamApiKey = trimmed;
+    emit sarvamApiKeyChanged();
+    persistApiKey(ApiKeyKind::Sarvam, trimmed);
+}
+
+QString AppSettings::sarvamModel() const {
+    return m_sarvamModel;
+}
+
+void AppSettings::setSarvamModel(const QString& model) {
+    const QString trimmed = model.trimmed();
+    if (m_sarvamModel == trimmed) {
+        return;
+    }
+    m_sarvamModel = trimmed;
+    persistValue(SettingsKeys::kSarvamModel.toString(), trimmed);
+    emit sarvamModelChanged();
+}
+
+QString AppSettings::sarvamLanguage() const {
+    return m_sarvamLanguage;
+}
+
+void AppSettings::setSarvamLanguage(const QString& language) {
+    const QString trimmed = language.trimmed().isEmpty() ? kDefaultSarvamLanguage : language.trimmed();
+    if (m_sarvamLanguage == trimmed) {
+        return;
+    }
+    m_sarvamLanguage = trimmed;
+    persistValue(SettingsKeys::kSarvamLanguage.toString(), trimmed);
+    emit sarvamLanguageChanged();
+}
+
+QString AppSettings::sarvamMode() const {
+    return m_sarvamMode;
+}
+
+void AppSettings::setSarvamMode(const QString& mode) {
+    QString trimmed = mode.trimmed().toLower();
+    if (trimmed != u"transcribe"_s && trimmed != u"codemix"_s && trimmed != u"translit"_s && trimmed != u"verbatim"_s) {
+        trimmed = kDefaultSarvamMode;
+    }
+    if (m_sarvamMode == trimmed) {
+        return;
+    }
+    m_sarvamMode = trimmed;
+    persistValue(SettingsKeys::kSarvamMode.toString(), trimmed);
+    emit sarvamModeChanged();
+}
+
+QString AppSettings::sarvamStylePreset() const {
+    return m_sarvamStylePreset;
+}
+
+void AppSettings::setSarvamStylePreset(const QString& preset) {
+    QString trimmed = preset.trimmed().toLower();
+    if (trimmed != u"clean"_s && trimmed != u"light"_s && trimmed != u"none"_s) {
+        trimmed = kDefaultSarvamStylePreset;
+    }
+    if (m_sarvamStylePreset == trimmed) {
+        return;
+    }
+    m_sarvamStylePreset = trimmed;
+    persistValue(SettingsKeys::kSarvamStylePreset.toString(), trimmed);
+    emit sarvamStylePresetChanged();
+}
+
+QString AppSettings::sarvamStyleRules() const {
+    return m_sarvamStyleRules;
+}
+
+void AppSettings::setSarvamStyleRules(const QString& rules) {
+    if (m_sarvamStyleRules == rules) {
+        return;
+    }
+    m_sarvamStyleRules = rules;
+    persistValue(SettingsKeys::kSarvamStyleRules.toString(), rules);
+    emit sarvamStyleRulesChanged();
+}
+
+QString AppSettings::sarvamCustomVocabulary() const {
+    return m_sarvamCustomVocabulary;
+}
+
+void AppSettings::setSarvamCustomVocabulary(const QString& vocabulary) {
+    if (m_sarvamCustomVocabulary == vocabulary) {
+        return;
+    }
+    m_sarvamCustomVocabulary = vocabulary;
+    persistValue(SettingsKeys::kSarvamCustomVocabulary.toString(), vocabulary);
+    emit sarvamCustomVocabularyChanged();
 }
 
 bool AppSettings::llmEnabled() const {
@@ -533,6 +692,9 @@ QString& AppSettings::apiKeyRef(ApiKeyKind kind) {
     if (kind == ApiKeyKind::Gemini) {
         return m_geminiApiKey;
     }
+    if (kind == ApiKeyKind::Sarvam) {
+        return m_sarvamApiKey;
+    }
     return m_metaMusaApiKey;
 }
 
@@ -541,18 +703,22 @@ void AppSettings::emitApiKeyChanged(ApiKeyKind kind) {
         emit groqApiKeyChanged();
     } else if (kind == ApiKeyKind::Gemini) {
         emit geminiApiKeyChanged();
+    } else if (kind == ApiKeyKind::Sarvam) {
+        emit sarvamApiKeyChanged();
     } else {
         emit metaMusaApiKeyChanged();
     }
 }
 
 void AppSettings::loadApiKey(ApiKeyKind kind) {
-    const QString keychainKey = (kind == ApiKeyKind::Groq)     ? QString::fromLatin1(kGroqKeychainKey)
-                                : (kind == ApiKeyKind::Gemini) ? QString::fromLatin1(kGeminiKeychainKey)
-                                                               : QString::fromLatin1(kMetaMusaKeychainKey);
-    const QString settingsKey = (kind == ApiKeyKind::Groq)     ? kGroqSettingsKey
-                                : (kind == ApiKeyKind::Gemini) ? kGeminiSettingsKey
-                                                               : kMetaMusaSettingsKey;
+    const QString keychainKey = (kind == ApiKeyKind::Groq)       ? QString::fromLatin1(kGroqKeychainKey)
+                                : (kind == ApiKeyKind::Gemini)   ? QString::fromLatin1(kGeminiKeychainKey)
+                                : (kind == ApiKeyKind::MetaMusa) ? QString::fromLatin1(kMetaMusaKeychainKey)
+                                                                 : QString::fromLatin1(kSarvamKeychainKey);
+    const QString settingsKey = (kind == ApiKeyKind::Groq)       ? kGroqSettingsKey
+                                : (kind == ApiKeyKind::Gemini)   ? kGeminiSettingsKey
+                                : (kind == ApiKeyKind::MetaMusa) ? kMetaMusaSettingsKey
+                                                                 : kSarvamSettingsKey;
 
     auto* readJob = new QKeychain::ReadPasswordJob(QString::fromLatin1(kKeychainService));
     readJob->setKey(keychainKey);
@@ -594,12 +760,14 @@ void AppSettings::applyLoadedApiKey(ApiKeyKind kind, const QString& key) {
 }
 
 void AppSettings::persistApiKey(ApiKeyKind kind, const QString& value) {
-    const QString keychainKey = (kind == ApiKeyKind::Groq)     ? QString::fromLatin1(kGroqKeychainKey)
-                                : (kind == ApiKeyKind::Gemini) ? QString::fromLatin1(kGeminiKeychainKey)
-                                                               : QString::fromLatin1(kMetaMusaKeychainKey);
-    const QString settingsKey = (kind == ApiKeyKind::Groq)     ? kGroqSettingsKey
-                                : (kind == ApiKeyKind::Gemini) ? kGeminiSettingsKey
-                                                               : kMetaMusaSettingsKey;
+    const QString keychainKey = (kind == ApiKeyKind::Groq)       ? QString::fromLatin1(kGroqKeychainKey)
+                                : (kind == ApiKeyKind::Gemini)   ? QString::fromLatin1(kGeminiKeychainKey)
+                                : (kind == ApiKeyKind::MetaMusa) ? QString::fromLatin1(kMetaMusaKeychainKey)
+                                                                 : QString::fromLatin1(kSarvamKeychainKey);
+    const QString settingsKey = (kind == ApiKeyKind::Groq)       ? kGroqSettingsKey
+                                : (kind == ApiKeyKind::Gemini)   ? kGeminiSettingsKey
+                                : (kind == ApiKeyKind::MetaMusa) ? kMetaMusaSettingsKey
+                                                                 : kSarvamSettingsKey;
     const QString legacyKey = (kind == ApiKeyKind::Groq) ? kGroqLegacySettingsKey : QString();
 
     QSettings settings;

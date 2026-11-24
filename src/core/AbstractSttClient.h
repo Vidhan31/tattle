@@ -4,6 +4,9 @@
 #include <QObject>
 #include <QString>
 
+#include <chrono>
+#include <optional>
+
 class AbstractSttClient : public QObject {
     Q_OBJECT
 
@@ -26,6 +29,7 @@ public:
 
     virtual QString lastError() const;
     virtual bool handlesSmartFormatting() const;
+    virtual std::optional<std::chrono::milliseconds> maxAudioDuration() const;
 
 signals:
     void transcriptionReady(const QString& text);
